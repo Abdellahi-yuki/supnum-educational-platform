@@ -1,0 +1,820 @@
+/* ========================================
+   FaceChat - Professional & Modern UI
+   ======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Scoped Reset - Try to avoid global * if possible, but keeping for compatibility with original design */
+/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+} */
+
+:root {
+    /* Refined Color Palette - Professional & Harmonious */
+    --fb-primary: #0064D1;
+    /* Slightly deeper blue for professionalism */
+    --fb-primary-hover: #0054B0;
+    --fb-primary-light: #EBF5FF;
+    --fb-secondary: #00A400;
+    /* Clean Green */
+    --fb-background: #F2F4F7;
+    /* Cool gray background */
+    --fb-surface: #FFFFFF;
+    --fb-divider: #D0D7DE;
+    /* Distinct but subtle border */
+    --fb-text-primary: #1F2328;
+    /* High contrast text */
+    --fb-text-secondary: #636C76;
+    /* Soft secondary text */
+    --fb-text-tertiary: #8D96A0;
+    --fb-hover-overlay: #F6F8FA;
+    --fb-active-overlay: #EFF3F6;
+
+    /* Modern Shadows */
+    --fb-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --fb-shadow-2: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --fb-shadow-3: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --fb-shadow-4: 0 12px 48px rgba(0, 0, 0, 0.15);
+
+    /* Radii */
+    --fb-radius-sm: 6px;
+    --fb-radius-md: 10px;
+    --fb-radius-lg: 14px;
+    --fb-radius-xl: 20px;
+
+    --fb-transition: all 0.2s ease-in-out;
+}
+
+/* Removed global html/body styles to avoid conflicts with App.css */
+/* html, body { ... } */
+
+/* ========================================
+   SIDEBAR NAVIGATION (Left)
+   ======================================== */
+
+.nav_left {
+    position: fixed;
+    top: 80px; /* Adjusted for global header (16 + 64) */
+    left: 16px;
+    bottom: 16px;
+    background: var(--fb-surface);
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    border-radius: var(--fb-radius-lg);
+    box-shadow: var(--fb-shadow-2);
+    z-index: 100;
+    overflow-y: visible;
+    /* Allow Dropdowns */
+    border: 1px solid var(--fb-divider);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--fb-divider);
+    margin-bottom: 16px;
+    padding: 0 20px 16px;
+}
+
+.nav_left h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--fb-primary);
+    padding: 0;
+    margin: 0;
+    letter-spacing: -0.5px;
+    border: none;
+    /* Remove border from H1 */
+}
+
+nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fb-text-secondary);
+    padding: 10px 20px;
+    margin: 4px 12px;
+    border-radius: var(--fb-radius-md);
+    transition: var(--fb-transition);
+}
+
+nav a:hover {
+    background-color: var(--fb-hover-overlay);
+    color: var(--fb-text-primary);
+}
+
+nav a.active {
+    background-color: var(--fb-primary-light);
+    color: var(--fb-primary);
+    font-weight: 600;
+}
+
+/* ========================================
+   TOP NAVIGATION BAR
+   ======================================== */
+
+.nave_top {
+    position: fixed;
+    top: 80px; /* Adjusted for global header (16 + 64) */
+    left: 292px;
+    /* 260 + 16 + 16 */
+    right: 16px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--fb-surface);
+    border-radius: var(--fb-radius-lg);
+    box-shadow: var(--fb-shadow-1);
+    /* Subtle shadow for top bar */
+    padding: 0 24px;
+    z-index: 50;
+    border: 1px solid var(--fb-divider);
+}
+
+.nave_top .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nave_top .logo img {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--fb-radius-sm);
+    object-fit: cover;
+}
+
+.nave_top .logo h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fb-text-primary);
+}
+
+.recherche_bare {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+}
+
+.recherche_bare input {
+    width: 320px;
+    padding: 9px 16px;
+    border-radius: 99px;
+    border: 1px solid var(--fb-divider);
+    background: var(--fb-hover-overlay);
+    font-size: 14px;
+    color: var(--fb-text-primary);
+    outline: none;
+    transition: var(--fb-transition);
+}
+
+.recherche_bare input:focus {
+    background: var(--fb-surface);
+    border-color: var(--fb-primary);
+    box-shadow: 0 0 0 3px var(--fb-primary-light);
+}
+
+#searchButton {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--fb-divider);
+    background: var(--fb-surface);
+    cursor: pointer;
+    display: flex;
+    /* Centering */
+    align-items: center;
+    justify-content: center;
+    color: var(--fb-text-secondary);
+    transition: var(--fb-transition);
+}
+
+#searchButton:hover {
+    background: var(--fb-hover-overlay);
+    color: var(--fb-primary);
+    border-color: var(--fb-primary);
+}
+
+.logout-button {
+    background: var(--fb-primary-light);
+    color: var(--fb-primary);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--fb-transition);
+}
+
+.logout-button:hover {
+    background: var(--fb-primary);
+    color: white;
+}
+
+/* ========================================
+   MAIN CONTENT AREA
+   ======================================== */
+
+section {
+    position: fixed;
+    top: 160px; /* Adjusted for global header (96 + 64) */
+    /* 16 + 64 + 16 */
+    left: 292px;
+    right: 16px;
+    bottom: 16px;
+    background: var(--fb-surface);
+    border-radius: var(--fb-radius-lg);
+    box-shadow: var(--fb-shadow-2);
+    z-index: 10;
+    overflow: hidden;
+    border: 1px solid var(--fb-divider);
+}
+
+#dashword {
+    height: 100%;
+}
+
+.dashword-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px 120px;
+    /* Bottom padding for input bar */
+    background: var(--fb-surface);
+}
+
+/* ========================================
+   CHAT / FEED ITEMS
+   ======================================== */
+
+.message-item {
+    background: var(--fb-surface);
+    border: 1px solid var(--fb-divider);
+    border-radius: var(--fb-radius-lg);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--fb-shadow-1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    max-width: 850px;
+    /* Optimize readability */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.message-item:hover {
+    box-shadow: var(--fb-shadow-2);
+    border-color: #B0B8C4;
+}
+
+/* Distinct Style for User's Own Messages */
+.message-me {
+    background: #F8FBFF;
+    border-color: #CCE3FF;
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--fb-divider);
+}
+
+/* Avatar Placeholder */
+.message-header::before {
+    content: '';
+    /* We use background image usually, but here a clear placeholder */
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: #E0E4E8;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23636C76"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 24px;
+    border: 1px solid var(--fb-divider);
+}
+
+.message-me .message-header::before {
+    background-color: var(--fb-primary-light);
+    border-color: var(--fb-primary);
+}
+
+.message-header strong {
+    font-size: 15px;
+    color: var(--fb-text-primary);
+    font-weight: 600;
+}
+
+.message-header span {
+    font-size: 12px;
+    color: var(--fb-text-tertiary);
+    margin-left: auto;
+}
+
+.message-content p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--fb-text-primary);
+    margin: 0 0 12px;
+    white-space: pre-wrap;
+}
+
+/* Media styling */
+.msg-media {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    /* Professional crop */
+    border-radius: var(--fb-radius-md);
+    border: 1px solid var(--fb-divider);
+    background: #000;
+}
+
+/* ========================================
+   COMMENTS & INTERACTIONS
+   ======================================== */
+
+.comments-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--fb-divider);
+    background: rgba(246, 248, 250, 0.5);
+    /* Subtle tint for comments area */
+    border-radius: var(--fb-radius-md);
+    padding: 12px;
+}
+
+.comment-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+}
+
+.comment-item::before {
+    display: none;
+    /* Removed pseudo-element default to use cleaner structure if possible, but keeping for now if no img tag */
+    content: '';
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #E0E4E8;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23636C76"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+    background-size: 18px;
+    background-repeat: no-repeat;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.comment-item .comment-text {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--fb-divider);
+    font-size: 13px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.comment-item strong {
+    display: block;
+    color: var(--fb-text-primary);
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.add-comment {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-top: 12px;
+}
+
+.add-comment textarea {
+    flex: 1;
+    min-height: 36px;
+    padding: 8px 12px;
+    border-radius: 18px;
+    border: 1px solid var(--fb-divider);
+    background: white;
+    font-size: 13px;
+    resize: none;
+    transition: var(--fb-transition);
+}
+
+.add-comment textarea:focus {
+    box-shadow: 0 0 0 2px var(--fb-primary-light);
+    border-color: var(--fb-primary);
+}
+
+.add-comment button {
+    background: var(--fb-primary);
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 2px;
+}
+
+/* ========================================
+   BOTTOM INPUT BAR (Main Chat)
+   ======================================== */
+
+.bar_mes {
+    position: absolute;
+    bottom: 24px;
+    left: 20%;
+    /* Centered relative to content */
+    right: 20%;
+    /* Centered */
+    width: auto;
+    background: var(--fb-surface);
+    padding: 10px;
+    border-radius: 20px;
+    /* Pill shape */
+    box-shadow: var(--fb-shadow-3);
+    border: 1px solid var(--fb-divider);
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    /* Align to bottom for multiline expansion */
+    z-index: 50;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+#mes {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 14px;
+    max-height: 120px;
+    font-size: 15px;
+    resize: none;
+    outline: none;
+}
+
+#mes::placeholder {
+    color: var(--fb-text-tertiary);
+}
+
+.envoyer,
+#enleve {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--fb-transition);
+    border: none;
+}
+
+.envoyer {
+    background: var(--fb-primary);
+    color: white;
+    box-shadow: var(--fb-shadow-2);
+}
+
+.envoyer:hover {
+    background: var(--fb-primary-hover);
+    transform: translateY(-2px);
+}
+
+#enleve {
+    background: var(--fb-hover-overlay);
+    color: var(--fb-text-secondary);
+}
+
+#enleve:hover {
+    background: #E5E9EE;
+}
+
+
+/* ========================================
+   NOTIFICATIONS
+   ======================================== */
+
+.notif-btn {
+    position: relative;
+    background: transparent;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    color: var(--fb-text-secondary);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notif-btn:hover {
+    background: var(--fb-hover-overlay);
+    color: var(--fb-primary);
+}
+
+.notif-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #FF3B30;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    height: 18px;
+    min-width: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    border: 2px solid white;
+}
+
+.notif-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 320px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--fb-shadow-3);
+    border: 1px solid var(--fb-divider);
+    margin-top: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 200;
+}
+
+.notif-item {
+    padding: 14px;
+    border-bottom: 1px solid var(--fb-divider);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.notif-item:hover {
+    background: var(--fb-hover-overlay);
+}
+
+.notif-item.unread {
+    background: var(--fb-primary-light);
+    border-left: 3px solid var(--fb-primary);
+}
+
+
+/* ========================================
+   RESPONSIVENESS (Mobile/Tablet)
+   ======================================== */
+
+@media (max-width: 900px) {
+    .nav_left {
+        width: 80px;
+        /* Collapsed sidebar */
+        padding: 16px 8px;
+    }
+
+    .nav_left h1 {
+        display: none;
+    }
+
+    /* Hide title on small screens */
+    .nav_left a span {
+        display: none;
+    }
+
+    /* Show only icons? Need icons first */
+    .nav_left a {
+        justify-content: center;
+        padding: 12px;
+    }
+
+    section,
+    .nave_top {
+        left: 112px;
+        /* 80 + 16 + 16 */
+    }
+}
+
+@media (max-width: 600px) {
+    .nav_left {
+        display: none;
+        /* Hide sidebar completely on mobile, use hamburger menu ideally */
+    }
+
+    .nave_top {
+        left: 16px;
+        top: 16px; /* Reset top for mobile? Or keep adjusted? */
+        /* If global header is also on mobile, we need to account for it. 
+           But usually mobile headers are different. 
+           Let's assume global header persists. */
+        top: 80px; 
+        padding: 0 12px;
+    }
+
+    section {
+        left: 16px;
+        top: 160px; /* Adjusted */
+    }
+
+    .bar_mes {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        width: auto;
+    }
+
+    .recherche_bare input {
+        width: 150px;
+    }
+}
+
+/* ========================================
+   LEFT NAVIGATION SIDEBAR (Duplicate block in original, merging/cleaning)
+   ======================================== */
+/* The original file had duplicate blocks. I will ignore the duplicates and stick to the first definitions which I've already adjusted. */
+
+/* ========================================
+   SCROLLBAR CUSTOMIZATION
+   ======================================== */
+
+.messages-container::-webkit-scrollbar,
+.nav_left::-webkit-scrollbar {
+    width: 8px;
+}
+
+.messages-container::-webkit-scrollbar-track,
+.nav_left::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messages-container::-webkit-scrollbar-thumb,
+.nav_left::-webkit-scrollbar-thumb {
+    background-color: var(--fb-divider);
+    border-radius: 4px;
+    transition: var(--fb-transition);
+}
+
+.messages-container::-webkit-scrollbar-thumb:hover,
+.nav_left::-webkit-scrollbar-thumb:hover {
+    background-color: var(--fb-text-tertiary);
+}
+
+/* ========================================
+   RESPONSIVE & UTILITY CLASSES
+   ======================================== */
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Selection color */
+::selection {
+    background: var(--fb-primary-light);
+    color: var(--fb-primary);
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+    outline: 2px solid var(--fb-primary);
+    outline-offset: 2px;
+}
+
+/* Three-Dot Menu Button - Facebook Style */
+.post-menu-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    padding: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.post-menu-btn:hover {
+    background: var(--fb-hover-overlay);
+}
+
+.post-menu-btn svg {
+    width: 20px;
+    height: 20px;
+    color: var(--fb-text-secondary);
+}
+
+/* Dropdown Menu */
+.post-menu-dropdown {
+    position: absolute;
+    top: 48px;
+    right: 16px;
+    background: var(--fb-surface);
+    border: 1px solid var(--fb-divider);
+    border-radius: var(--fb-radius-md);
+    box-shadow: var(--fb-shadow-3);
+    min-width: 200px;
+    z-index: 100;
+    animation: dropdownFadeIn 0.15s ease;
+    overflow: hidden;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.post-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fb-text-primary);
+    background: white;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid var(--fb-divider);
+}
+
+.post-menu-item:last-child {
+    border-bottom: none;
+}
+
+.post-menu-item:hover {
+    background: var(--fb-hover-overlay);
+}
+
+.post-menu-item svg {
+    width: 18px;
+    height: 18px;
+    color: var(--fb-text-secondary);
+}
+
+.post-menu-item.delete-item {
+    color: #dc3545;
+}
+
+.post-menu-item.delete-item svg {
+    color: #dc3545;
+}
+
+.post-menu-item.delete-item:hover {
+    background: #fff5f5;
+}
+
+/* Archive/Save icon color when saved */
+.post-menu-item.saved svg {
+    color: var(--fb-primary);
+}
+
+.post-menu-item.saved {
+    color: var(--fb-primary);
+}

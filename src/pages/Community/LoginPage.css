@@ -1,0 +1,253 @@
+/* ========================================
+   LOGIN PAGE STYLING
+   ======================================== */
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--fb-background) 0%, #E7F3FF 100%);
+    padding: 20px;
+}
+
+.login-container {
+    background: var(--fb-surface);
+    border-radius: var(--fb-radius-xl);
+    padding: 48px 40px;
+    box-shadow: var(--fb-shadow-4);
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid var(--fb-divider);
+    position: relative;
+    animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--fb-primary), var(--fb-primary-hover));
+    border-radius: var(--fb-radius-xl) var(--fb-radius-xl) 0 0;
+}
+
+.login-header {
+    margin-bottom: 32px;
+}
+
+.logo-section {
+    text-align: center;
+}
+
+.login-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 16px;
+    box-shadow: var(--fb-shadow-2);
+    transition: var(--fb-transition);
+}
+
+.login-logo:hover {
+    transform: scale(1.05);
+}
+
+.login-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--fb-primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.login-subtitle {
+    font-size: 15px;
+    color: var(--fb-text-secondary);
+    margin: 0;
+}
+
+.error-message {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+    color: white;
+    padding: 14px 16px;
+    border-radius: var(--fb-radius-md);
+    font-size: 14px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+.error-icon {
+    font-size: 18px;
+}
+
+.login-form {
+    margin-bottom: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--fb-text-primary);
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--fb-divider);
+    border-radius: var(--fb-radius-md);
+    font-size: 15px;
+    transition: var(--fb-transition);
+    background: var(--fb-surface);
+    color: var(--fb-text-primary);
+    font-family: inherit;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--fb-primary);
+    box-shadow: 0 0 0 3px var(--fb-primary-light);
+}
+
+.form-group input::placeholder {
+    color: var(--fb-text-tertiary);
+}
+
+.form-group input:disabled {
+    background: var(--fb-hover-overlay);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.password-input-wrapper {
+    position: relative;
+}
+
+.password-input-wrapper input {
+    padding-right: 48px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--fb-text-secondary);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 8px;
+    border-radius: var(--fb-radius-sm);
+    transition: var(--fb-transition);
+}
+
+.password-toggle:hover {
+    background: var(--fb-hover-overlay);
+}
+
+.password-toggle:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.login-button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--fb-primary) 0%, var(--fb-primary-hover) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--fb-radius-md);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--fb-transition);
+    font-family: inherit;
+    box-shadow: var(--fb-shadow-2);
+}
+
+.login-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--fb-shadow-3);
+}
+
+.login-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.login-button:disabled {
+    background: var(--fb-divider);
+    color: var(--fb-text-tertiary);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.help-text {
+    font-size: 13px;
+    color: var(--fb-text-secondary);
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 32px 24px;
+        margin: 16px;
+    }
+
+    .login-title {
+        font-size: 28px;
+    }
+
+    .login-logo {
+        width: 70px;
+        height: 70px;
+    }
+}

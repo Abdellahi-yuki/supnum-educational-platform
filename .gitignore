@@ -57,4 +57,11 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
+*.sln
 *.sw?
+
+# Archive assets
+public/s1
+public/s2
+public/s3
+public/s4
