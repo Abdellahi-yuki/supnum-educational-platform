@@ -37,7 +37,7 @@ src/
 ├── App.jsx             # Main Routing
 └── main.jsx            # Entry Point
 ```
-
+Ignore the src/assets/pages and src/assets/components and do never use them cuz they will be deleted
 ## 2. CSS & Styling Guidelines
 
 Since this is a Single Page Application (SPA), all CSS is loaded globally. This creates a high risk of style conflicts between pages.
