@@ -1,107 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import { API_BASE_URL } from '../../apiConfig';
 import './style.css';
 import Logo from './assets/Logo-supnum.jpg';
 
 // const socket = io.connect("http://localhost:5000");
 
-// Changed to let to allow mutations for mocking interactions
-let MOCK_MESSAGES = [
-  {
-    id: 117,
-    user_id: 2,
-    username: "brahim",
-    email: "brahim.hmeida@supnum.mr",
-    content: "",
-    type: "video",
-    media_url: "/uploads/1766916694-Chat_Group_App_-_Google_Chrome_2025-12-27_14-22-05.mp4",
-    created_at: "2025-12-28 11:11:35",
-    is_saved: false,
-    comments: [
-      { id: 59, user_id: 6, username: "24212", email: "24212@supnum.mr", content: "khh", created_at: "2025-12-28 14:27:12" },
-      { id: 60, user_id: 6, username: "24212", email: "24212@supnum.mr", content: "kjh", created_at: "2025-12-28 14:27:28" },
-      { id: 66, user_id: 2, username: "brahim", email: "brahim.hmeida@supnum.mr", content: "hghjkn", created_at: "2025-12-28 16:39:33" },
-      { id: 67, user_id: 2, username: "brahim", email: "brahim.hmeida@supnum.mr", content: "ihkn", created_at: "2025-12-28 16:39:34" },
-      { id: 74, user_id: 2, username: "brahim", email: "brahim.hmeida@supnum.mr", content: "jkl,", created_at: "2025-12-28 20:51:23" }
-    ]
-  },
-  {
-    id: 118,
-    user_id: 2,
-    username: "brahim",
-    email: "brahim.hmeida@supnum.mr",
-    content: "jeshfkj\r\n",
-    type: "text",
-    media_url: null,
-    created_at: "2025-12-28 11:11:43",
-    is_saved: false,
-    comments: [
-      { id: 57, user_id: 2, username: "brahim", email: "brahim.hmeida@supnum.mr", content: "fghgf", created_at: "2025-12-28 11:11:47" },
-      { id: 58, user_id: 2, username: "brahim", email: "brahim.hmeida@supnum.mr", content: "edrg", created_at: "2025-12-28 11:11:49" },
-      { id: 61, user_id: 6, username: "24212", email: "24212@supnum.mr", content: "lijluijk", created_at: "2025-12-28 14:27:32" },
-      { id: 64, user_id: 2, username: "brahim", email: "brahim.hmeida@supnum.mr", content: "ilugyjk", created_at: "2025-12-28 16:39:15" },
-      { id: 65, user_id: 2, username: "brahim", email: "brahim.hmeida@supnum.mr", content: "lkj", created_at: "2025-12-28 16:39:16" },
-      { id: 68, user_id: 6, username: "24212", email: "24212@supnum.mr", content: "jhn", created_at: "2025-12-28 16:40:15" }
-    ]
-  },
-  {
-    id: 123,
-    user_id: 2,
-    username: "brahim",
-    email: "brahim.hmeida@supnum.mr",
-    content: "Test message from Antigravity",
-    type: "text",
-    media_url: null,
-    created_at: "2025-12-31 18:36:59",
-    is_saved: false,
-    comments: []
-  },
-  {
-    id: 120,
-    user_id: 6,
-    username: "24212",
-    email: "24212@supnum.mr",
-    content: "hjg\r\n",
-    type: "text",
-    media_url: null,
-    created_at: "2025-12-28 15:37:56",
-    is_saved: false,
-    comments: [
-      { id: 69, user_id: 2, username: "brahim", email: "brahim.hmeida@supnum.mr", content: "knh", created_at: "2025-12-28 16:40:31" },
-      { id: 70, user_id: 2, username: "brahim", email: "brahim.hmeida@supnum.mr", content: "ijghjnm", created_at: "2025-12-28 16:40:32" }
-    ]
-  },
-  {
-    id: 127,
-    user_id: 2,
-    username: "brahim",
-    email: "brahim.hmeida@supnum.mr",
-    content: "",
-    type: "image",
-    media_url: "/uploads/1767207896-t__l__chargement.jpg",
-    created_at: "2025-12-31 20:04:56",
-    is_saved: false,
-    comments: []
-  },
-  {
-    id: 126,
-    user_id: 2,
-    username: "brahim",
-    email: "brahim.hmeida@supnum.mr",
-    content: "hfghfjuvm",
-    type: "text",
-    media_url: null,
-    created_at: "2025-12-31 20:04:45",
-    is_saved: false,
-    comments: []
-  }
-];
 
-let MOCK_NOTIFICATIONS = [
-  { id: 1, user_id: 2, actor_id: 6, actor_name: "24212", message_id: 117, type: "comment", is_read: 1, created_at: "2025-12-28 14:27:12" },
-  { id: 2, user_id: 2, actor_id: 6, actor_name: "24212", message_id: 117, type: "comment", is_read: 1, created_at: "2025-12-28 14:27:28" },
-  { id: 3, user_id: 2, actor_id: 6, actor_name: "24212", message_id: 118, type: "comment", is_read: 1, created_at: "2025-12-28 14:27:32" },
-  { id: 6, user_id: 2, actor_id: 6, actor_name: "24212", message_id: 118, type: "comment", is_read: 1, created_at: "2025-12-28 16:40:15" }
-];
 
 export default function Community({ currentUser: propUser, onLogout }) {
   const [activeSection, setActiveSection] = useState('Ccommunauté');
@@ -161,57 +65,50 @@ export default function Community({ currentUser: propUser, onLogout }) {
 
   const fetchMessages = React.useCallback(async (query = '', section = 'dashword') => {
     try {
-      // Mock Data Implementation
-      let data = [...MOCK_MESSAGES];
 
-      if (query) {
-        const lowerQuery = query.toLowerCase();
-        data = data.filter(msg =>
-          (msg.content && msg.content.toLowerCase().includes(lowerQuery)) ||
-          (msg.username && msg.username.toLowerCase().includes(lowerQuery))
-        );
-      }
-
-      if (section === 'archives') {
-        data = data.filter(msg => msg.is_saved);
-      }
 
       // Simulate network delay
       // await new Promise(resolve => setTimeout(resolve, 500));
 
-      setMessages(data);
-      setFilteredMessages(data);
+      // setMessages(data);
+      // setFilteredMessages(data);
 
-      /* 
       // Original API Call
-      let url = `http://localhost:8000/api/messages?user_id=${currentUser.id}`;
+      let url = `${API_BASE_URL}/community_messages.php?user_id=${currentUser.id}`;
       if (query) url += `&search=${encodeURIComponent(query)}`;
       if (section === 'archives') url += `&only_archived=true`;
 
       const res = await fetch(url);
       const data = await res.json();
-      setMessages(data);
-      setFilteredMessages(data); // Backend handles filtering now
-      */
+      // Ensure data is always an array
+      const messagesArray = Array.isArray(data) ? data : [];
+      setMessages(messagesArray);
+      setFilteredMessages(messagesArray); // Backend handles filtering now
     } catch (err) {
       console.error(err);
+      // Set empty arrays on error to prevent map errors
+      setMessages([]);
+      setFilteredMessages([]);
     }
   }, [currentUser.id]);
 
   const fetchNotifications = React.useCallback(async () => {
     try {
-      // Mock Data Implementation
-      setNotifications(MOCK_NOTIFICATIONS);
-
-      /*
       // Original API Call
-      const res = await fetch(`http://localhost:8000/api/notifications?user_id=${currentUser.id}`);
+      const res = await fetch(`${API_BASE_URL}/community_notifications.php?user_id=${currentUser.id}`);
       if (res.ok) {
         const data = await res.json();
-        setNotifications(data);
+        // Ensure data is always an array
+        const notificationsArray = Array.isArray(data) ? data : [];
+        setNotifications(notificationsArray);
+      } else {
+        setNotifications([]);
       }
-      */
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+      // Set empty array on error to prevent array method errors
+      setNotifications([]);
+    }
   }, [currentUser.id]);
 
   // Polling with safety against overlapping requests
@@ -245,7 +142,7 @@ export default function Community({ currentUser: propUser, onLogout }) {
     // Mark as read
     if (!notif.is_read) {
       try {
-        await fetch('http://localhost:8000/api/notifications/read', {
+        await fetch(`${API_BASE_URL}/community_notifications.php`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: notif.id })
@@ -276,29 +173,6 @@ export default function Community({ currentUser: propUser, onLogout }) {
 
   const handleToggleArchive = async (messageId) => {
     try {
-      // Mock Implementation
-      const msgIndex = MOCK_MESSAGES.findIndex(m => m.id === messageId);
-      if (msgIndex !== -1) {
-        MOCK_MESSAGES[msgIndex].is_saved = !MOCK_MESSAGES[msgIndex].is_saved;
-
-        // Update local state
-        const updatedMessages = messages.map(m => {
-          if (m.id === messageId) {
-            return { ...m, is_archived: !m.is_archived }; // Note: using is_archived/is_saved inconsistently in legacy code, fixing to match mock
-          }
-          return m;
-        });
-
-        if (activeSection === 'archives') {
-          setFilteredMessages(updatedMessages.filter(m => m.is_saved)); // Use is_saved to match mock
-          setMessages(updatedMessages.filter(m => m.is_saved));
-        } else {
-          setMessages(updatedMessages);
-          setFilteredMessages(updatedMessages);
-        }
-      }
-
-      /*
       // Original API Call
       // Optimistic update
       const updatedMessages = messages.map(m => {
@@ -308,9 +182,15 @@ export default function Community({ currentUser: propUser, onLogout }) {
         return m;
       });
 
-      // ... (filtering logic) ...
+      if (activeSection === 'archives') {
+        setFilteredMessages(updatedMessages.filter(m => m.is_archived));
+        setMessages(updatedMessages.filter(m => m.is_archived));
+      } else {
+        setMessages(updatedMessages);
+        setFilteredMessages(updatedMessages);
+      }
 
-      const res = await fetch('http://localhost:8000/api/archives/toggle', {
+      const res = await fetch(`${API_BASE_URL}/community_archives.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: currentUser.id, message_id: messageId })
@@ -321,7 +201,6 @@ export default function Community({ currentUser: propUser, onLogout }) {
         console.error('Failed to toggle archive');
         fetchMessages(searchQuery, activeSection);
       }
-      */
     } catch (err) {
       console.error(err);
     }
@@ -347,7 +226,7 @@ export default function Community({ currentUser: propUser, onLogout }) {
       formData.append('file_name', file.name);
 
       try {
-        const res = await fetch('http://localhost:8000/api/upload/chunk', {
+        const res = await fetch(`${API_BASE_URL}/community_upload.php`, {
           method: 'POST',
           body: formData,
         });
@@ -384,43 +263,10 @@ export default function Community({ currentUser: propUser, onLogout }) {
     try {
       console.log('Sending message...', currentUser.id, newMessage); // Debug
 
-      // Mock Upload
-      if (selectedFile) {
-        // Simulate upload delay
-        for (let i = 0; i <= 100; i += 20) {
-          setUploadProgress(i);
-          await new Promise(r => setTimeout(r, 100));
-        }
-        mediaUrl = URL.createObjectURL(selectedFile);
-        mediaType = selectedFile.type.startsWith('image') ? 'image' : (selectedFile.type.startsWith('video') ? 'video' : 'file');
-      }
-
-      // Mock Send
-      const newMsg = {
-        id: Date.now(),
-        user_id: currentUser.id,
-        username: currentUser.username || "Me",
-        email: currentUser.email || "me@example.com",
-        content: newMessage,
-        type: mediaType || 'text',
-        media_url: mediaUrl,
-        created_at: new Date().toISOString(),
-        is_saved: false,
-        comments: []
-      };
-
-      MOCK_MESSAGES.unshift(newMsg); // Add to top
-
-      setNewMessage('');
-      setSelectedFile(null);
-      const fileInput = document.getElementById('file-input');
-      if (fileInput) fileInput.value = '';
-
-      setActiveSection('dashword');
-      await fetchMessages(searchQuery);
-
-      /*
       // 1. Upload file if exists
+      let mediaUrl = null;
+      let mediaType = null;
+
       if (selectedFile) {
         try {
           // For very small files we could skip chunking, but for consistency we use it for all
@@ -442,19 +288,21 @@ export default function Community({ currentUser: propUser, onLogout }) {
       if (mediaUrl) {
         formData.append('media_url', mediaUrl);
         formData.append('media_type', mediaType);
-      } else if (selectedFile) {
-        // If chunk upload failed or wasn't used for some reason (fallback), 
-        // we could send 'file' here, but we are designing this to REPLACE 'file' sending.
-        // So we do NOT append 'file' if we have mediaUrl.
       }
 
-      const res = await fetch('http://localhost:8000/api/messages', {
+      const res = await fetch(`${API_BASE_URL}/community_messages.php`, {
         method: 'POST',
         body: formData,
       });
 
       if (res.ok) {
-        console.log('Message sent successfully!');
+        const savedMessage = await res.json();
+        console.log('Message sent successfully!', savedMessage);
+
+        // Optimistic update (or rather, using the confirmed saved message)
+        setMessages(prev => [savedMessage, ...prev]);
+        setFilteredMessages(prev => [savedMessage, ...prev]);
+
         setNewMessage('');
         setSelectedFile(null);
 
@@ -466,7 +314,7 @@ export default function Community({ currentUser: propUser, onLogout }) {
         // Always ensure we are on dashword (though we only have one section now)
         setActiveSection('dashword');
 
-        await fetchMessages(searchQuery); // Refresh list immediately
+        // await fetchMessages(searchQuery); // Skip re-fetch to avoid race condition where DB isn't updated yet
       } else {
         const errText = await res.text();
         console.error('Send failed raw:', errText);
@@ -478,7 +326,6 @@ export default function Community({ currentUser: propUser, onLogout }) {
           alert('Failed to send message: ' + errText);
         }
       }
-      */
     } catch (err) {
       console.error('Network error:', err);
       alert('Network error sending message.');
@@ -493,26 +340,7 @@ export default function Community({ currentUser: propUser, onLogout }) {
     if (!content || !content.trim()) return;
 
     try {
-      // Mock Implementation
-      const msgIndex = MOCK_MESSAGES.findIndex(m => m.id === messageId);
-      if (msgIndex !== -1) {
-        const newComment = {
-          id: Date.now(),
-          message_id: messageId,
-          user_id: currentUser.id,
-          username: currentUser.username || "Me",
-          email: currentUser.email || "me@example.com",
-          content: content,
-          created_at: new Date().toISOString()
-        };
-        MOCK_MESSAGES[msgIndex].comments.push(newComment);
-
-        setCommentInputs({ ...commentInputs, [messageId]: '' });
-        fetchMessages(searchQuery);
-      }
-
-      /*
-      const res = await fetch('http://localhost:8000/api/comments', {
+      const res = await fetch(`${API_BASE_URL}/community_comments.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -525,7 +353,6 @@ export default function Community({ currentUser: propUser, onLogout }) {
         setCommentInputs({ ...commentInputs, [messageId]: '' });
         fetchMessages(searchQuery); // Refresh list
       }
-      */
     } catch (err) {
       console.error(err);
     }
@@ -533,7 +360,7 @@ export default function Community({ currentUser: propUser, onLogout }) {
 
   // Render main content
   return (
-    <React.Fragment>
+    <div className="community-container">
       <nav className="nav_left">
         <div className="sidebar-header">
           <h1>facechat</h1>
@@ -543,13 +370,13 @@ export default function Community({ currentUser: propUser, onLogout }) {
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
-              {notifications.some(n => !n.is_read) && (
+              {Array.isArray(notifications) && notifications.some(n => !n.is_read) && (
                 <span className="notif-badge">{notifications.filter(n => !n.is_read).length}</span>
               )}
             </button>
             {showNotifications && (
               <div className="notif-dropdown">
-                {notifications.length === 0 ? <div style={{ padding: '10px' }}>No notifications</div> : (
+                {!Array.isArray(notifications) || notifications.length === 0 ? <div style={{ padding: '10px' }}>No notifications</div> : (
                   notifications.map(n => (
                     <div key={n.id} className={`notif-item ${!n.is_read ? 'unread' : ''}`} onClick={() => handleNotificationClick(n)}>
                       <strong>{n.actor_name}</strong> commented on your {n.message_type || 'post'}.
@@ -580,10 +407,8 @@ export default function Community({ currentUser: propUser, onLogout }) {
 
       <nav>
         <div className="nave_top">
-          <div className="logo">
-            <span><img src={Logo} alt="logo"></img></span>
-            <h2>Instiut Supérieur de Numerique</h2>
-          </div>
+          {/* Logo removed - using global header */}
+
           <div className="recherche_bare">
             <div style={{ position: 'relative', width: '100%' }}>
               <input
@@ -643,14 +468,8 @@ export default function Community({ currentUser: propUser, onLogout }) {
             </svg>
           </button>
 
-          {onLogout && (
-            <button
-              onClick={onLogout}
-              className="logout-button"
-            >
-              Logout
-            </button>
-          )}
+          {/* Logout removed - using global header */}
+
         </div>
       </nav>
 
@@ -723,7 +542,7 @@ export default function Community({ currentUser: propUser, onLogout }) {
         </button>
       </div>
 
-    </React.Fragment >
+    </div>
   );
 }
 
@@ -768,8 +587,8 @@ const MessageList = ({ items, currentUser, commentInputs, setCommentInputs, hand
     }
 
     try {
-      const res = await fetch('http://localhost:8000/api/messages/delete', {
-        method: 'POST',
+      const res = await fetch(`${API_BASE_URL}/community_messages.php`, {
+        method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message_id: msgId,
@@ -799,8 +618,8 @@ const MessageList = ({ items, currentUser, commentInputs, setCommentInputs, hand
 
   return (
     <div className="messages-container" ref={scrollContainerRef} style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-      {items.length === 0 && <p style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>No items found.</p>}
-      {items.map(msg => {
+      {(!items || items.length === 0) && <p style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>No items found.</p>}
+      {Array.isArray(items) && items.map((msg, index) => {
         const isOwnMessage = msg.user_id === currentUser.id;
         const comments = msg.comments || [];
         const isExpanded = expandedComments[msg.id];
@@ -809,8 +628,11 @@ const MessageList = ({ items, currentUser, commentInputs, setCommentInputs, hand
         const hiddenCount = comments.length - INITIAL_COMMENTS_SHOW;
         const isMenuOpen = openMenuId === msg.id;
 
+        // Ensure unique key
+        const itemKey = msg.id ? msg.id : `msg-${index}`;
+
         return (
-          <div key={msg.id} id={`msg-${msg.id}`} className={`message-item ${isOwnMessage ? 'message-me' : 'message-others'}`}>
+          <div key={itemKey} id={`msg-${msg.id}`} className={`message-item ${isOwnMessage ? 'message-me' : 'message-others'}`}>
             <div className="message-header">
               <strong>{msg.email ? getDisplayName(msg.email) : (isOwnMessage ? getDisplayName(currentUser.email) : msg.username)}</strong>
               <span>{new Date(msg.created_at).toLocaleString()}</span>
@@ -881,8 +703,8 @@ const MessageList = ({ items, currentUser, commentInputs, setCommentInputs, hand
                 </button>
               )}
 
-              {displayedComments.map(comment => (
-                <div key={comment.id} className="comment-item">
+              {displayedComments.map((comment, idx) => (
+                <div key={comment.id || `comment-${idx}`} className="comment-item">
                   <div>
                     <div>
                       <strong>{comment.email ? getDisplayName(comment.email) : comment.username}</strong>

@@ -370,9 +370,7 @@ const Mail = () => {
                 </div>
 
                 <div className="sidebar-footer">
-                    <a href="/" className="back-link">
-                        <i className="fas fa-arrow-left"></i> Dashboard
-                    </a>
+                    {/* Back link removed - using global header */}
                 </div>
             </aside>
 

@@ -43,6 +43,36 @@ In the project directory, you can run:
 - **`npm run lint`**: Runs ESLint to check for code quality issues.
 - **`npm run preview`**: Locally preview the production build.
 
+### Running the Backend
+
+The application requires a PHP backend to function. The backend is maintained in a separate repository.
+
+**Backend Repository:** [supnum-educational-platform-backend](https://github.com/Abdellahi-yuki/supnum-educational-platform-backend)
+
+To run the backend:
+
+```bash
+php -S localhost:8000 -t supnum-educational-platform-backend supnum-educational-platform-backend/index.php
+```
+
+> **Note:** The backend must be running on port 8000 for the frontend to connect successfully.
+
+### Running the Full Stack
+
+To run the full application, you need two terminal windows:
+
+1.  **Terminal 1 (Backend):**
+    ```bash
+    php -S localhost:8000 -t supnum-educational-platform-backend supnum-educational-platform-backend/index.php
+    ```
+
+2.  **Terminal 2 (Frontend):**
+    ```bash
+    cd main
+    npm run dev
+    ```
+
+
 ### Testing on Mobile
 
 To test on a phone, build the project and serve the `dist` folder:
