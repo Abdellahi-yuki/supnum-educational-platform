@@ -20,12 +20,12 @@ function DashboardLayout({ user, onLogout, onUpdateUser }) {
 
   const handleChangePage = (page, state = null) => {
     setCurrentPage(page);
-    if (page === 'dashboard') navigate('/', { state });
-    if (page === 'settings') navigate('/settings', { state });
-    if (page === 'results') navigate('/results', { state });
-    if (page === 'archive') navigate('/archive', { state });
-    if (page === 'mail') navigate('/mail', { state });
-    if (page === 'community') navigate('/community', { state });
+    if (page === 'dashboard') navigate('/dashboard', { state });
+    if (page === 'settings') navigate('/dashboard/settings', { state });
+    if (page === 'results') navigate('/dashboard/results', { state });
+    if (page === 'archive') navigate('/dashboard/archive', { state });
+    if (page === 'mail') navigate('/dashboard/mail', { state });
+    if (page === 'community') navigate('/dashboard/community', { state });
   };
 
   return (
@@ -34,17 +34,17 @@ function DashboardLayout({ user, onLogout, onUpdateUser }) {
       <div className="main-container no-sidebar">
         <main className="content-area">
           <Routes>
-            <Route path="/" element={
+            <Route index element={
               <>
                 <WelcomeBanner user={user} />
                 <CardsGrid onCardClick={handleChangePage} />
               </>
             } />
-            <Route path="/settings" element={<Settings user={user} onUpdateUser={onUpdateUser} />} />
-            <Route path="/results" element={<Results />} />
-            <Route path="/archive" element={<Archive />} />
-            <Route path="/mail" element={<Mail />} />
-            <Route path="/community" element={<Community user={user} />} />
+            <Route path="settings" element={<Settings user={user} onUpdateUser={onUpdateUser} />} />
+            <Route path="results" element={<Results />} />
+            <Route path="archive" element={<Archive />} />
+            <Route path="mail" element={<Mail />} />
+            <Route path="community" element={<Community user={user} />} />
           </Routes>
         </main>
       </div>
@@ -78,7 +78,7 @@ function Dashboard() {
     <Routes>
       <Route
         path="/*"
-        element={user ? <DashboardLayout user={user} onLogout={handleLogout} onUpdateUser={handleUpdateUser} /> : <Navigate to="/login" />}
+        element={user ? <DashboardLayout user={user} onLogout={handleLogout} onUpdateUser={handleUpdateUser} /> : <Navigate to="/login" replace />}
       />
     </Routes>
   );

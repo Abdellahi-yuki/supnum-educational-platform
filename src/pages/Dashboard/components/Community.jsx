@@ -15,7 +15,8 @@ import {
 
     Menu,
     X,
-    Shield
+    Shield,
+    Plus
 } from 'lucide-react';
 import { API_BASE_URL } from '../apiConfig';
 import { useLocation } from 'react-router-dom';
@@ -23,8 +24,6 @@ import UserProfile from './UserProfile';
 
 const Community = ({ user }) => {
     const location = useLocation();
-    if (!user) return <div style={{ padding: '4rem', textAlign: 'center' }}>Chargement...</div>;
-
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
@@ -52,7 +51,11 @@ const Community = ({ user }) => {
 
     const pollInterval = useRef(null);
 
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [messageToDelete, setMessageToDelete] = useState(null);
+
     const fetchMessages = useCallback(async () => {
+        if (!user) return;
         try {
             let url = `${API_BASE_URL}/community_messages.php?user_id=${user.id}`;
             if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
@@ -68,7 +71,7 @@ const Community = ({ user }) => {
         } finally {
             setLoading(false);
         }
-    }, [user.id, searchQuery, showOnlySaved]);
+    }, [user?.id, searchQuery, showOnlySaved]);
 
     const fetchStats = useCallback(async () => {
         try {
@@ -270,9 +273,6 @@ const Community = ({ user }) => {
         }
     };
 
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [messageToDelete, setMessageToDelete] = useState(null);
-
     const confirmDeleteMessage = (msgId) => {
         setMessageToDelete(msgId);
         setShowDeleteModal(true);
@@ -304,7 +304,7 @@ const Community = ({ user }) => {
         }));
     };
 
-
+    if (!user) return <div style={{ padding: '4rem', textAlign: 'center' }}>Chargement...</div>;
 
     // Show user profile if selected
     if (showUserProfile && selectedUserId) {
@@ -367,7 +367,7 @@ const Community = ({ user }) => {
             }}>
                 <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary-blue)' }}>Discussions</h2>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary-blue)' }}>Publications</h2>
                         <div style={{ position: 'relative' }}>
                             {/* Notifications removed from here and moved to Header */}
                         </div>
@@ -405,11 +405,11 @@ const Community = ({ user }) => {
                         </div>
                         <div style={{ flex: 1 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Général</h4>
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Flux Global</h4>
                                 <span style={{ fontSize: '0.7rem', color: 'var(--primary-green)', fontWeight: 700 }}>{stats.activeMembers} actifs</span>
                             </div>
                             <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: 0 }}>
-                                {messages.length > 0 ? messages[0].content : 'Lancer une discussion...'}
+                                {messages.length > 0 ? messages[0].content : 'Voir les publications...'}
                             </p>
                         </div>
                     </div>
@@ -422,12 +422,12 @@ const Community = ({ user }) => {
                             alignItems: 'center',
                             gap: '1.2rem',
                             cursor: 'pointer',
-                            background: showOnlySaved ? 'rgba(249, 115, 22, 0.05)' : 'transparent',
-                            borderLeft: showOnlySaved ? '5px solid #f97316' : '5px solid transparent',
+                            background: showOnlySaved ? 'rgba(28, 53, 134, 0.05)' : 'transparent',
+                            borderLeft: showOnlySaved ? '5px solid var(--primary-blue)' : '5px solid transparent',
                             transition: 'all 0.33s cubic-bezier(0.4, 0, 0.2, 1)'
                         }}
                     >
-                        <div style={{ width: '56px', height: '56px', borderRadius: '18px', background: '#f97316', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(249, 115, 22, 0.2)' }}>
+                        <div style={{ width: '56px', height: '56px', borderRadius: '18px', background: 'var(--primary-blue)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(28, 53, 134, 0.2)' }}>
                             <Bookmark size={28} />
                         </div>
                         <div style={{ flex: 1 }}>
@@ -471,11 +471,30 @@ const Community = ({ user }) => {
                 {/* Chat Header */}
                 <div style={{ padding: '1.2rem 2.5rem', background: 'white', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-                        <div style={{ width: '48px', height: '48px', borderRadius: '15px', background: showMembersList ? 'var(--primary-green)' : (showOnlySaved ? '#f97316' : 'var(--primary-blue)'), color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                        <button
+                            onClick={() => window.location.href = '/'}
+                            style={{
+                                background: 'rgba(0,0,0,0.05)',
+                                border: 'none',
+                                borderRadius: '12px',
+                                padding: '0.6rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'var(--gray-700)',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.1)'}
+                            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
+                        >
+                            <X size={20} />
+                        </button>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '15px', background: showMembersList ? 'var(--primary-green)' : (showOnlySaved ? 'var(--primary-blue)' : 'var(--primary-blue)'), color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                             {showMembersList ? <Users size={24} /> : (showOnlySaved ? <Bookmark size={24} /> : <Users size={24} />)}
                         </div>
                         <div>
-                            <h3 style={{ fontSize: '1.3rem', fontWeight: 900, margin: 0 }}>{showMembersList ? 'Membres' : (showOnlySaved ? 'Favoris' : 'Canal Général')}</h3>
+                            <h3 style={{ fontSize: '1.3rem', fontWeight: 900, margin: 0 }}>{showMembersList ? 'Membres' : (showOnlySaved ? 'Favoris' : 'Flux de Publications')}</h3>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary-green)' }}></div>
                                 <p style={{ fontSize: '0.8rem', color: 'var(--gray-500)', fontWeight: 600, margin: 0 }}>{stats.activeMembers} actifs maintenant</p>
@@ -581,7 +600,7 @@ const Community = ({ user }) => {
                                                 width: '48px',
                                                 height: '48px',
                                                 borderRadius: '14px',
-                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                background: 'linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-green) 100%)',
                                                 overflow: 'hidden',
                                                 flexShrink: 0,
                                                 display: 'flex',
@@ -618,7 +637,7 @@ const Community = ({ user }) => {
                                                 width: '24px',
                                                 height: '24px',
                                                 borderRadius: '8px',
-                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                background: 'linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-green) 100%)',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
@@ -633,7 +652,7 @@ const Community = ({ user }) => {
                                                 style={{
                                                     fontSize: '0.9rem',
                                                     fontWeight: 700,
-                                                    color: '#667eea',
+                                                    color: 'var(--primary-blue)',
                                                     cursor: 'pointer'
                                                 }}
                                                 onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
@@ -670,7 +689,7 @@ const Community = ({ user }) => {
                                                 style={{
                                                     background: 'rgba(102, 126, 234, 0.1)',
                                                     border: 'none',
-                                                    color: '#667eea',
+                                                    color: 'var(--primary-blue)',
                                                     cursor: 'pointer',
                                                     padding: '0.5rem',
                                                     borderRadius: '8px',
@@ -709,7 +728,7 @@ const Community = ({ user }) => {
                                                 style={{
                                                     background: msg.is_archived ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
                                                     border: 'none',
-                                                    color: msg.is_archived ? '#f97316' : 'var(--gray-300)',
+                                                    color: msg.is_archived ? 'var(--primary-blue)' : 'var(--gray-300)',
                                                     cursor: 'pointer',
                                                     padding: '0.5rem',
                                                     borderRadius: '8px',
@@ -742,7 +761,7 @@ const Community = ({ user }) => {
                                                 top: 0,
                                                 bottom: 0,
                                                 width: '5px',
-                                                background: 'linear-gradient(180deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+                                                background: 'linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-green) 100%)',
                                                 borderRadius: '24px 0 0 24px'
                                             }}></div>
                                             {/* Reply Context */}
@@ -815,31 +834,97 @@ const Community = ({ user }) => {
                                             )}
                                             <p style={{ fontSize: '1.05rem', lineHeight: '1.6', margin: 0, fontWeight: 400, color: '#2d3748' }}>{msg.content}</p>
 
-                                            {/* Reply count and expand button */}
-                                            {msg.comments && msg.comments.length > 0 && (
-                                                <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+                                            {/* Comments Section */}
+                                            <div style={{ marginTop: '1.5rem', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '1rem' }}>
+                                                {msg.comments && msg.comments.length > 0 && (
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '1rem' }}>
+                                                        {(expandedComments[msg.id] ? msg.comments : msg.comments.slice(0, 2)).map(comment => (
+                                                            <div key={comment.id} style={{
+                                                                padding: '0.8rem 1.2rem',
+                                                                background: 'rgba(0,0,0,0.03)',
+                                                                borderRadius: '16px',
+                                                                fontSize: '0.9rem',
+                                                                position: 'relative'
+                                                            }}>
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                                                    <span style={{ fontWeight: 800, color: 'var(--primary-blue)', fontSize: '0.85rem' }}>{comment.username}</span>
+                                                                    <span style={{ fontSize: '0.75rem', color: 'var(--gray-400)' }}>
+                                                                        {new Date(comment.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                                                                    </span>
+                                                                </div>
+                                                                <p style={{ margin: 0, color: '#4a5568', lineHeight: '1.4' }}>{comment.content}</p>
+                                                            </div>
+                                                        ))}
+
+                                                        {msg.comments.length > 2 && (
+                                                            <button
+                                                                onClick={() => toggleComments(msg.id)}
+                                                                style={{
+                                                                    background: 'none',
+                                                                    border: 'none',
+                                                                    color: 'var(--primary-blue)',
+                                                                    fontSize: '0.85rem',
+                                                                    fontWeight: 700,
+                                                                    cursor: 'pointer',
+                                                                    padding: '0.5rem 0',
+                                                                    textAlign: 'left',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '8px',
+                                                                    transition: 'all 0.2s'
+                                                                }}
+                                                            >
+                                                                {expandedComments[msg.id] ? (
+                                                                    <>Voir moins</>
+                                                                ) : (
+                                                                    <>Voir tout ({msg.comments.length})</>
+                                                                )}
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Comment Input */}
+                                                <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+                                                    <div style={{ flex: 1, position: 'relative' }}>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Ajouter un commentaire..."
+                                                            value={commentInputs[msg.id] || ''}
+                                                            onChange={(e) => setCommentInputs(prev => ({ ...prev, [msg.id]: e.target.value }))}
+                                                            onKeyDown={(e) => e.key === 'Enter' && handleSendComment(msg.id)}
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '0.7rem 1.2rem',
+                                                                borderRadius: '12px',
+                                                                background: 'rgba(0,0,0,0.04)',
+                                                                border: 'none',
+                                                                fontSize: '0.85rem',
+                                                                outline: 'none'
+                                                            }}
+                                                        />
+                                                    </div>
                                                     <button
-                                                        onClick={() => toggleComments(msg.id)}
+                                                        onClick={() => handleSendComment(msg.id)}
+                                                        disabled={!commentInputs[msg.id]?.trim()}
                                                         style={{
-                                                            background: 'rgba(102, 126, 234, 0.08)',
+                                                            background: 'var(--primary-blue)',
+                                                            color: 'white',
                                                             border: 'none',
-                                                            padding: '0.6rem 1.2rem',
-                                                            borderRadius: '12px',
+                                                            borderRadius: '10px',
+                                                            padding: '0.6rem',
                                                             cursor: 'pointer',
-                                                            fontSize: '0.85rem',
-                                                            fontWeight: 600,
-                                                            color: '#667eea',
                                                             display: 'flex',
                                                             alignItems: 'center',
-                                                            gap: '0.5rem'
+                                                            justifyContent: 'center',
+                                                            opacity: !commentInputs[msg.id]?.trim() ? 0.5 : 1,
+                                                            transition: 'all 0.2s'
                                                         }}
                                                     >
-                                                        <MessageSquare size={16} />
-                                                        {msg.comments.length} {msg.comments.length === 1 ? 'réponse' : 'réponses'}
-                                                        {expandedComments[msg.id] ? ' - Masquer' : ' - Afficher'}
+                                                        <Send size={16} />
                                                     </button>
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -890,7 +975,7 @@ const Community = ({ user }) => {
                             <textarea
                                 id="community-textarea"
                                 className="auth-input"
-                                placeholder="Écrivez un message ici..."
+                                placeholder="Partagez quelque chose avec la communauté..."
                                 value={newMessage}
                                 onChange={(e) => setNewMessage(e.target.value)}
                                 onKeyDown={(e) => {

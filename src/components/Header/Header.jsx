@@ -72,9 +72,9 @@ const Header = ({ user, onLogout }) => {
     };
 
     const navLinks = [
-        { name: 'Tableau de bord', path: '/' },
+        { name: 'Tableau de bord', path: '/dashboard' },
         { name: 'Cours/Annales', path: '/archive' },
-        { name: 'Notes', path: '/results' },
+        { name: 'Notes', path: '/dashboard/results' },
         { name: 'Messagerie', path: '/mail' },
         { name: 'Communauté', path: '/community' },
     ];
@@ -88,7 +88,7 @@ const Header = ({ user, onLogout }) => {
         <header className="header">
             <div className="header-container">
                 <div className="logo-section" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                    <img src="/assets/logo-supnum.jpg" alt="SupNum Logo" className="logo-img" />
+                    <img src="/assets/logo-supnum.png" alt="SupNum Logo" className="logo-img" />
                     <span className="logo-text">SupNum</span>
                 </div>
 
@@ -109,91 +109,40 @@ const Header = ({ user, onLogout }) => {
                 </nav>
 
                 <div className="header-actions">
-                    <button className="mobile-menu-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
-
-                    <div className="notification-container" style={{ position: 'relative', marginRight: '1rem' }}>
+                    <div className="notification-container" style={{ position: 'relative' }}>
                         <button
                             className="icon-btn"
                             onClick={() => setShowNotifications(!showNotifications)}
-                            style={{
-                                position: 'relative',
-                                background: 'white',
-                                borderRadius: '12px',
-                                padding: '0.6rem',
-                                border: 'none',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
                         >
                             <Bell size={20} />
                             {unreadCount > 0 && (
-                                <span style={{
-                                    position: 'absolute',
-                                    top: '-5px',
-                                    right: '-5px',
-                                    background: '#ef4444',
-                                    color: 'white',
-                                    borderRadius: '50%',
-                                    width: '18px',
-                                    height: '18px',
-                                    fontSize: '10px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontWeight: 800,
-                                    border: '2px solid white'
-                                }}>{unreadCount}</span>
+                                <span className="notification-badge">{unreadCount}</span>
                             )}
                         </button>
 
                         {showNotifications && (
-                            <div className="notification-dropdown" style={{
-                                position: 'absolute',
-                                top: '120%',
-                                right: '-50px',
-                                width: '320px',
-                                zIndex: 1000,
-                                background: 'white',
-                                borderRadius: '16px',
-                                padding: '1rem',
-                                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                                border: '1px solid rgba(0,0,0,0.05)'
-                            }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                    <h3 style={{ fontSize: '0.95rem', fontWeight: 800, margin: 0 }}>Notifications</h3>
-                                    {unreadCount > 0 && <span style={{ fontSize: '0.75rem', color: 'var(--primary-blue)', fontWeight: 600 }}>{unreadCount} non lues</span>}
+                            <div className="notification-dropdown">
+                                <div className="notification-dropdown-header">
+                                    <h3>Notifications</h3>
+                                    {unreadCount > 0 && <span>{unreadCount} non lues</span>}
                                 </div>
-                                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                                <div className="notification-list">
                                     {notifications.length === 0 ? (
-                                        <p style={{ fontSize: '0.85rem', textAlign: 'center', color: 'var(--gray-500)', padding: '1rem 0' }}>Aucune notification</p>
+                                        <p className="no-notifications">Aucune notification</p>
                                     ) : (
                                         notifications.map(n => (
                                             <div
                                                 key={n.id}
+                                                className={`notification-item ${n.is_read ? 'read' : 'unread'}`}
                                                 onClick={() => handleNotificationClick(n)}
-                                                style={{
-                                                    padding: '0.75rem',
-                                                    borderRadius: '12px',
-                                                    background: n.is_read ? 'transparent' : 'rgba(249, 115, 22, 0.05)',
-                                                    cursor: 'pointer',
-                                                    marginBottom: '0.5rem',
-                                                    transition: 'background 0.2s',
-                                                    border: n.is_read ? '1px solid transparent' : '1px solid rgba(249, 115, 22, 0.1)'
-                                                }}
-                                                onMouseOver={(e) => e.currentTarget.style.background = n.is_read ? 'var(--gray-50)' : 'rgba(249, 115, 22, 0.1)'}
-                                                onMouseOut={(e) => e.currentTarget.style.background = n.is_read ? 'transparent' : 'rgba(249, 115, 22, 0.05)'}
                                             >
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                                                    <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{n.actor_name}</span>
-                                                    <span style={{ fontSize: '0.7rem', color: 'var(--gray-400)' }}>
+                                                <div className="notification-item-top">
+                                                    <span className="actor-name">{n.actor_name}</span>
+                                                    <span className="notification-time">
                                                         {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                     </span>
                                                 </div>
-                                                <p style={{ fontSize: '0.8rem', color: 'var(--gray-600)', margin: 0, lineHeight: '1.4' }}>
+                                                <p className="notification-text">
                                                     {n.type === 'reply' ? 'a répondu à votre message' : 'a commenté votre publication'}
                                                 </p>
                                             </div>
@@ -227,7 +176,7 @@ const Header = ({ user, onLogout }) => {
                         {showDropdown && (
                             <div className="profile-dropdown">
                                 <div className="dropdown-item" onClick={() => {
-                                    navigate('/settings');
+                                    navigate('/dashboard/settings');
                                     setShowDropdown(false);
                                 }}>
                                     <Settings size={16} /> Mon Profil

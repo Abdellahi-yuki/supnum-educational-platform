@@ -6,12 +6,12 @@ This project is an educational platform built with React and Vite.
 
 The application consists of the following main pages:
 
-- **Dashboard** (`/`): The main landing dashboard.
-  - Component: `src/components/Dashboard`
+- **Dashboard** (`/dashboard`): The main landing dashboard.
+  - Component: `src/pages/Dashboard/Dashboard`
 - **Mail** (`/mail`): A page for messaging or mail-related features.
   - Component: `src/pages/Mail/Mail`
 - **Community** (`/community`): A community interaction page.
-  - Component: `src/pages/Community/Community`
+  - Component: `src/pages/Dashboard/components/Community`
 - **Archive** (`/archive`): An archive page.
   - Component: `src/pages/Archive/Archive`
 

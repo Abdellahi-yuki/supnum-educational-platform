@@ -1,11 +1,11 @@
 import logo from "@/../public/supnum-logo.png"
 
-function LogoSupnum(){
+function LogoSupnum() {
 
-    return(
+    return (
         <div className="logoSupNum">
             <span id="supnum">Sup<div>Num</div></span>
-            <img src={logo} alt="Supnum Logo" className="supnum"/>
+            <img src={logo} alt="Supnum Logo" className="supnum" />
         </div>
     )
 }

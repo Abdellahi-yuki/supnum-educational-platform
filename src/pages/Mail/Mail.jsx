@@ -1,13 +1,37 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import mailService from '../../services/mailService';
+import {
+    Inbox,
+    Star,
+    Send,
+    AlertTriangle,
+    Trash2,
+    Archive,
+    Plus,
+    Search,
+    Menu,
+    X,
+    Reply,
+    ReplyAll,
+    Forward,
+    Maximize2,
+    Minimize2,
+    Paperclip,
+    MoreVertical
+} from 'lucide-react';
 import './Mail.css';
 
 const Mail = () => {
+    const location = useLocation();
     const [selectedLabel, setSelectedLabel] = useState('inbox');
     const [selectedMessage, setSelectedMessage] = useState(null);
     const [isComposeOpen, setIsComposeOpen] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
+    const [isMaximized, setIsMaximized] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [allUsers, setAllUsers] = useState([]);
 
     // Compose state to handle pre-filling data for replies/forwards
     const [composeData, setComposeData] = useState({
@@ -19,133 +43,42 @@ const Mail = () => {
         parentId: null
     });
 
-    // Enhanced mock data with labels support and branching
-    const [messages, setMessages] = useState([
-        {
-            id: 1,
-            from: 'Root Admin',
-            email: 'root@supnum.mr',
-            subject: 'Welcome to SupNum Mail',
-            content: 'Welcome to the new unified messaging platform...',
-            date: 'Jan 1',
-            isRead: false,
-            isStarred: false,
-            labels: ['inbox'],
-            parentId: 0
-        },
-        {
-            id: 2,
-            from: 'Brahim Hmeida',
-            email: 'brahim.hmeida@supnum.mr',
-            subject: 'Project Update',
-            content: 'Here is the latest update on the project progress...',
-            date: 'Jan 1',
-            isRead: true,
-            isStarred: true,
-            labels: ['inbox', 'starred'],
-            parentId: 0
-        },
-        {
-            id: 3,
-            from: 'Spam Bot',
-            email: 'spam@bot.com',
-            subject: 'You won a prize!',
-            content: 'Click here to claim your prize...',
-            date: 'Jan 2',
-            isRead: false,
-            isStarred: false,
-            labels: ['spam'],
-            parentId: 0
-        },
-        // Thread Example
-        {
-            id: 4,
-            from: 'Me',
-            email: 'me@supnum.mr',
-            subject: 'Re: Project Update',
-            content: 'Thanks for the update, Brahim.',
-            date: 'Jan 1',
-            isRead: true,
-            isStarred: false,
-            labels: ['sent'],
-            parentId: 2
-        },
-        {
-            id: 5,
-            from: 'Brahim Hmeida',
-            email: 'brahim.hmeida@supnum.mr',
-            subject: 'Re: Project Update',
-            content: 'You are welcome! Let me know if you need anything else.',
-            date: 'Jan 2',
-            isRead: false,
-            isStarred: false,
-            labels: ['inbox'],
-            parentId: 4
-        },
-        // Branching Example: O1 -> O2 -> (A1->A2) + (B1)
-        {
-            id: 10,
-            from: 'Origin Sender',
-            email: 'origin@supnum.mr',
-            subject: 'Branching Discussion',
-            content: 'O1: Starting the discussion.',
-            date: 'Jan 1',
-            isRead: true,
-            isStarred: false,
-            labels: ['inbox'],
-            parentId: 0
-        },
-        {
-            id: 11,
-            from: 'Me',
-            email: 'me@supnum.mr',
-            subject: 'Re: Branching Discussion',
-            content: 'O2: My reply to O1.',
-            date: 'Jan 2',
-            isRead: true,
-            isStarred: false,
-            labels: ['sent'],
-            parentId: 10
-        },
-        // Branch A
-        {
-            id: 12,
-            from: 'Alice',
-            email: 'alice@supnum.mr',
-            subject: 'Re: Branching Discussion',
-            content: 'A1: Alice replying to O2.',
-            date: 'Jan 3',
-            isRead: true,
-            isStarred: false,
-            labels: ['inbox'],
-            parentId: 11
-        },
-        {
-            id: 13,
-            from: 'Me',
-            email: 'me@supnum.mr',
-            subject: 'Re: Branching Discussion',
-            content: 'A2: Me replying to Alice (Leaf of Branch A).',
-            date: 'Jan 4',
-            isRead: true,
-            isStarred: false,
-            labels: ['sent'],
-            parentId: 12
-        },
-        // Branch B
-        {
-            id: 14,
-            from: 'Bob',
-            email: 'bob@supnum.mr',
-            subject: 'Re: Branching Discussion',
-            content: 'B1: Bob replying to O2 separately (Leaf of Branch B).',
-            date: 'Jan 3',
-            isRead: false,
-            isStarred: true,
-            labels: ['inbox'],
-            parentId: 11
+    // Handle pre-filling from Community profile
+    useEffect(() => {
+        if (location.state?.composeWithEmail) {
+            setComposeData(prev => ({
+                ...prev,
+                to: location.state.composeWithEmail
+            }));
+            setIsComposeOpen(true);
+            setIsMinimized(false);
+            setIsMaximized(false);
         }
-    ]);
+    }, [location.state]);
+
+    // Enhanced mock data with labels support and branching
+    const [messages, setMessages] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Fetch messages on mount
+    useEffect(() => {
+        const loadData = async () => {
+            setIsLoading(true);
+            try {
+                const [msgs, users] = await Promise.all([
+                    mailService.fetchMessages(selectedLabel),
+                    mailService.fetchUsers()
+                ]);
+                setMessages(msgs);
+                setAllUsers(users);
+            } catch (error) {
+                console.error("Failed to fetch data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadData();
+    }, [selectedLabel]);
 
     const [selectedMessageIds, setSelectedMessageIds] = useState(new Set());
 
@@ -174,16 +107,20 @@ const Mail = () => {
     // Filter messages based on selected label and search query
     // AND show only LEAF NODES (latest in branch)
     const filteredMessages = useMemo(() => {
-        // 1. Identify all parent IDs
-        const parentIds = new Set(messages.map(m => m.parentId));
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const currentUserId = Number(user.id || 3);
 
-        // Helper to check if any ancestor has a specific label
-        const hasAncestorWithLabel = (startMsg, label) => {
-            let current = messages.find(m => m.id === startMsg.parentId);
+        // 1. Identify all parent IDs
+        const parentIds = new Set(messages.map(m => Number(m.parentId)));
+
+        // Helper to check if user participated in a thread
+        const userParticipatedInThread = (msg) => {
+            if (Number(msg.sender_id) === currentUserId) return true;
+            let current = messages.find(m => Number(m.id) === Number(msg.parentId));
             while (current) {
-                if (current.labels.includes(label)) return true;
-                if (current.parentId === 0) break;
-                current = messages.find(m => m.id === current.parentId);
+                if (Number(current.sender_id) === currentUserId) return true;
+                if (Number(current.parentId) === 0) break;
+                current = messages.find(m => Number(m.id) === Number(current.parentId));
             }
             return false;
         };
@@ -198,21 +135,33 @@ const Mail = () => {
                 msg.email.toLowerCase().includes(query);
 
             // 3. Leaf Node Check
-            const isLeaf = !parentIds.has(msg.id);
-
-            if (!matchesSearch || !isLeaf) return false;
+            const isLeaf = !parentIds.has(Number(msg.id));
 
             // 4. Label Logic
+            if (selectedLabel === 'sent') {
+                if (!matchesSearch) return false;
+
+                // Rule: Show if I sent it
+                return Number(msg.sender_id) === currentUserId;
+            }
+
+            // For other labels (Inbox, Starred, etc.), only show leaf nodes to maintain threaded view
+            if (!matchesSearch || !isLeaf) return false;
+
             if (selectedLabel === 'inbox') {
                 // Show if:
-                // a) Message itself is in inbox
-                // b) Message is 'sent' (reply) BUT it belongs to a thread that started in inbox (ancestor has 'inbox')
+                // a) Message itself is in inbox AND (it's received OR it's a sent reply)
                 const isInbox = msg.labels.includes('inbox');
-                const isSentReplyToInbox = msg.labels.includes('sent') && hasAncestorWithLabel(msg, 'inbox');
+                const isSentByMe = Number(msg.sender_id) === currentUserId;
+                const isReply = Number(msg.parentId) !== 0;
 
-                return isInbox || isSentReplyToInbox;
+                // User's rule: "when the mail is (sent) by the user then display it in the (Sent section) and don't display it in inbox, 
+                // but if the mail is a part of a thread then display it in both"
+                if (isSentByMe && !isReply) return false;
+
+                return isInbox;
             } else {
-                // Standard label filtering for other views (sent, starred, etc.)
+                // Standard label filtering for other views (starred, etc.)
                 return msg.labels.includes(selectedLabel);
             }
         });
@@ -230,17 +179,50 @@ const Mail = () => {
     };
 
     // Toggle label for selected messages
-    const toggleLabelForSelected = (label) => {
-        const updatedMessages = messages.map(msg => {
-            if (selectedMessageIds.has(msg.id)) {
-                const newLabels = msg.labels.includes(label)
-                    ? msg.labels.filter(l => l !== label)
-                    : [...msg.labels, label];
-                return { ...msg, labels: newLabels };
+    const toggleLabelForSelected = async (label) => {
+        const dbFieldMap = {
+            'starred': 'is_starred',
+            'spam': 'is_spam',
+            'trash': 'is_trash',
+            'archive': 'is_archived'
+        };
+        const dbField = dbFieldMap[label];
+        if (!dbField) return;
+
+        const updatedMessages = [...messages];
+        const updatePromises = [];
+
+        for (const msgId of selectedMessageIds) {
+            const msgIndex = updatedMessages.findIndex(m => m.id === msgId);
+            if (msgIndex !== -1) {
+                const currentVal = updatedMessages[msgIndex].labels.includes(label);
+                const newVal = !currentVal;
+
+                // Update local state optimistically
+                const newLabels = newVal
+                    ? [...updatedMessages[msgIndex].labels, label]
+                    : updatedMessages[msgIndex].labels.filter(l => l !== label);
+
+                updatedMessages[msgIndex] = {
+                    ...updatedMessages[msgIndex],
+                    labels: newLabels,
+                    [label === 'starred' ? 'isStarred' : dbField]: newVal
+                };
+
+                // Prepare API call
+                updatePromises.push(mailService.updateMessage(msgId, { [dbField]: newVal }));
             }
-            return msg;
-        });
+        }
+
         setMessages(updatedMessages);
+
+        try {
+            await Promise.all(updatePromises);
+        } catch (error) {
+            console.error("Failed to update labels in batch:", error);
+            // In a real app, we might want to rollback or show an error toast
+            alert("Some updates failed. Please refresh.");
+        }
     };
 
     // Check if a label is active for all selected messages
@@ -314,16 +296,22 @@ const Mail = () => {
     const handleComposeClose = () => {
         setIsComposeOpen(false);
         setIsMinimized(false);
+        setIsMaximized(false);
         setComposeData({ to: '', cc: [], bcc: [], subject: '', body: '', parentId: null });
     };
 
-    const handleMessageClick = (msg) => {
+    const handleMessageClick = async (msg) => {
         setSelectedMessage(msg);
         if (!msg.isRead) {
-            const updatedMessages = messages.map(m =>
-                m.id === msg.id ? { ...m, isRead: true } : m
-            );
-            setMessages(updatedMessages);
+            try {
+                await mailService.updateMessage(msg.id, { is_read: true });
+                const updatedMessages = messages.map(m =>
+                    m.id === msg.id ? { ...m, isRead: true } : m
+                );
+                setMessages(updatedMessages);
+            } catch (error) {
+                console.error("Failed to mark as read:", error);
+            }
         }
     };
 
@@ -343,29 +331,42 @@ const Mail = () => {
                 </div>
 
                 <nav className="mail-nav">
-                    {['inbox', 'starred', 'sent', 'spam', 'trash'].map(label => (
-                        <button
-                            key={label}
-                            className={`nav-item ${selectedLabel === label ? 'active' : ''}`}
-                            onClick={() => {
-                                setSelectedLabel(label);
-                                setSelectedMessage(null);
-                                setSelectedMessageIds(new Set());
-                            }}
-                        >
-                            <i className={`fas fa-${label === 'inbox' ? 'inbox' : label === 'starred' ? 'star' : label === 'sent' ? 'paper-plane' : label === 'spam' ? 'triangle-exclamation' : 'trash'}`}></i>
-                            <span style={{ textTransform: 'capitalize' }}>{label}</span>
-                            {label === 'inbox' && <span className="count">{messages.filter(m => m.labels.includes('inbox') && !m.isRead).length}</span>}
-                        </button>
-                    ))}
+                    {[
+                        { id: 'inbox', label: 'Boîte de réception', icon: Inbox },
+                        { id: 'starred', label: 'Favoris', icon: Star },
+                        { id: 'sent', label: 'Envoyés', icon: Send },
+                        { id: 'spam', label: 'Indésirables', icon: AlertTriangle },
+                        { id: 'trash', label: 'Corbeille', icon: Trash2 }
+                    ].map(item => {
+                        const Icon = item.icon;
+                        return (
+                            <button
+                                key={item.id}
+                                className={`nav-item ${selectedLabel === item.id ? 'active' : ''}`}
+                                onClick={() => {
+                                    setSelectedLabel(item.id);
+                                    setSelectedMessage(null);
+                                    setSelectedMessageIds(new Set());
+                                }}
+                            >
+                                <Icon size={20} />
+                                <span>{item.label}</span>
+                                {item.id === 'inbox' && (
+                                    <span className="count">
+                                        {messages.filter(m => m.labels.includes('inbox') && !m.isRead).length}
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
                 </nav>
 
                 <div className="sidebar-compose">
                     <button className="compose-btn" onClick={() => {
-                        setComposeData({ to: '', subject: '', body: '', parentId: null });
+                        setComposeData({ to: '', cc: [], bcc: [], subject: '', body: '', parentId: null });
                         setIsComposeOpen(true);
                     }}>
-                        <i className="fas fa-plus"></i> Compose
+                        <Plus size={20} /> Nouveau message
                     </button>
                 </div>
 
@@ -379,51 +380,60 @@ const Mail = () => {
                 {/* Header */}
                 <header className="mail-header">
                     <button className="menu-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-                        <i className="fas fa-bars"></i>
+                        <Menu size={20} />
                     </button>
                     <div className="search-box">
-                        <i className="fas fa-search"></i>
+                        <Search size={18} />
                         <input
                             type="text"
-                            placeholder="Search mail"
+                            placeholder="Rechercher des mails..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-
                 </header>
 
                 {/* Selection Toolbar (Conditional) */}
                 {selectedMessageIds.size > 0 && (
                     <div className="selection-toolbar" style={{ padding: '10px 16px', background: '#f8f9fa', borderBottom: '1px solid #e0e0e0', display: 'flex', gap: '8px', alignItems: 'center' }}>
                         <span style={{ fontSize: '14px', color: '#5f6368', marginRight: '8px' }}>{selectedMessageIds.size} selected</span>
-                        {availableLabels.map(item => (
-                            <button
-                                key={item.id}
-                                className={`label-choice-btn ${isLabelActiveForSelected(item.id) ? 'selected' : ''}`}
-                                onClick={() => toggleLabelForSelected(item.id)}
-                                style={{
-                                    padding: '6px 12px',
-                                    borderRadius: '16px',
-                                    border: `1px solid ${isLabelActiveForSelected(item.id) ? '#00a86b' : '#dadce0'}`,
-                                    background: isLabelActiveForSelected(item.id) ? '#d1f2e5' : 'white',
-                                    color: isLabelActiveForSelected(item.id) ? '#00a86b' : '#5f6368',
-                                    cursor: 'pointer',
-                                    fontSize: '13px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    fontWeight: '500'
-                                }}
-                            >
-                                <i className={item.icon}></i> {item.label}
-                            </button>
-                        ))}
+                        {availableLabels.map(item => {
+                            // Map string icon names to Lucide components
+                            const IconMap = {
+                                'starred': Star,
+                                'spam': AlertTriangle,
+                                'trash': Trash2,
+                                'archive': Archive
+                            };
+                            const Icon = IconMap[item.id];
+                            return (
+                                <button
+                                    key={item.id}
+                                    className={`label-choice-btn ${isLabelActiveForSelected(item.id) ? 'selected' : ''}`}
+                                    onClick={() => toggleLabelForSelected(item.id)}
+                                    style={{
+                                        padding: '6px 12px',
+                                        borderRadius: '16px',
+                                        border: `1px solid ${isLabelActiveForSelected(item.id) ? '#00a86b' : '#dadce0'}`,
+                                        background: isLabelActiveForSelected(item.id) ? '#d1f2e5' : 'white',
+                                        color: isLabelActiveForSelected(item.id) ? '#00a86b' : '#5f6368',
+                                        cursor: 'pointer',
+                                        fontSize: '13px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        fontWeight: '500'
+                                    }}
+                                >
+                                    <Icon size={14} /> {item.label}
+                                </button>
+                            );
+                        })}
                         <button
                             onClick={() => setSelectedMessageIds(new Set())}
                             style={{ marginLeft: 'auto', border: 'none', background: 'transparent', cursor: 'pointer', color: '#5f6368' }}
                         >
-                            <i className="fas fa-times"></i>
+                            <X size={18} />
                         </button>
                     </div>
                 )}
@@ -465,7 +475,7 @@ const Mail = () => {
                 <aside className="message-detail">
                     <div className="detail-header">
                         <button className="close-detail" onClick={() => setSelectedMessage(null)}>
-                            <i className="fas fa-times"></i>
+                            <X size={20} />
                         </button>
                     </div>
                     <div className="detail-content">
@@ -479,6 +489,22 @@ const Mail = () => {
                                         <div className="sender-info">
                                             <div className="sender-name">{msg.from}</div>
                                             <div className="sender-email">{msg.email}</div>
+
+                                            {/* Recipients Display */}
+                                            {msg.recipients && msg.recipients.length > 0 && (
+                                                <div className="recipients-list" style={{ fontSize: '12px', color: '#5f6368', marginTop: '4px' }}>
+                                                    {msg.recipients.filter(r => r.type === 'to').length > 0 && (
+                                                        <div>
+                                                            <strong>À:</strong> {msg.recipients.filter(r => r.type === 'to').map(r => r.name || r.email).join(', ')}
+                                                        </div>
+                                                    )}
+                                                    {msg.recipients.filter(r => r.type === 'cc').length > 0 && (
+                                                        <div>
+                                                            <strong>Cc:</strong> {msg.recipients.filter(r => r.type === 'cc').map(r => r.name || r.email).join(', ')}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="detail-date">{msg.date}</div>
                                     </div>
@@ -487,13 +513,13 @@ const Mail = () => {
                                     </div>
                                     <div className="detail-actions">
                                         <button className="action-btn" onClick={() => handleReply(msg)}>
-                                            <i className="fas fa-reply"></i> Reply
+                                            <Reply size={16} /> Répondre
                                         </button>
                                         <button className="action-btn" onClick={() => handleReplyAll(msg)}>
-                                            <i className="fas fa-reply-all"></i> Reply All
+                                            <ReplyAll size={16} /> Répondre à tous
                                         </button>
                                         <button className="action-btn" onClick={() => handleForward(msg)}>
-                                            <i className="fas fa-forward"></i> Forward
+                                            <Forward size={16} /> Transférer
                                         </button>
                                     </div>
                                 </div>
@@ -506,23 +532,32 @@ const Mail = () => {
             {/* Compose Modal */}
             {isComposeOpen && (
                 <div
-                    className={`compose-modal ${isMinimized ? 'minimized' : ''}`}
+                    className={`compose-modal ${isMinimized ? 'minimized' : ''} ${isMaximized ? 'maximized' : ''}`}
                     onClick={() => isMinimized && setIsMinimized(false)}
                 >
                     <div className="compose-header">
-                        <h3>{isMinimized ? (composeData.subject || 'New Message') : 'New Message'}</h3>
+                        <h3>{isMinimized ? (composeData.subject || 'Nouveau message') : 'Nouveau message'}</h3>
                         <div className="compose-actions">
+                            {!isMaximized && (
+                                <button onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsMinimized(!isMinimized);
+                                }}>
+                                    {isMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
+                                </button>
+                            )}
                             <button onClick={(e) => {
                                 e.stopPropagation();
-                                setIsMinimized(!isMinimized);
+                                setIsMaximized(!isMaximized);
+                                setIsMinimized(false);
                             }}>
-                                <i className={`fas fa-${isMinimized ? 'plus' : 'minus'}`}></i>
+                                {isMaximized ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                             </button>
                             <button onClick={(e) => {
                                 e.stopPropagation();
                                 handleComposeClose();
                             }}>
-                                <i className="fas fa-times"></i>
+                                <X size={16} />
                             </button>
                         </div>
                     </div>
@@ -557,7 +592,7 @@ const Mail = () => {
                                             className="remove-recipient-btn"
                                             onClick={() => removeRecipient('cc', index)}
                                         >
-                                            <i className="fas fa-times"></i>
+                                            <X size={14} />
                                         </button>
                                     </div>
                                 ))}
@@ -576,7 +611,7 @@ const Mail = () => {
                                             className="remove-recipient-btn"
                                             onClick={() => removeRecipient('bcc', index)}
                                         >
-                                            <i className="fas fa-times"></i>
+                                            <X size={14} />
                                         </button>
                                     </div>
                                 ))}
@@ -598,11 +633,42 @@ const Mail = () => {
                                 ></textarea>
                             </div>
                             <div className="compose-footer">
-                                <button className="send-btn" onClick={() => {
-                                    console.log('Sending message:', composeData);
-                                    handleComposeClose();
+                                <button className="send-btn" onClick={async () => {
+                                    try {
+                                        // 1. Extract all emails
+                                        const toEmails = (composeData.to || '').split(',').map(e => e.trim()).filter(e => e !== '');
+                                        const allRecipients = [...toEmails, ...composeData.cc, ...composeData.bcc];
+
+                                        if (allRecipients.length === 0) {
+                                            window.alert("Veuillez ajouter au moins un destinataire.");
+                                            return;
+                                        }
+
+                                        // 2. Validate format and existence
+                                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                        const validEmails = allUsers.map(u => (u.email || '').toLowerCase());
+
+                                        for (const email of allRecipients) {
+                                            if (!emailRegex.test(email)) {
+                                                window.alert(`L'adresse email "${email}" n'est pas valide.`);
+                                                return;
+                                            }
+                                            if (!validEmails.includes(email.toLowerCase())) {
+                                                window.alert(`"${email}" does not exist`);
+                                                return;
+                                            }
+                                        }
+
+                                        // 3. Send if all valid
+                                        const sentMsg = await mailService.sendMessage(composeData);
+                                        setMessages(prev => [...prev, sentMsg]);
+                                        handleComposeClose();
+                                    } catch (error) {
+                                        console.error("Failed to send:", error);
+                                        alert(error.message);
+                                    }
                                 }}>
-                                    <i className="fas fa-paper-plane"></i> Send
+                                    <Send size={16} /> Envoyer
                                 </button>
                                 <button className="cancel-btn" onClick={handleComposeClose}>
                                     Cancel

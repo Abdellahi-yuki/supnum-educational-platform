@@ -71,7 +71,7 @@ const Settings = ({ user, onUpdateUser }) => {
     return (
         <div className="settings-container" style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
             <div className="settings-card glass-card" style={{ padding: '2rem', borderRadius: '24px', background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(40px)' }}>
-                <h2 className="settings-title" style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '0.5rem', color: '#1C3586' }}>Mon Profil</h2>
+                <h2 className="settings-title" style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--primary-blue)' }}>Mon Profil</h2>
                 <p className="settings-subtitle" style={{ color: '#475569', marginBottom: '2rem' }}>Modifiez vos informations personnelles et votre photo</p>
 
                 {message && <p className="success-message" style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem' }}>{message}</p>}
@@ -189,7 +189,7 @@ const Settings = ({ user, onUpdateUser }) => {
                         background: 'rgba(28, 53, 134, 0.05)',
                         border: '1px solid rgba(28, 53, 134, 0.1)'
                     }}>
-                        <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem', fontSize: '0.9rem', color: '#1C3586', fontWeight: '700' }}>
+                        <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem', fontSize: '0.9rem', color: 'var(--primary-blue)', fontWeight: '700' }}>
                             <Lock size={16} /> Confirmation requise
                         </label>
                         <input

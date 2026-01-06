@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, MessageSquare, Calendar, Mail, User, Loader2, Send } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../apiConfig';
 
 const UserProfile = ({ userId, onBack, currentUser }) => {
+    const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -125,7 +127,7 @@ const UserProfile = ({ userId, onBack, currentUser }) => {
                         {/* Action Buttons */}
                         {!isMe && (
                             <button
-                                onClick={onBack}
+                                onClick={() => navigate('/mail', { state: { composeWithEmail: user.email } })}
                                 style={{
                                     marginBottom: '1rem',
                                     background: 'var(--primary-green)',

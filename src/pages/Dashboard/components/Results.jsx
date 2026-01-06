@@ -66,12 +66,12 @@ const Results = () => {
     const subjects = getSubjects();
 
     return (
-        <div className="content-container">
-            <div className="settings-card" style={{ maxWidth: '1000px' }}>
+        <div className="settings-container results-container">
+            <div className="settings-card glass-panel" style={{ maxWidth: '1100px', width: '100%', animation: 'fadeInUp 0.6s ease-out' }}>
                 <h2 className="settings-title">Consultation des Résultats</h2>
                 <p className="settings-subtitle">Entrez votre matricule et choisissez le semestre pour voir vos notes.</p>
 
-                <form onSubmit={handleSearch} className="form-group-row" style={{ marginBottom: '2rem' }}>
+                <form onSubmit={handleSearch} className="form-group-row" style={{ marginBottom: '2.5rem' }}>
                     <div style={{ flex: 2 }}>
                         <label className="form-label">Matricule</label>
                         <input
@@ -95,11 +95,9 @@ const Results = () => {
                             <option value="4">Semestre 4</option>
                         </select>
                     </div>
-                    <div style={{ flex: 0.5, display: 'flex', alignItems: 'flex-end' }}>
-                        <button type="submit" className="btn btn-primary" disabled={loading} style={{ height: '56px', width: '100%' }}>
-                            {loading ? <Loader2 className="animate-spin" /> : <Search />}
-                        </button>
-                    </div>
+                    <button type="submit" className="btn btn-primary" disabled={loading} style={{ height: '56px', padding: '0 1.5rem' }}>
+                        {loading ? <Loader2 className="animate-spin" /> : <><Search size={20} /> <span style={{ marginLeft: '8px' }}>Chercher</span></>}
+                    </button>
                 </form>
 
                 {error && (
@@ -133,21 +131,31 @@ const Results = () => {
                                 </thead>
                                 <tbody>
                                     {subjects.map((sub, idx) => (
-                                        <tr key={idx} className="table-row-hover" style={{ background: 'rgba(255, 255, 255, 0.5)', borderRadius: '14px' }}>
-                                            <td style={{ padding: '1.25rem', fontWeight: 700, borderRadius: '14px 0 0 14px' }} data-label="Matière">
-                                                <div style={{ fontSize: '1rem' }}>{sub.name}</div>
-                                                <div style={{ fontSize: '0.7rem', color: 'var(--gray-500)', opacity: 0.7 }}>{sub.code}</div>
+                                        <tr key={idx} className="table-row-hover" style={{ background: 'rgba(255, 255, 255, 0.3)', backdropFilter: 'blur(10px)', transition: 'all 0.3s ease' }}>
+                                            <td style={{ padding: '1.25rem', fontWeight: 700, borderRadius: '18px 0 0 18px', borderLeft: '1px solid rgba(255, 255, 255, 0.4)' }} data-label="Matière">
+                                                <div style={{ fontSize: '1rem', color: 'var(--primary-blue)' }}>{sub.name}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--gray-500)', fontWeight: 600 }}>{sub.code}</div>
                                             </td>
                                             <td style={{ textAlign: 'center', padding: '1.25rem' }} data-label="NCC">{sub.ncc || '-'}</td>
                                             <td style={{ textAlign: 'center', padding: '1.25rem' }} data-label="NSN">{sub.nsn || '-'}</td>
                                             <td style={{ textAlign: 'center', padding: '1.25rem' }} data-label="NSR">{sub.nsr || '-'}</td>
-                                            <td style={{ textAlign: 'center', padding: '1.25rem', fontWeight: 800, color: (sub.moy >= 10 || ['C', 'CI', 'CE'].includes(sub.capit)) ? 'var(--success)' : 'var(--danger)' }} data-label="Moyenne">{sub.moy}</td>
-                                            <td style={{ textAlign: 'center', padding: '1.25rem', borderRadius: '0 14px 14px 0' }} data-label="Crédit">
+                                            <td style={{ textAlign: 'center', padding: '1.25rem', fontWeight: 800, color: (sub.moy >= 10 || ['C', 'CI', 'CE'].includes(sub.capit)) ? 'var(--primary-green)' : 'var(--danger)' }} data-label="Moyenne">{sub.moy}</td>
+                                            <td style={{ textAlign: 'center', padding: '1.25rem', borderRadius: '0 18px 18px 0', borderRight: '1px solid rgba(255, 255, 255, 0.4)' }} data-label="Crédit">
                                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                                                    <span style={{ fontWeight: 800, fontSize: '1rem' }}>{sub.credits}</span>
-                                                    <span style={{ padding: '2px 8px', background: ['C', 'CI', 'CE'].includes(sub.capit) ? 'rgba(46, 171, 78, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: ['C', 'CI', 'CE'].includes(sub.capit) ? 'var(--success)' : 'var(--danger)', borderRadius: '10px', fontSize: '0.65rem', fontWeight: 700 }}>
-                                                        {['C', 'CI', 'CE'].includes(sub.capit) ? 'VALIDÉ' : 'ÉCHEC'}
-                                                    </span>
+                                                    <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>{sub.credits}</span>
+                                                    {sub.capit && (
+                                                        <span style={{
+                                                            padding: '4px 10px',
+                                                            background: ['C', 'V', 'CI', 'CE'].includes(sub.capit) ? 'rgba(46, 171, 78, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                                            color: ['C', 'V', 'CI', 'CE'].includes(sub.capit) ? 'var(--primary-green)' : 'var(--danger)',
+                                                            borderRadius: '12px',
+                                                            fontSize: '0.7rem',
+                                                            fontWeight: 800,
+                                                            textTransform: 'uppercase'
+                                                        }}>
+                                                            {sub.capit}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -156,18 +164,26 @@ const Results = () => {
                             </table>
                         </div>
 
-                        <div className="summary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
-                            <div className="summary-card" style={{ background: 'white', padding: '1.5rem', borderRadius: '22px', textAlign: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', fontWeight: 700, marginBottom: '0.5rem' }}>MOYENNE GÉNÉRALE</p>
-                                <h4 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary-blue)' }}>{results.Moy_General}</h4>
+                        <div className="summary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
+                            <div className="summary-card glass-panel" style={{ padding: '2rem', textAlign: 'center', animation: 'scaleIn 0.5s ease-out' }}>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--gray-500)', fontWeight: 800, marginBottom: '0.75rem', letterSpacing: '1px' }}>MOYENNE GÉNÉRALE</p>
+                                <h4 style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--primary-blue)', margin: 0 }}>{results.Moy_General}</h4>
                             </div>
-                            <div className="summary-card" style={{ background: 'white', padding: '1.5rem', borderRadius: '22px', textAlign: 'center', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', fontWeight: 700, marginBottom: '0.5rem' }}>CRÉDITS ACQUIS</p>
-                                <h4 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary-green)' }}>{results.Credit_total}</h4>
+                            <div className="summary-card glass-panel" style={{ padding: '2rem', textAlign: 'center', animation: 'scaleIn 0.5s ease-out 0.1s backwards' }}>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--gray-500)', fontWeight: 800, marginBottom: '0.75rem', letterSpacing: '1px' }}>CRÉDITS ACQUIS</p>
+                                <h4 style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--primary-green)', margin: 0 }}>{results.Credit_total}</h4>
                             </div>
-                            <div className="summary-card" style={{ background: results.Decision === 'Admis' ? 'linear-gradient(135deg, var(--primary-green), #248a3f)' : 'linear-gradient(135deg, var(--primary-blue), #182d73)', padding: '1.5rem', borderRadius: '22px', textAlign: 'center', color: 'white' }}>
-                                <p style={{ fontSize: '0.85rem', opacity: 0.8, fontWeight: 700, marginBottom: '0.5rem' }}>DÉCISION</p>
-                                <h4 style={{ fontSize: '1.75rem', fontWeight: 800 }}>{results.Decision}</h4>
+                            <div className="summary-card" style={{
+                                background: results.Decision === 'Admis' ? 'linear-gradient(135deg, var(--primary-green), #248a3f)' : 'linear-gradient(135deg, var(--primary-blue), #182d73)',
+                                padding: '2rem',
+                                borderRadius: 'var(--radius-lg)',
+                                textAlign: 'center',
+                                color: 'white',
+                                boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                                animation: 'scaleIn 0.5s ease-out 0.2s backwards'
+                            }}>
+                                <p style={{ fontSize: '0.9rem', opacity: 0.9, fontWeight: 800, marginBottom: '0.75rem', letterSpacing: '1px' }}>DÉCISION</p>
+                                <h4 style={{ fontSize: '2.5rem', fontWeight: 900, margin: 0 }}>{results.Decision}</h4>
                             </div>
                         </div>
                     </div>

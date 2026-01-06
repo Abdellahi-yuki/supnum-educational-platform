@@ -1,0 +1,252 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    /* SupNum Brand Colors - Pre-3.0 Classic Variants */
+    --primary-blue: #1C3586;
+    --primary-green: #2EAB4E;
+    --accent-blue: #3b82f6;
+    --glow-blue: rgba(28, 53, 134, 0.2);
+    --glow-green: rgba(46, 171, 78, 0.2);
+
+    /* Text Colors - Restored for light contrast */
+    --p-text-main: #1e293b;
+    --p-text-dim: #64748b;
+    --dark: #0f172a;
+    --gray-900: #0f172a;
+    --gray-700: #334155;
+    --gray-500: #64748b;
+    --gray-300: #cbd5e1;
+
+    /* Feedback Colors */
+    --success: #2EAB4E;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+
+    /* Liquid Glass System */
+    --glass-bg: rgba(255, 255, 255, 0.12);
+    --glass-bg-light: rgba(255, 255, 255, 0.45);
+    --glass-bg-hover: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.35);
+    --glass-blur: blur(40px) saturate(180%);
+    --glass-inner-glow: inset 0 0 20px rgba(255, 255, 255, 0.5);
+
+    /* SupNum Gradients */
+    --supnum-gradient: linear-gradient(135deg, #1C3586 0%, #2EAB4E 100%);
+    --supnum-gradient-hover: linear-gradient(135deg, #162a6b 0%, #268a3f 100%);
+
+    /* Shadows & Radius */
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+
+    /* Advanced Shadows - Restored for light theme */
+    --shadow-card: 0 10px 40px -10px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 20px 50px -10px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 20px var(--glow-blue);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: linear-gradient(135deg, #b8c5f2 0%, #c8dce8 35%, #d0e8dc 70%, #d8f0e0 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--p-text-main);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+/* Global Animations */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* =========================================
+   Global Glass Components
+   ========================================= */
+
+/* Glass Card */
+.glass-panel,
+.card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-card);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* Buttons */
+.btn {
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue), #2546a3);
+    color: white;
+    box-shadow: 0 4px 15px rgba(28, 53, 134, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #182d73, var(--primary-blue));
+    box-shadow: 0 8px 25px rgba(28, 53, 134, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+.btn-outline:hover {
+    background: var(--primary-blue);
+    color: white;
+    box-shadow: 0 4px 15px rgba(28, 53, 134, 0.2);
+}
+
+.btn-block {
+    width: 100%;
+    padding: 1.25rem;
+    font-size: 1.15rem;
+}
+
+/* Form Inputs */
+.input-glass,
+.auth-input {
+    width: 100%;
+    padding: 1.25rem 1.5rem;
+    border-radius: 18px;
+    border: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.7);
+    font-size: 1.05rem;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all 0.3s;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.input-glass:focus,
+.auth-input:focus {
+    outline: none;
+    background: white;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 6px rgba(46, 171, 78, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Auth Pages Standard Layout */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.auth-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 24px;
+    padding: 3.5rem;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.auth-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    color: var(--primary-blue);
+    letter-spacing: -1px;
+}
+
+.auth-subtitle {
+    color: var(--gray-500);
+    margin-bottom: 2.5rem;
+    font-size: 1.1rem;
+}
+
+.auth-link {
+    margin-top: 2rem;
+    color: var(--primary-blue);
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.auth-link:hover {
+    color: var(--primary-green);
+    text-decoration: underline;
+}

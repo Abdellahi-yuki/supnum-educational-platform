@@ -58,7 +58,7 @@ const Register = () => {
             <div className="auth-card">
                 {/* Diamond Logo Center */}
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-                    <img src="/assets/logo-supnum.jpg" alt="SupNum Logo" style={{ height: '80px', width: 'auto' }} />
+                    <img src="/assets/logo-supnum.png" alt="SupNum Logo" style={{ height: '80px', width: 'auto' }} />
                 </div>
 
                 <h2 className="auth-title">Créer un compte</h2>

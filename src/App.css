@@ -1,7 +1,4 @@
 .app-content {
     padding-top: 0px;
-    /* Height of the fixed header */
-    height: 100vh;
-    overflow: hidden;
-    /* Prevent double scrollbars */
+    min-height: calc(100vh - 90px);
 }

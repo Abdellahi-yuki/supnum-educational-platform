@@ -80,7 +80,7 @@ const Header = ({ user, onLogout, onChangePage }) => {
         <header className="header">
             <div className="header-container">
                 <div className="logo-section" onClick={() => onChangePage('dashboard')} style={{ cursor: 'pointer' }}>
-                    <img src="/assets/logo-supnum.jpg" alt="SupNum Logo" className="logo-img" />
+                    <img src="/assets/logo-supnum.png" alt="SupNum Logo" className="logo-img" />
                     <span className="logo-text">SupNum</span>
                 </div>
 

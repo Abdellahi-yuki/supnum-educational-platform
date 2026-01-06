@@ -42,6 +42,18 @@ This is a unified messaging and collaboration platform for educational instituti
 - **No Global Conflicts**: Removed global CSS resets, applied box-sizing per module
 - **Dedicated Auth CSS**: Created `Auth.css` with extracted authentication styles
 
+### ✅ Mail Module Enhancements (January 2026 - Phase 2)
+- **Recipient Verification**: Implemented frontend and backend validation to ensure recipients exist in the system.
+- **Sent Tab Fix**: Corrected the "Sent" tab to filter by `sender_id`, ensuring users see only their sent messages.
+- **Intermittent Error Resolution**: Fixed a duplicate parameter issue in the backend SQL query that caused random fetch failures.
+- **Improved Error Reporting**: Enhanced `mailService.js` to propagate detailed error messages from the backend.
+
+### ✅ Community Module Enhancements (January 2026 - Phase 2)
+- **Chunked File Upload**: Fully implemented and debugged chunked upload for large media files.
+- **Media URL Pathing**: Fixed image/video display by correctly handling relative paths from the backend.
+- **DOM Stability**: Moved file input to a stable position to prevent `NotFoundError` during re-renders.
+- **Simplified UI**: Removed the preview feature at user request to streamline the posting flow.
+
 ## Current Project State
 
 ### Completed Features
@@ -60,9 +72,10 @@ This is a unified messaging and collaboration platform for educational instituti
 - ⚠️ **Real-time Features**: WebSocket/polling for Community chat updates
 
 ### Not Started
-- ❌ **Attachment Handling**: Upload/download for Mail and Archive
-- ❌ **System Notifications**: Cross-module notification center
-- ❌ **User Profile Management**: Edit profile, change password, etc.
+- ✅ **Attachment Handling**: Chunked upload implemented for Community media
+- ✅ **User Profile Management**: Basic profile data integrated into Community and Mail
+- ⚠️ **System Notifications**: Cross-module notification center (partially implemented in Community)
+- ❌ **Mail Attachments**: Upload/download for Mail specifically
 
 ## Critical Architectural Decisions
 
@@ -158,7 +171,8 @@ Click B1 → Shows: O1 -> O2 -> B1 (A1, A2 are hidden)
 
 **State Management**:
 - `composeData.cc` and `composeData.bcc` are **arrays** of email strings
-- When sending, join arrays into comma-separated strings for API
+- **Recipient Verification**: Validates all recipients against a cached list of system users before sending.
+- **Fresh Data**: Re-fetches messages whenever the `selectedLabel` changes to ensure tab consistency.
 
 #### Community Component (`/main/src/pages/Community/Community.jsx`)
 **Key Features**:
@@ -166,7 +180,8 @@ Click B1 → Shows: O1 -> O2 -> B1 (A1, A2 are hidden)
 - Comment system with expandable/collapsible threads
 - Notification system for new comments
 - Archive/save functionality for messages
-- Chunked file upload for large media files
+- **Chunked File Upload**: Robust 1MB chunked upload handling with progress tracking.
+- **Media Display**: Pre-processes `media_url` to correctly resolve paths relative to the backend root.
 
 **Error Handling**:
 - Array validation in `fetchMessages` and `fetchNotifications`

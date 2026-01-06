@@ -17,7 +17,7 @@ const Login = ({ onLogin }) => {
 
             if (response.data.status === 'success') {
                 onLogin(response.data.user);
-                navigate('/');
+                navigate('/dashboard');
             } else if (response.data.status === 'unverified') {
                 // Seamless redirect to verify page
                 navigate('/verify', { state: { email: response.data.email } });
@@ -34,7 +34,7 @@ const Login = ({ onLogin }) => {
             <div className="auth-card">
                 {/* Diamond Logo Center */}
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-                    <img src="/assets/logo-supnum.jpg" alt="SupNum Logo" style={{ height: '80px', width: 'auto' }} />
+                    <img src="/assets/logo-supnum.png" alt="SupNum Logo" style={{ height: '80px', width: 'auto' }} />
                 </div>
 
                 <h2 className="auth-title">Connexion</h2>

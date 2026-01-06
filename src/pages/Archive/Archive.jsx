@@ -305,14 +305,20 @@ const FileViewer = ({ file, onClose }) => {
                 }
                 if (['pdf'].includes(extension)) {
                     let embedUrl = filepath;
+                    // If it's a relative path starting with /archives/, it might need full URL if served from different domain, 
+                    // but usually in Vite it should just work if files are in public/archives/.
+                    // However, we'll check if it's a Google Drive link first.
                     if (filepath.includes('drive.google.com/file/d/')) {
                         const fileId = filepath.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)[1];
                         embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
                     }
                     setContent(
-                        <div style={{ textAlign: 'center' }}>
-                            <iframe src={embedUrl} style={{ width: '100%', height: '600px', border: 'none', borderRadius: '4px' }} allow="autoplay">
-                                <p>Impossible d'afficher le PDF. <a href={filepath} target="_blank" rel="noreferrer">Cliquez ici pour l'ouvrir</a></p>
+                        <div style={{ textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <iframe src={embedUrl} style={{ width: '100%', flex: 1, minHeight: '600px', border: 'none', borderRadius: '12px', background: 'white' }} allow="autoplay" title={filename}>
+                                <div style={{ padding: '2rem', textAlign: 'center' }}>
+                                    <p>Impossible d'afficher le PDF dans le navigateur.</p>
+                                    <a href={filepath} target="_blank" rel="noreferrer" style={{ color: 'var(--primary-blue)', fontWeight: 700 }}>Cliquez ici pour l'ouvrir dans un nouvel onglet</a>
+                                </div>
                             </iframe>
                         </div>
                     );
@@ -406,17 +412,19 @@ const Toolbar = ({ onSearch, onAdminAccess }) => {
     const handleKeyPress = (e) => { if (e.key === 'Enter') handleSearch(); };
 
     return (
-        <div className="archive-toolbar" style={{ padding: '1rem 2rem', background: 'white', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-                <h1 id="A1" style={{ margin: 0, fontSize: '1.5rem', color: '#1C3586' }}>Archives des Supports de Cours</h1>
-                <p style={{ margin: 0, fontSize: '0.9rem', color: '#666' }}>Plateforme de gestion et d'archivage des ressources pédagogiques</p>
+        <div className="archive-toolbar">
+            <div className="toolbar-branding">
+                <h1 className="logo-text">Archives des Supports</h1>
+                <p className="toolbar-subtitle">Plateforme de gestion pédagogique SupNum</p>
             </div>
             <div className="header-actions">
                 <div className="search-bar">
-                    <input type="text" className="search-input" placeholder="Rechercher..." value={query} onChange={(e) => setQuery(e.target.value)} onKeyPress={handleKeyPress} />
+                    <input type="text" className="search-input" placeholder="Rechercher un cours, une matière..." value={query} onChange={(e) => setQuery(e.target.value)} onKeyPress={handleKeyPress} />
                     <button className="search-btn" onClick={handleSearch}><Search size={20} /></button>
                 </div>
-                <button className="admin-button" onClick={onAdminAccess} title="Administration"><Settings size={28} /></button>
+                <button className="admin-button" onClick={onAdminAccess} title="Administration">
+                    <Settings size={22} />
+                </button>
             </div>
         </div>
     );

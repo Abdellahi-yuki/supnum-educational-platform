@@ -17,6 +17,7 @@ export default function Community({ currentUser: propUser, onLogout }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = React.useRef(null);
 
   // Notification State
   const [notifications, setNotifications] = useState([]);
@@ -210,7 +211,7 @@ export default function Community({ currentUser: propUser, onLogout }) {
 
   const uploadFileInChunks = async (file) => {
     const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
-    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
     const uploadId = Date.now().toString(36) + Math.random().toString(36).substr(2); // Unique ID for this upload session
 
     for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
@@ -361,6 +362,20 @@ export default function Community({ currentUser: propUser, onLogout }) {
   // Render main content
   return (
     <div className="community-container">
+      <input
+        type="file"
+        id="whatsapp-file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        accept="image/*,video/*,.pdf,.doc,.docx"
+        onChange={(e) => {
+          const file = e.target.files[0];
+          if (file) {
+            console.log('File selected (Secondary):', file.name, file.size, 'bytes');
+            setSelectedFile(file);
+          }
+        }}
+      />
       <nav className="nav_left">
         <div className="sidebar-header">
           <h1>facechat</h1>
@@ -495,13 +510,7 @@ export default function Community({ currentUser: propUser, onLogout }) {
       {/* Message Bar - Always visible */}
       <div className="bar_mes">
         <div className="file-upload-wrapper">
-          <input
-            type="file"
-            id="file-input"
-            style={{ display: 'none' }}
-            onChange={(e) => setSelectedFile(e.target.files[0])}
-          />
-          <button id="enleve" type="button" onClick={() => document.getElementById('file-input').click()}>
+          <label htmlFor="whatsapp-file" id="enleve" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
             <span className="enlevee">
               <svg width="20px" height="20px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none">
                 <g fill={selectedFile ? "#007bff" : "#333333"}>
@@ -510,9 +519,16 @@ export default function Community({ currentUser: propUser, onLogout }) {
                 </g>
               </svg>
             </span>
-          </button>
-          {selectedFile && <span className="file-name">{selectedFile.name}</span>}
+          </label>
+          {selectedFile && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <span className="file-name">{selectedFile.name}</span>
+              <button onClick={() => { setSelectedFile(null); }} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer' }}>✕</button>
+            </div>
+          )}
         </div>
+
+        {/* Preview removed */}
 
         <textarea
           name="messages"
@@ -688,9 +704,9 @@ const MessageList = ({ items, currentUser, commentInputs, setCommentInputs, hand
             </div>
             <div className="message-content">
               {msg.content && <p>{msg.content}</p>}
-              {msg.type === 'image' && <img src={`http://localhost:8000${msg.media_url}`} alt="upload" className="msg-media" />}
-              {msg.type === 'video' && <video src={`http://localhost:8000${msg.media_url}`} controls className="msg-media" />}
-              {msg.type === 'file' && <a href={`http://localhost:8000${msg.media_url}`} target="_blank" rel="noopener noreferrer">Download File</a>}
+              {msg.type === 'image' && <img src={`${API_BASE_URL.replace('/api', '')}${msg.media_url}`} alt="upload" className="msg-media" />}
+              {msg.type === 'video' && <video src={`${API_BASE_URL.replace('/api', '')}${msg.media_url}`} controls className="msg-media" />}
+              {msg.type === 'file' && <a href={`${API_BASE_URL.replace('/api', '')}${msg.media_url}`} target="_blank" rel="noopener noreferrer">Download File</a>}
             </div>
 
             <div className="comments-section">

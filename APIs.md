@@ -24,7 +24,9 @@ This document outlines the API endpoints required for the unified messaging syst
         - `page`: (pagination, default 1)
         - `limit`: (items per page, default 20)
     - Response: `[{ id, subject, content, date, from, isRead, isStarred, labels, hasAttachments }]`
-    - **Logic Note**: For `label=inbox`, the backend should return only **Leaf Nodes** (latest message in a branch). If a sent message is part of an inbox thread, it should be included.
+    - **Logic Note**: 
+        - For `label=inbox`, the backend returns only **Leaf Nodes** (latest message in a branch).
+        - For `label=sent`, the backend filters by `sender_id = :user_id`.
 
 - `GET /mail/messages/:id`: Get details of a specific message.
     - Response: `{ id, subject, content, date, from: {name, email}, to: [{name, email}], cc: [], attachments: [{id, name, url}], parent_id }`
@@ -42,6 +44,7 @@ This document outlines the API endpoints required for the unified messaging syst
         - `body`: (text)
         - `attachments[]`: (files)
         - `parent_id`: (optional, ID of the message being replied to. Required for threading)
+    - **Validation**: The backend validates all recipients (To, Cc, Bcc) against the `users` table. If any email is not found, it returns `400 Bad Request` with `{ "error": "{email} does not exist" }`.
 
 - `PATCH /mail/messages/batch`: Batch update messages (labels, read status).
     - Body: 
@@ -89,7 +92,8 @@ This document outlines the API endpoints required for the unified messaging syst
     - Body: `{ message_id, user_id }`
 - `POST /community/upload/chunk`: Upload a file in chunks.
     - Body: `FormData` with `chunk`, `upload_id`, `chunk_index`, `total_chunks`, `file_name`
-    - Response: `{ status: "done" | "part", media_url?: string, type?: string }`
+    - Response: `{ "status": "done" | "part", "media_url": "string", "type": "string" }`
+    - **Note**: `media_url` is returned relative to the root (e.g., `/uploads/...`). The frontend should prepend the base URL (excluding `/api`) for display.
 - `GET /community/notifications`: Get user notifications.
     - Query: `user_id`
     - Response: `[{ id, user_id, actor_id, actor_name, message_id, type, is_read, created_at }]`
