@@ -67,27 +67,13 @@ const Landing = () => {
 
     return (
         <div className="landing-premium">
-            {/* Logo-First Navigation */}
-            <nav className="p-nav glass-2-0">
-                <div className="p-nav-wrapper">
-                    <div className="p-logo">
-                        <img src="/assets/logo-supnum.png" alt="SupNum Logo" className="header-logo" />
-                        <span className="logo-text">SupNum</span>
-                    </div>
-                    <div className="p-nav-links">
-                        <button className="p-nav-btn secondary" onClick={() => navigate('/login')}>Connexion</button>
-                        <button className="p-nav-btn primary" onClick={() => navigate('/register')}>S'inscrire</button>
-                    </div>
-                </div>
-            </nav>
-
             {/* Institutional Hero */}
             <header className="p-hero">
                 <div className="hero-artwork-container">
                     <img src={heroArt} alt="Visual Excellence" className="hero-artwork" />
                 </div>
                 <div className="hero-text-overlay" ref={addToRefs}>
-                    <div className="h-badge glass-2-0">Plateforme Officielle - SupNum</div>
+                    <div className="h-badge glass-panel">Plateforme Officielle - SupNum</div>
                     <h1 className="h-title">
                         L'Excellence Académique par <br />
                         <span className="highlight">l'Innovation Numérique.</span>
@@ -97,7 +83,7 @@ const Landing = () => {
                         Une infrastructure robuste dédiée à la réussite de nos étudiants.
                     </p>
                     <div className="h-actions">
-                        <button className="p-btn-glow" onClick={() => navigate('/login')}>
+                        <button className="btn btn-primary btn-block" style={{ maxWidth: '300px' }} onClick={() => navigate('/login')}>
                             Accéder à mon espace <ArrowRight size={18} />
                         </button>
                     </div>
@@ -111,17 +97,17 @@ const Landing = () => {
                     <p className="v-subtitle">Un écosystème numérique robuste et intuitif.</p>
                 </div>
                 <div className="v-grid">
-                    <div className="v-card glass-2-0" ref={addToRefs}>
+                    <div className="v-card glass-panel" ref={addToRefs}>
                         <ShieldCheck className="v-icon blue" />
                         <h3>Environnement de Confiance</h3>
                         <p>Une sécurisation avancée de vos données et de vos communications institutionnelles.</p>
                     </div>
-                    <div className="v-card glass-2-0" ref={addToRefs}>
+                    <div className="v-card glass-panel" ref={addToRefs}>
                         <Globe className="v-icon green" />
                         <h3>Disponibilité Totale</h3>
                         <p>Accédez à vos ressources et à votre communauté partout, tout le temps, en un clic.</p>
                     </div>
-                    <div className="v-card glass-2-0" ref={addToRefs}>
+                    <div className="v-card glass-panel" ref={addToRefs}>
                         <CheckCircle2 className="v-icon blue" />
                         <h3>Interface Optimisée</h3>
                         <p>Une ergonomie pensée pour minimiser les distractions et maximiser la concentration.</p>
@@ -130,13 +116,13 @@ const Landing = () => {
             </section>
 
             {/* Modules Grid */}
-            <section className="p-modules section-padding bg-darker">
+            <section className="p-modules section-padding bg-light-glass">
                 <div className="m-header" ref={addToRefs}>
                     <h2 className="m-title">Services Intégrés</h2>
                 </div>
                 <div className="m-grid">
                     {coreFeatures.map((f, idx) => (
-                        <div key={idx} className="m-item glass-2-0" ref={addToRefs}>
+                        <div key={idx} className="m-item glass-panel" ref={addToRefs}>
                             <div className="m-icon-box">{f.icon}</div>
                             <div className="m-content">
                                 <h3>{f.title}</h3>
@@ -149,22 +135,15 @@ const Landing = () => {
 
             {/* Bottom CTA */}
             <section className="p-cta section-padding" ref={addToRefs}>
-                <div className="cta-glass-box glass-2-0">
+                <div className="cta-glass-box glass-panel">
                     <h2>Rejoignez l'Écosystème Numérique</h2>
                     <p>Connectez-vous dès maintenant pour accéder à vos services et ressources.</p>
                     <div className="cta-btns">
-                        <button className="p-btn-glow" onClick={() => navigate('/login')}>Se connecter à SupNum</button>
-                        <button className="p-btn-ghost" onClick={() => navigate('/register')}>Nouvelle inscription</button>
+                        <button className="btn btn-primary" onClick={() => navigate('/login')}>Se connecter à SupNum</button>
+                        <button className="btn btn-outline" onClick={() => navigate('/register')}>Nouvelle inscription</button>
                     </div>
                 </div>
             </section>
-
-            <footer className="p-footer">
-                <div className="f-logo">
-                    <img src="/assets/logo-supnum.png" alt="SupNum" className="footer-logo" />
-                </div>
-                <p>&copy; 2026 SupNum - École Supérieure du Numérique. Dédié à la formation des leaders de demain.</p>
-            </footer>
         </div>
     );
 };

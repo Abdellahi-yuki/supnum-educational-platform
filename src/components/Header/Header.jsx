@@ -93,102 +93,111 @@ const Header = ({ user, onLogout }) => {
                 </div>
 
                 <nav className="nav-menu">
-                    {navLinks.map((link) => (
-                        <a
-                            key={link.name}
-                            href={link.path}
-                            className={`nav-link ${isActive(link.path) ? 'active' : ''}`}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                navigate(link.path);
-                            }}
-                        >
-                            {link.name}
-                        </a>
-                    ))}
+                    {user ? (
+                        navLinks.map((link) => (
+                            <a
+                                key={link.name}
+                                href={link.path}
+                                className={`nav-link ${isActive(link.path) ? 'active' : ''}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    navigate(link.path);
+                                }}
+                            >
+                                {link.name}
+                            </a>
+                        ))
+                    ) : (
+                        <div className="auth-nav-links">
+                            <button className="nav-link" onClick={() => navigate('/login')}>Connexion</button>
+                            <button className="nav-link active" onClick={() => navigate('/register')}>S'inscrire</button>
+                        </div>
+                    )}
                 </nav>
 
-                <div className="header-actions">
-                    <div className="notification-container" style={{ position: 'relative' }}>
-                        <button
-                            className="icon-btn"
-                            onClick={() => setShowNotifications(!showNotifications)}
-                        >
-                            <Bell size={20} />
-                            {unreadCount > 0 && (
-                                <span className="notification-badge">{unreadCount}</span>
-                            )}
-                        </button>
-
-                        {showNotifications && (
-                            <div className="notification-dropdown">
-                                <div className="notification-dropdown-header">
-                                    <h3>Notifications</h3>
-                                    {unreadCount > 0 && <span>{unreadCount} non lues</span>}
-                                </div>
-                                <div className="notification-list">
-                                    {notifications.length === 0 ? (
-                                        <p className="no-notifications">Aucune notification</p>
-                                    ) : (
-                                        notifications.map(n => (
-                                            <div
-                                                key={n.id}
-                                                className={`notification-item ${n.is_read ? 'read' : 'unread'}`}
-                                                onClick={() => handleNotificationClick(n)}
-                                            >
-                                                <div className="notification-item-top">
-                                                    <span className="actor-name">{n.actor_name}</span>
-                                                    <span className="notification-time">
-                                                        {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </span>
-                                                </div>
-                                                <p className="notification-text">
-                                                    {n.type === 'reply' ? 'a répondu à votre message' : 'a commenté votre publication'}
-                                                </p>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="profile-container" style={{ position: 'relative' }}>
-                        <div
-                            className="user-profile"
-                            onClick={() => setShowDropdown(!showDropdown)}
-                        >
-                            <div className="user-avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                {user?.profile_pic ? (
-                                    <img
-                                        src={`${API_BASE_URL}/${user.profile_pic}`}
-                                        alt="Avatar"
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                    />
-                                ) : (
-                                    getInitials()
+                {user && (
+                    <div className="header-actions">
+                        <div className="notification-container" style={{ position: 'relative' }}>
+                            <button
+                                className="icon-btn"
+                                onClick={() => setShowNotifications(!showNotifications)}
+                            >
+                                <Bell size={20} />
+                                {unreadCount > 0 && (
+                                    <span className="notification-badge">{unreadCount}</span>
                                 )}
-                                <span className="status-dot"></span>
-                            </div>
-                            <span className="user-name">{getUserName()}</span>
+                            </button>
+
+                            {showNotifications && (
+                                <div className="notification-dropdown">
+                                    <div className="notification-dropdown-header">
+                                        <h3>Notifications</h3>
+                                        {unreadCount > 0 && <span>{unreadCount} non lues</span>}
+                                    </div>
+                                    <div className="notification-list">
+                                        {notifications.length === 0 ? (
+                                            <p className="no-notifications">Aucune notification</p>
+                                        ) : (
+                                            notifications.map(n => (
+                                                <div
+                                                    key={n.id}
+                                                    className={`notification-item ${n.is_read ? 'read' : 'unread'}`}
+                                                    onClick={() => handleNotificationClick(n)}
+                                                >
+                                                    <div className="notification-item-top">
+                                                        <span className="actor-name">{n.actor_name}</span>
+                                                        <span className="notification-time">
+                                                            {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </span>
+                                                    </div>
+                                                    <p className="notification-text">
+                                                        {n.type === 'reply' ? 'a répondu à votre message' : 'a commenté votre publication'}
+                                                    </p>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {showDropdown && (
-                            <div className="profile-dropdown">
-                                <div className="dropdown-item" onClick={() => {
-                                    navigate('/dashboard/settings');
-                                    setShowDropdown(false);
-                                }}>
-                                    <Settings size={16} /> Mon Profil
+                        <div className="profile-container" style={{ position: 'relative' }}>
+                            <div
+                                className="user-profile"
+                                onClick={() => setShowDropdown(!showDropdown)}
+                            >
+                                <div className="user-avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    {user?.profile_pic ? (
+                                        <img
+                                            src={`${API_BASE_URL}/${user.profile_pic}`}
+                                            alt="Avatar"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        getInitials()
+                                    )}
+                                    <span className="status-dot"></span>
                                 </div>
-                                <div className="dropdown-divider"></div>
-                                <div className="dropdown-item danger" onClick={onLogout}>
-                                    <LogOut size={16} /> Déconnexion
-                                </div>
+                                <span className="user-name">{getUserName()}</span>
                             </div>
-                        )}
+
+                            {showDropdown && (
+                                <div className="profile-dropdown">
+                                    <div className="dropdown-item" onClick={() => {
+                                        navigate('/dashboard/settings');
+                                        setShowDropdown(false);
+                                    }}>
+                                        <Settings size={16} /> Mon Profil
+                                    </div>
+                                    <div className="dropdown-divider"></div>
+                                    <div className="dropdown-item danger" onClick={onLogout}>
+                                        <LogOut size={16} /> Déconnexion
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             {/* Mobile Menu Drawer */}
