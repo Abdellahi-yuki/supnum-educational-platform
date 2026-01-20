@@ -7,13 +7,15 @@ This project is an educational platform built with React and Vite.
 The application consists of the following main pages:
 
 - **Dashboard** (`/dashboard`): The main landing dashboard.
-  - Component: `src/pages/Dashboard/Dashboard`
+  - Component: `src/pages/Dashboard/Dashboard.jsx`
 - **Mail** (`/mail`): A page for messaging or mail-related features.
-  - Component: `src/pages/Mail/Mail`
+  - Component: `src/pages/Mail/Mail.jsx`
 - **Community** (`/community`): A community interaction page.
-  - Component: `src/pages/Dashboard/components/Community`
+  - Component: `src/pages/Community/Community.jsx`
 - **Archive** (`/archive`): An archive page.
-  - Component: `src/pages/Archive/Archive`
+  - Component: `src/pages/Archive/Archive.jsx`
+- **Results** (`/results`): A results/grades page.
+  - Component: `src/pages/Results/Results.jsx`
 
 ## Getting Started
 
@@ -68,7 +70,6 @@ To run the full application, you need two terminal windows:
 
 2.  **Terminal 2 (Frontend):**
     ```bash
-    cd main
     npm run dev
     ```
 
@@ -92,4 +93,4 @@ For more detailed information, please refer to the following documents:
 - **[INSTRUCTIONS.md](INSTRUCTIONS.md)**: General developer guidelines and rules.
 - **[APIs.md](APIs.md)**: Backend API documentation.
 - **[CSS_REGISTRY.md](CSS_REGISTRY.md)**: Registry of used CSS classes to prevent conflicts.
-- **[README_DB.md](README_DB.md)**: Database schema documentation.
+- **[probably.md](probably.md)**: Detailed project handover and architecture.

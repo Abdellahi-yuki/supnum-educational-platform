@@ -10,6 +10,7 @@ This is a unified messaging and collaboration platform for educational instituti
 - **Separated Backend**: PHP backend moved to root `backend/` directory (outside of `main/`)
 - **Single Entry Point**: Application runs from `main/` with unified routing in `src/App.jsx`
 - **Centralized API Config**: `main/src/apiConfig.js` manages `API_BASE_URL` for all modules
+- **New Results Module**: Added `src/pages/Results/` for checking academic results
 
 ### ✅ Authentication Refactoring
 - **Dedicated Auth Directory**: Created `src/pages/Auth/` containing:
@@ -66,17 +67,6 @@ This is a unified messaging and collaboration platform for educational instituti
 - ✅ **Dashboard Module (Frontend)**: User dashboard with consolidated routing
 - ✅ **Error Handling**: Defensive programming for API responses
 
-### In Progress
-- ⚠️ **Backend API Services**: Need full implementation (see `APIs.md`)
-- ⚠️ **User Authentication Backend**: Login/register endpoints need completion
-- ⚠️ **Real-time Features**: WebSocket/polling for Community chat updates
-
-### Not Started
-- ✅ **Attachment Handling**: Chunked upload implemented for Community media
-- ✅ **User Profile Management**: Basic profile data integrated into Community and Mail
-- ⚠️ **System Notifications**: Cross-module notification center (partially implemented in Community)
-- ❌ **Mail Attachments**: Upload/download for Mail specifically
-
 ## Critical Architectural Decisions
 
 ### Application Structure
@@ -85,6 +75,7 @@ main/
 ├── src/
 │   ├── components/          # Shared components
 │   │   └── Header/          # Global navigation header
+│   │   └── Footer/          # Global footer
 │   ├── pages/               # Module pages
 │   │   ├── Auth/            # Authentication pages
 │   │   │   ├── Login.jsx
@@ -100,11 +91,14 @@ main/
 │   │   │   └── Mail.css
 │   │   ├── Community/       # Community module
 │   │   │   ├── Community.jsx
-│   │   │   ├── style.css
+│   │   │   ├── Community.css
 │   │   │   └── assets/
-│   │   └── Archive/         # Archive module
-│   │       ├── App.jsx
-│   │       └── style.css
+│   │   ├── Archive/         # Archive module
+│   │   │   ├── Archive.jsx
+│   │   │   └── Archive.css
+│   │   └── Results/         # Results module
+│   │       ├── Results.jsx
+│   │       └── Results.css
 │   ├── apiConfig.js         # Centralized API configuration
 │   ├── App.jsx              # Main router with auth routes
 │   └── App.css              # Global styles
@@ -163,7 +157,7 @@ Click B1 → Shows: O1 -> O2 -> B1 (A1, A2 are hidden)
 
 ### Frontend Implementation Details
 
-#### Mail Component (`/main/src/pages/Mail/Mail.jsx`)
+#### Mail Component (`src/pages/Mail/Mail.jsx`)
 **Key Functions**:
 - `filteredMessages`: Implements leaf-node filtering with inbox ancestry check
 - `getThreadPath`: Traverses parent_id chain to build ancestor array
@@ -174,7 +168,7 @@ Click B1 → Shows: O1 -> O2 -> B1 (A1, A2 are hidden)
 - **Recipient Verification**: Validates all recipients against a cached list of system users before sending.
 - **Fresh Data**: Re-fetches messages whenever the `selectedLabel` changes to ensure tab consistency.
 
-#### Community Component (`/main/src/pages/Community/Community.jsx`)
+#### Community Component (`src/pages/Community/Community.jsx`)
 **Key Features**:
 - Real-time message fetching with polling (3-second intervals)
 - Comment system with expandable/collapsible threads
@@ -188,7 +182,7 @@ Click B1 → Shows: O1 -> O2 -> B1 (A1, A2 are hidden)
 - Defensive checks before using array methods (`.map()`, `.some()`, `.filter()`)
 - Graceful fallback to empty arrays on API errors
 
-#### App Component (`/main/src/App.jsx`)
+#### App Component (`src/App.jsx`)
 **Responsibilities**:
 - User state management with `useState` and `localStorage`
 - Top-level routing for all modules
@@ -203,16 +197,37 @@ Click B1 → Shows: O1 -> O2 -> B1 (A1, A2 are hidden)
 
 ## Database Schema
 
-### Key Tables
-- `mail_messages`: Stores all messages with `parent_id` for threading
-- `mail_recipients`: Many-to-many relationship for To/CC/BCC
-- `mail_message_labels`: Many-to-many for inbox/sent/starred/trash/spam
-- `mail_attachments`: File metadata for message attachments
-- `community_messages`: Chat messages with media support
-- `community_comments`: Comments on messages
-- `notifications`: User notifications for comments and mentions
+### Detailed Schema
 
-**Important**: The `parent_id` field is central to threading. A `parent_id` of `0` indicates a root message.
+#### 1. Shared Tables
+- **`users`**: Centralized user repository.
+  - `id`, `username`, `email`, `password`, `first_name`, `last_name`, `role` ('user', 'admin', 'moderator', 'Root')
+
+#### 2. Mail Component (`mail_` prefix)
+- **`mail_messages`**: Stores email content.
+  - `sender_id` (FK -> users), `parent_id` (0 for new thread)
+- **`mail_recipients`**: Junction table for recipients.
+  - `status` ('to', 'cc', 'bcc', 'Fwd')
+- **`mail_labels`**: Per-user message state.
+  - `is_starred`, `is_spam`, `is_trash`, `is_archived`, `is_read`
+- **`mail_attachments`**: File metadata.
+
+#### 3. Community Component (`community_` prefix)
+- **`community_messages`**: Chat messages.
+  - `type` ('text', 'image', 'video'), `media_url`
+- **`community_comments`**: Threaded replies to messages.
+- **`community_notifications`**: User activity alerts.
+
+#### 4. Archive Component (`archive_` prefix)
+- **`archive_semesters`**: Academic periods (e.g., "Semestre 1").
+- **`archive_subjects`**: Subjects linked to semesters.
+- **`archive_materials`**: Educational resources ('cours', 'td', 'tp', etc.).
+
+#### 5. Results Component (`results_` prefix)
+- **`results_data`**: Student academic results.
+  - `matricule`, `semester`, `grades` (CC, SN, SR), `decision`
+
+**Note**: The `parent_id` field in `mail_messages` is central to the threading logic. A `parent_id` of `0` indicates a root message.
 
 ## API Specifications
 

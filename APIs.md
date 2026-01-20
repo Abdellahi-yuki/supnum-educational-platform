@@ -106,3 +106,29 @@ This document outlines the API endpoints required for the unified messaging syst
 - `GET /archive/subjects/:id/materials`: List materials for a subject.
 - `POST /archive/materials`: Upload a new material (Admin only).
     - Body: `{ name, type, file, subject_id }`
+
+## 5. Results Service (`/results`)
+- `GET /get_results.php`: Get student results.
+    - Query Params:
+        - `matricule`: Student ID string.
+        - `semester`: Semester ID (e.g., '1').
+    - Response: 
+      ```json
+      {
+        "status": "success",
+        "data": {
+          "Matricule": "...",
+          "Nom": "...",
+          "Prenom": "...",
+          "Decision": "...",
+          "Moy_General": "...",
+          "Credit_total": "...",
+          "NCC_CODE": "...",
+          "NSN_CODE": "...",
+          ...
+        },
+        "subjects_map": {
+          "CODE": { "name": "...", "credits": 5 }
+        }
+      }
+      ```
