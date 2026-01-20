@@ -2,10 +2,10 @@
     padding: 2.5rem 0;
     margin-top: 4rem;
     position: relative;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-top: 1px solid var(--glass-border);
     width: 100%;
     z-index: 10;
 }
@@ -25,7 +25,7 @@
 
 .footer-text {
     font-size: 0.9rem;
-    color: var(--gray-700);
+    color: var(--gray-500);
     font-weight: 600;
     letter-spacing: 0.3px;
 }

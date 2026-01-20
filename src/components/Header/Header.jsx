@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, LogOut, Menu, X, User, Bell } from 'lucide-react';
+import { Settings, LogOut, Menu, X, Bell, Sun, Moon } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { API_BASE_URL } from '../../apiConfig';
+import { useTheme } from '../../context/ThemeContext';
 import './Header.css';
 
 const Header = ({ user, onLogout }) => {
@@ -9,6 +10,7 @@ const Header = ({ user, onLogout }) => {
     const location = useLocation();
     const [showDropdown, setShowDropdown] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { theme, toggleTheme } = useTheme();
 
     // Notifications state
     const [notifications, setNotifications] = useState([]);
@@ -74,7 +76,7 @@ const Header = ({ user, onLogout }) => {
     const navLinks = [
         { name: 'Tableau de bord', path: '/dashboard' },
         { name: 'Cours/Annales', path: '/archive' },
-        { name: 'Notes', path: '/dashboard/results' },
+        { name: 'Notes', path: '/results'},
         { name: 'Messagerie', path: '/mail' },
         { name: 'Communauté', path: '/community' },
     ];
@@ -91,6 +93,17 @@ const Header = ({ user, onLogout }) => {
                     <img src="/assets/logo-supnum.png" alt="SupNum Logo" className="logo-img" />
                     <span className="logo-text">SupNum</span>
                 </div>
+
+                {/* Mobile Menu Toggle */}
+                {user && (
+                    <button
+                        className="mobile-menu-toggle"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        aria-label="Toggle menu"
+                    >
+                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                )}
 
                 <nav className="nav-menu">
                     {user ? (
@@ -115,89 +128,104 @@ const Header = ({ user, onLogout }) => {
                     )}
                 </nav>
 
-                {user && (
-                    <div className="header-actions">
-                        <div className="notification-container" style={{ position: 'relative' }}>
-                            <button
-                                className="icon-btn"
-                                onClick={() => setShowNotifications(!showNotifications)}
-                            >
-                                <Bell size={20} />
-                                {unreadCount > 0 && (
-                                    <span className="notification-badge">{unreadCount}</span>
-                                )}
-                            </button>
+                <div className="header-actions">
+                    {/* Theme Toggle Button */}
+                    <button
+                        className="icon-btn"
+                        onClick={toggleTheme}
+                        aria-label="Toggle Theme"
+                    >
+                        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+                    </button>
 
-                            {showNotifications && (
-                                <div className="notification-dropdown">
-                                    <div className="notification-dropdown-header">
-                                        <h3>Notifications</h3>
-                                        {unreadCount > 0 && <span>{unreadCount} non lues</span>}
-                                    </div>
-                                    <div className="notification-list">
-                                        {notifications.length === 0 ? (
-                                            <p className="no-notifications">Aucune notification</p>
-                                        ) : (
-                                            notifications.map(n => (
-                                                <div
-                                                    key={n.id}
-                                                    className={`notification-item ${n.is_read ? 'read' : 'unread'}`}
-                                                    onClick={() => handleNotificationClick(n)}
-                                                >
-                                                    <div className="notification-item-top">
-                                                        <span className="actor-name">{n.actor_name}</span>
-                                                        <span className="notification-time">
-                                                            {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                        </span>
-                                                    </div>
-                                                    <p className="notification-text">
-                                                        {n.type === 'reply' ? 'a répondu à votre message' : 'a commenté votre publication'}
-                                                    </p>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="profile-container" style={{ position: 'relative' }}>
-                            <div
-                                className="user-profile"
-                                onClick={() => setShowDropdown(!showDropdown)}
-                            >
-                                <div className="user-avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    {user?.profile_pic ? (
-                                        <img
-                                            src={`${API_BASE_URL}/${user.profile_pic}`}
-                                            alt="Avatar"
-                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        />
-                                    ) : (
-                                        getInitials()
+                    {user && (
+                        <>
+                            <div className="notification-container" style={{ position: 'relative' }}>
+                                <button
+                                    className="icon-btn"
+                                    onClick={() => setShowNotifications(!showNotifications)}
+                                >
+                                    <Bell size={20} />
+                                    {unreadCount > 0 && (
+                                        <span className="notification-badge">{unreadCount}</span>
                                     )}
-                                    <span className="status-dot"></span>
-                                </div>
-                                <span className="user-name">{getUserName()}</span>
+                                </button>
+
+                                {showNotifications && (
+                                    <div className="notification-dropdown">
+                                        <div className="notification-dropdown-header">
+                                            <h3>Notifications</h3>
+                                            {unreadCount > 0 && <span>{unreadCount} non lues</span>}
+                                        </div>
+                                        <div className="notification-list">
+                                            {notifications.length === 0 ? (
+                                                <p className="no-notifications">Aucune notification</p>
+                                            ) : (
+                                                notifications.map(n => (
+                                                    <div
+                                                        key={n.id}
+                                                        className={`notification-item ${n.is_read ? 'read' : 'unread'}`}
+                                                        onClick={() => handleNotificationClick(n)}
+                                                    >
+                                                        <div className="notification-item-top">
+                                                            <span className="actor-name">{n.actor_name}</span>
+                                                            <span className="notification-time">
+                                                                {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </span>
+                                                        </div>
+                                                        <p className="notification-text">
+                                                            {n.type === 'reply' ? 'a répondu à votre message' : 'a commenté votre publication'}
+                                                        </p>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
-                            {showDropdown && (
-                                <div className="profile-dropdown">
-                                    <div className="dropdown-item" onClick={() => {
-                                        navigate('/dashboard/settings');
-                                        setShowDropdown(false);
-                                    }}>
-                                        <Settings size={16} /> Mon Profil
+                            <div className="profile-container" style={{ position: 'relative' }}>
+                                <div
+                                    className="user-profile"
+                                    onClick={() => setShowDropdown(!showDropdown)}
+                                >
+                                    <div className="user-avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        {user?.profile_pic ? (
+                                            <img
+                                                src={`${API_BASE_URL}/${user.profile_pic}`}
+                                                alt="Avatar"
+                                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            />
+                                        ) : (
+                                            getInitials()
+                                        )}
+                                        <span className="status-dot"></span>
                                     </div>
-                                    <div className="dropdown-divider"></div>
-                                    <div className="dropdown-item danger" onClick={onLogout}>
-                                        <LogOut size={16} /> Déconnexion
-                                    </div>
+                                    <span className="user-name">{getUserName()}</span>
                                 </div>
-                            )}
-                        </div>
-                    </div>
-                )}
+
+                                {showDropdown && (
+                                    <div className="profile-dropdown">
+                                        <div className="dropdown-item" onClick={() => {
+                                            if (user.role === 'Root' || user.role === 'teacher') {
+                                                navigate('/settings');
+                                            } else {
+                                                navigate('/dashboard/settings');
+                                            }
+                                            setShowDropdown(false);
+                                        }}>
+                                            <Settings size={16} /> {(user.role === 'Root' || user.role === 'teacher') ? 'Gestion Admin' : 'Mon Profil'}
+                                        </div>
+                                        <div className="dropdown-divider"></div>
+                                        <div className="dropdown-item danger" onClick={onLogout}>
+                                            <LogOut size={16} /> Déconnexion
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
 
             {/* Mobile Menu Drawer */}

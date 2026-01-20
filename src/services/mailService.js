@@ -112,7 +112,7 @@ const mailService = {
      * Fetch all users for email validation
      */
     fetchUsers: async () => {
-        const response = await fetch(`${API_BASE_URL}/community_members.php`);
+        const response = await fetch(`${API_BASE_URL}/community_members.php?include_lists=true`);
         if (!response.ok) throw new Error('Failed to fetch users');
         return response.json();
     }

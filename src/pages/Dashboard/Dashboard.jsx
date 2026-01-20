@@ -9,10 +9,10 @@ axios.defaults.withCredentials = true;
 import WelcomeBanner from './components/WelcomeBanner';
 import CardsGrid from './components/CardsGrid';
 import Settings from './components/Settings';
-import Results from './components/Results';
-import Archive from './components/Archive';
-import Mail from './components/Mail';
-import Community from './components/Community';
+import Results from '../Results/Results';
+import Archive from '../Archive/Archive';
+import Mail from '../Mail/Mail';
+import Community from '../Community/Community.jsx';
 
 function DashboardLayout({ user, onLogout, onUpdateUser }) {
   const navigate = useNavigate();
@@ -22,10 +22,10 @@ function DashboardLayout({ user, onLogout, onUpdateUser }) {
     setCurrentPage(page);
     if (page === 'dashboard') navigate('/dashboard', { state });
     if (page === 'settings') navigate('/dashboard/settings', { state });
-    if (page === 'results') navigate('/dashboard/results', { state });
-    if (page === 'archive') navigate('/dashboard/archive', { state });
-    if (page === 'mail') navigate('/dashboard/mail', { state });
-    if (page === 'community') navigate('/dashboard/community', { state });
+    if (page === 'results') navigate('/results', { state });
+    if (page === 'archive') navigate('/archive', { state });
+    if (page === 'mail') navigate('/mail', { state });
+    if (page === 'community') navigate('/community', { state });
   };
 
   return (

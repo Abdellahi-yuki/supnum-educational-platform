@@ -1,41 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import {
     ChevronRight, FolderOpen, BookMarked, ArrowLeft,
     BookOpenText, ScrollText, Laptop, ClipboardCheck,
     FileSpreadsheet, Microscope, RotateCcw, Download,
-    X, FileText, Music2, File, Search, Settings,
-    BarChart3, GraduationCap, BookOpen, Edit2, Trash2,
-    Plus, ShieldCheck, LayoutGrid, LogOut
+    X, File, Search,
+    Edit2, Trash2,
+    Plus, ShieldCheck, LogOut, Loader2
 } from 'lucide-react';
 
 // ==========================================
 // DATA MANAGER UTILS
 // ==========================================
 import { database as initialDatabase } from './data/database';
+import axios from 'axios';
+import { API_BASE_URL } from '../../apiConfig';
 import './Archive.css';
 
+const loadDataFromAPI = async () => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/archive.php`);
+        return response.data;
+    } catch (error) {
+        console.error('Erreur lors du chargement des données API:', error);
+        return { semestres: [], matieres: [], supports: [] };
+    }
+};
+
 const STORAGE_KEY = 'archive-supnum-data';
-
-const loadData = () => {
-    try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) return JSON.parse(stored);
-    } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
-    }
-    return { ...initialDatabase };
-};
-
-const saveData = (data) => {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        return true;
-    } catch (error) {
-        console.error('Erreur lors de la sauvegarde des données:', error);
-        return false;
-    }
-};
 
 const generateId = (items) => {
     if (!items || items.length === 0) return 1;
@@ -258,7 +250,7 @@ const DocumentList = ({ documents, onSelectDocument, onBack, subjectName }) => {
             <h2 id="documentsTitle">{subjectName}</h2>
             <div id="documentsGrid">
                 {!hasDocuments && (
-                    <p style={{ textAlign: 'center', color: '#666', margin: '40px 0' }}>
+                    <p style={{ textAlign: 'center', color: 'var(--p-text-dim)', margin: '40px 0' }}>
                         Aucun document disponible pour cette matière.
                     </p>
                 )}
@@ -266,7 +258,7 @@ const DocumentList = ({ documents, onSelectDocument, onBack, subjectName }) => {
                     if (groupedDocs[type].length === 0) return null;
                     return (
                         <div key={type}>
-                            <h3 style={{ marginTop: '20px', color: '#4a5568', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <h3 style={{ marginTop: '20px', color: 'var(--p-text-dim)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 {typeIcons[type]} {typeNames[type]}
                             </h3>
                             {groupedDocs[type].map(doc => (
@@ -289,7 +281,11 @@ const FileViewer = ({ file, onClose }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const filepath = file.chemin_fichier;
+    // Construct full URL if it's a relative path from the backend
+    const filepath = file.chemin_fichier.startsWith('http')
+        ? file.chemin_fichier
+        : `${API_BASE_URL}/..${file.chemin_fichier}`;
+
     const filename = file.nom;
     const extension = filepath.split('.').pop().toLowerCase();
 
@@ -357,17 +353,17 @@ const FileViewer = ({ file, onClose }) => {
     };
 
     return (
-        <div id="fileViewer" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', boxSizing: 'border-box' }}>
-            <div style={{ background: 'white', borderRadius: '8px', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                <div style={{ padding: '15px 20px', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8f9fa' }}>
-                    <h3 style={{ margin: 0 }}>{filename}</h3>
+        <div id="fileViewer" className="file-viewer-overlay">
+            <div className="file-viewer-content">
+                <div className="file-viewer-header">
+                    <h3>{filename}</h3>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <button onClick={() => downloadFile(filepath, filename)} style={{ background: '#4299e1', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', marginRight: '10px' }}><Download size={16} /> Télécharger</button>
-                        <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', padding: '5px 10px', borderRadius: '4px' }}><X size={20} /></button>
+                        <button onClick={() => downloadFile(filepath, filename)} className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.9rem', marginRight: '10px' }}><Download size={16} /> Télécharger</button>
+                        <button onClick={onClose} className="btn-close"><X size={20} /></button>
                     </div>
                 </div>
-                <div style={{ flex: 1, padding: '20px', overflow: 'auto', background: 'white' }}>
-                    {loading ? <p>Chargement...</p> : error ? <p>Erreur: {error}</p> : content}
+                <div className="file-viewer-body">
+                    {loading ? <div className="loading-state"><Loader2 className="animate-spin" /> Chargement...</div> : error ? <p>Erreur: {error}</p> : content}
                 </div>
             </div>
         </div>
@@ -422,9 +418,6 @@ const Toolbar = ({ onSearch, onAdminAccess }) => {
                     <input type="text" className="search-input" placeholder="Rechercher un cours, une matière..." value={query} onChange={(e) => setQuery(e.target.value)} onKeyPress={handleKeyPress} />
                     <button className="search-btn" onClick={handleSearch}><Search size={20} /></button>
                 </div>
-                <button className="admin-button" onClick={onAdminAccess} title="Administration">
-                    <Settings size={22} />
-                </button>
             </div>
         </div>
     );
@@ -644,7 +637,8 @@ const AdminPanel = ({ database, onDataChange, onLogout }) => {
 // ==========================================
 
 function Archive() {
-    const [database, setDatabase] = useState(loadData());
+    const [database, setDatabase] = useState({ semestres: [], matieres: [], supports: [] });
+    const [loadingItems, setLoadingItems] = useState(true);
     const [currentView, setCurrentView] = useState('semesters');
     const [currentSemester, setCurrentSemester] = useState(null);
     const [currentSubject, setCurrentSubject] = useState(null);
@@ -654,7 +648,16 @@ function Archive() {
     const [breadcrumbs, setBreadcrumbs] = useState([{ name: 'Accueil', action: 'semesters' }]);
     const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(sessionStorage.getItem('admin-authenticated') === 'true');
 
-    useEffect(() => { setIsAdminAuthenticated(sessionStorage.getItem('admin-authenticated') === 'true'); }, []);
+    useEffect(() => {
+        setIsAdminAuthenticated(sessionStorage.getItem('admin-authenticated') === 'true');
+        const refreshData = async () => {
+            setLoadingItems(true);
+            const data = await loadDataFromAPI();
+            setDatabase(data);
+            setLoadingItems(false);
+        };
+        refreshData();
+    }, []);
 
     const handleSelectSemester = (semesterId) => {
         const semester = database.semestres.find(s => s.id === semesterId);
@@ -707,14 +710,6 @@ function Archive() {
         }
     };
 
-    const handleAdminAccess = () => {
-        if (isAdminAuthenticated) {
-            setCurrentView('admin');
-            setBreadcrumbs([{ name: 'Administration', action: null }]);
-        } else {
-            setCurrentView('admin-login');
-        }
-    };
 
     const handleAdminLogin = () => {
         setIsAdminAuthenticated(true);
@@ -745,13 +740,22 @@ function Archive() {
 
         return (
             <div className="container">
-                <Toolbar onSearch={handleSearch} onAdminAccess={handleAdminAccess} />
+                <Toolbar onSearch={handleSearch} />
                 <div className="main-content">
-                    {currentView !== 'search' && <Breadcrumb items={breadcrumbs} onNavigate={handleNavigate} />}
-                    {currentView === 'semesters' && <SemesterList semesters={database.semestres} subjects={database.matieres} onSelectSemester={handleSelectSemester} />}
-                    {currentView === 'subjects' && currentSemester && <SubjectList subjects={database.matieres.filter(m => m.id_semestre === currentSemester.id)} supports={database.supports} semesterName={currentSemester.nom} onSelectSubject={handleSelectSubject} onBack={handleBack} />}
-                    {currentView === 'documents' && currentSubject && <DocumentList documents={database.supports.filter(s => s.id_matiere === currentSubject.id)} subjectName={currentSubject.nom} onSelectDocument={(doc) => setCurrentFile(doc)} onBack={handleBack} />}
-                    {currentView === 'search' && <SearchResults results={searchResults} query={searchQuery} onSelectResult={(res) => res.type === 'support' ? handleSelectSubject(res.matiere.id) : handleSelectSubject(res.item.id)} onBack={handleBack} />}
+                    {loadingItems ? (
+                        <div className="loader-container" style={{ padding: '3rem', textAlign: 'center' }}>
+                            <Loader2 className="animate-spin" size={40} style={{ color: '#667eea' }} />
+                            <p style={{ marginTop: '1rem', color: '#64748b' }}>Chargement de l'archive...</p>
+                        </div>
+                    ) : (
+                        <>
+                            {currentView !== 'search' && <Breadcrumb items={breadcrumbs} onNavigate={handleNavigate} />}
+                            {currentView === 'semesters' && <SemesterList semesters={database.semestres} subjects={database.matieres} onSelectSemester={handleSelectSemester} />}
+                            {currentView === 'subjects' && currentSemester && <SubjectList subjects={database.matieres.filter(m => m.id_semestre === currentSemester.id)} supports={database.supports} semesterName={currentSemester.nom} onSelectSubject={handleSelectSubject} onBack={handleBack} />}
+                            {currentView === 'documents' && currentSubject && <DocumentList documents={database.supports.filter(s => s.id_matiere === currentSubject.id)} subjectName={currentSubject.nom} onSelectDocument={(doc) => setCurrentFile(doc)} onBack={handleBack} />}
+                            {currentView === 'search' && <SearchResults results={searchResults} query={searchQuery} onSelectResult={(res) => res.type === 'support' ? handleSelectSubject(res.matiere.id) : handleSelectSubject(res.item.id)} onBack={handleBack} />}
+                        </>
+                    )}
                 </div>
                 {currentFile && <FileViewer file={currentFile} onClose={() => setCurrentFile(null)} />}
             </div>
@@ -759,11 +763,9 @@ function Archive() {
     };
 
     return (
-        <ThemeProvider theme={theme}>
-            <div className="archive-container">
-                {renderContent()}
-            </div>
-        </ThemeProvider>
+        <div className="archive-container">
+            {renderContent()}
+        </div>
     );
 }
 

@@ -15,8 +15,9 @@
 }
 
 .bg-light-glass {
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
+    background: var(--glass-bg);
+    backdrop-filter: blur(40px);
+    border: 1px solid var(--glass-border);
 }
 
 /* Hero Section */
@@ -27,6 +28,22 @@
     justify-content: flex-start;
     padding: 0 10%;
     position: relative;
+    overflow: visible;
+    /* Ensure glows don't get clipped */
+}
+
+/* Add a hero glow effect */
+.p-hero::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--glow-blue) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(60px);
 }
 
 .hero-artwork-container {
@@ -46,6 +63,7 @@
     height: 100%;
     object-fit: contain;
     opacity: 0.9;
+    filter: drop-shadow(0 0 30px var(--glow-blue));
 }
 
 .hero-text-overlay {
@@ -69,9 +87,12 @@
     font-size: 0.85rem;
     font-weight: 800;
     color: var(--primary-green);
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.2);
     margin-bottom: 2rem;
     text-transform: uppercase;
     letter-spacing: 2px;
+    box-shadow: 0 0 20px rgba(52, 211, 153, 0.1);
 }
 
 .h-title {
@@ -80,7 +101,7 @@
     line-height: 1.1;
     letter-spacing: -2px;
     margin-bottom: 2rem;
-    color: var(--primary-blue);
+    color: var(--p-text-main);
 }
 
 .highlight {
@@ -88,6 +109,7 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 15px var(--glow-blue));
 }
 
 .h-lead {
@@ -115,7 +137,7 @@
     font-weight: 900;
     letter-spacing: -1px;
     margin-bottom: 1rem;
-    color: var(--primary-blue);
+    color: var(--p-text-main);
 }
 
 .v-subtitle {
@@ -130,11 +152,37 @@
 }
 
 .v-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    /* Subtle border */
+    border-radius: 30px;
     padding: 4rem 2.5rem;
     text-align: center;
     opacity: 0;
     transform: translateY(40px);
     transition: all 1s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.v-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 30px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+.v-card:hover {
+    background: var(--glass-bg-hover);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-10px);
 }
 
 .v-card.visible {
@@ -146,6 +194,7 @@
     width: 50px;
     height: 50px;
     margin-bottom: 2rem;
+    filter: drop-shadow(0 0 10px var(--glow-blue));
 }
 
 .v-icon.blue {
@@ -160,7 +209,7 @@
     font-size: 1.75rem;
     font-weight: 800;
     margin-bottom: 1.25rem;
-    color: var(--primary-blue);
+    color: var(--p-text-main);
 }
 
 .v-card p {
@@ -174,7 +223,7 @@
     font-weight: 900;
     margin-bottom: 5rem;
     text-align: center;
-    color: var(--primary-blue);
+    color: var(--p-text-main);
 }
 
 .m-grid {
@@ -184,12 +233,23 @@
 }
 
 .m-item {
+    background: var(--glass-bg-light);
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
     padding: 3rem;
     display: flex;
     gap: 2rem;
     opacity: 0;
     transform: translateX(-30px);
     transition: all 1s ease-out;
+}
+
+.m-item:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-highlight);
+    transform: translateY(-5px) translateX(0) !important;
+    /* Override transform */
+    box-shadow: var(--shadow-hover);
 }
 
 .m-item.visible {
@@ -200,13 +260,14 @@
 .m-icon-box {
     width: 70px;
     height: 70px;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(30, 41, 59, 0.6);
     border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .m-content h3 {
@@ -247,7 +308,8 @@
     font-size: 4rem;
     font-weight: 900;
     margin-bottom: 1.5rem;
-    color: var(--primary-blue);
+    color: white;
+    /* Force white */
 }
 
 .cta-glass-box p {
@@ -269,6 +331,7 @@
     .h-title {
         font-size: 4rem;
     }
+
     .hero-artwork-container {
         width: 45%;
     }
@@ -278,14 +341,17 @@
     .p-hero {
         text-align: center;
         justify-content: center;
-        padding-top: 8rem;
+        padding-top: 6rem;
+        padding-left: 5%;
+        padding-right: 5%;
         flex-direction: column;
+        min-height: 80vh;
     }
 
     .hero-artwork-container {
         position: relative;
         width: 100%;
-        height: 350px;
+        height: 300px;
         order: -1;
         transform: none;
         top: 0;
@@ -296,30 +362,235 @@
         font-size: 3.5rem;
     }
 
-    .v-grid,
-    .m-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .hero-text-overlay {
-        max-width: 100%;
-    }
-}
-
-@media (max-width: 768px) {
-    .h-title {
-        font-size: 2.8rem;
+    .h-lead {
+        font-size: 1.25rem;
     }
 
     .section-padding {
         padding: 6rem 5%;
     }
 
+    .v-grid,
+    .m-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .hero-text-overlay {
+        max-width: 100%;
+    }
+
+    .v-title {
+        font-size: 3rem;
+    }
+
+    .m-title {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .p-hero {
+        padding-top: 4rem;
+        min-height: auto;
+        padding-left: 4%;
+        padding-right: 4%;
+    }
+
+    .hero-artwork-container {
+        height: 250px;
+    }
+
+    .h-title {
+        font-size: 2.8rem;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+    }
+
+    .h-lead {
+        font-size: 1.15rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .h-badge {
+        font-size: 0.75rem;
+        padding: 0.5rem 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-padding {
+        padding: 5rem 4%;
+    }
+
+    .v-title,
+    .m-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .v-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .v-header {
+        margin-bottom: 4rem;
+    }
+
+    .v-card {
+        padding: 3rem 2rem;
+    }
+
+    .v-card h3 {
+        font-size: 1.5rem;
+    }
+
+    .m-item {
+        padding: 2.5rem;
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+
+    .m-icon-box {
+        margin-bottom: 1rem;
+    }
+
     .cta-btns {
         flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .cta-btns .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .cta-glass-box {
+        padding: 6rem 3rem;
     }
 
     .cta-glass-box h2 {
         font-size: 2.5rem;
+    }
+
+    .cta-glass-box p {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .p-hero {
+        padding-top: 3rem;
+        padding-left: 3%;
+        padding-right: 3%;
+    }
+
+    .hero-artwork-container {
+        height: 200px;
+        margin-bottom: 1.5rem;
+    }
+
+    .h-title {
+        font-size: 2.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .h-lead {
+        font-size: 1.05rem;
+        margin-bottom: 2rem;
+    }
+
+    .h-badge {
+        font-size: 0.7rem;
+        padding: 0.45rem 1rem;
+    }
+
+    .section-padding {
+        padding: 4rem 3%;
+    }
+
+    .v-title,
+    .m-title {
+        font-size: 2rem;
+    }
+
+    .v-subtitle {
+        font-size: 1rem;
+    }
+
+    .v-card {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .v-card h3 {
+        font-size: 1.35rem;
+    }
+
+    .v-card p {
+        font-size: 0.95rem;
+    }
+
+    .m-item {
+        padding: 2rem 1.5rem;
+    }
+
+    .m-content h3 {
+        font-size: 1.4rem;
+    }
+
+    .m-content p {
+        font-size: 0.95rem;
+    }
+
+    .cta-glass-box {
+        padding: 4rem 2rem;
+    }
+
+    .cta-glass-box h2 {
+        font-size: 2rem;
+    }
+
+    .cta-glass-box p {
+        font-size: 1.1rem;
+        margin-bottom: 2.5rem;
+    }
+}
+
+@media (max-width: 320px) {
+    .h-title {
+        font-size: 1.85rem;
+    }
+
+    .h-lead {
+        font-size: 0.95rem;
+    }
+
+    .section-padding {
+        padding: 3rem 2%;
+    }
+
+    .v-title,
+    .m-title {
+        font-size: 1.75rem;
+    }
+
+    .v-card {
+        padding: 2rem 1.25rem;
+    }
+
+    .m-item {
+        padding: 1.75rem 1.25rem;
+    }
+
+    .cta-glass-box {
+        padding: 3rem 1.5rem;
+    }
+
+    .cta-glass-box h2 {
+        font-size: 1.75rem;
+    }
+
+    .cta-glass-box p {
+        font-size: 1rem;
     }
 }

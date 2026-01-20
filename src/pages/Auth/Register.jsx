@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../apiConfig';
 import './Auth.css';
 
+import { Eye, EyeOff } from 'lucide-react';
+
 const Register = () => {
     const [formData, setFormData] = useState({
         first_name: '',
@@ -12,11 +14,18 @@ const Register = () => {
         password: '',
         role: 'user' // Default to user (student), no UI to change it
     });
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const validatePassword = (pass) => {
+        const hasUpperCase = /[A-Z]/.test(pass);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
+        return hasUpperCase && hasSpecialChar;
     };
 
     const handleSubmit = async (e) => {
@@ -27,15 +36,13 @@ const Register = () => {
             setError('L\'email doit finir par @supnum.mr');
             return;
         }
-        try {
-            // AuthController expects { email, password } for signup, but we might want to send username too if we update backend
-            // For now, let's send what AuthController expects.
-            // Wait, AuthController.php uses email to generate username: $username = explode('@', $email)[0];
-            // It ignores first_name and last_name.
-            // We should update AuthController to accept username if we want to use first/last name, 
-            // OR just proceed with email/password as per current backend implementation.
-            // Current backend: $input['email'], $input['password'].
 
+        if (!validatePassword(password)) {
+            setError('Le mot de passe doit contenir au moins une lettre majuscule et un caractère spécial.');
+            return;
+        }
+
+        try {
             const response = await axios.post(`${API_BASE_URL}/register.php`, { first_name, last_name, email, password, role });
             if (response.data.status === 'success') {
                 // Redirect directly without alert
@@ -95,17 +102,26 @@ const Register = () => {
                         className="auth-input"
                         required
                     />
-                    <input
-                        name="password"
-                        type="password"
-                        placeholder="Mot de passe"
-                        value={formData.password}
-                        onChange={handleChange}
-                        className="auth-input"
-                        required
-                    />
-
-                    {/* Role Selection REMOVED as per request */}
+                    <div className="password-wrapper">
+                        <input
+                            name="password"
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Mot de passe"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className="auth-input"
+                            style={{ paddingRight: '3.5rem' }}
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="password-toggle"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        >
+                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
+                    </div>
 
                     <button type="submit" className="btn btn-primary btn-block">S'inscrire</button>
                 </form>

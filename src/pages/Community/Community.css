@@ -1,0 +1,126 @@
+/* Community Liquid Glass Aesthetic */
+.community-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: transparent;
+    color: var(--p-text-main);
+}
+
+.messages-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.message-item {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    max-width: 85%;
+    align-self: flex-start;
+}
+
+.message-item.own-message {
+    align-self: flex-end;
+    background: rgba(46, 171, 78, 0.1);
+    border-color: rgba(46, 171, 78, 0.2);
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.message-body {
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.message-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--p-text-dim);
+}
+
+.input-bar {
+    padding: 1.5rem;
+    background: var(--glass-bg-light);
+    backdrop-filter: var(--glass-blur);
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.input-wrapper {
+    flex: 1;
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 1px solid var(--glass-border);
+    padding: 0.25rem 0.5rem;
+}
+
+.input-wrapper input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0.75rem;
+    color: white;
+    outline: none;
+}
+
+.send-button {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(28, 53, 134, 0.2);
+    transition: all 0.2s;
+}
+
+.send-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(28, 53, 134, 0.3);
+}
+
+/* Verified Badge Animation */
+.verified-badge {
+    animation: badgePulse 2s infinite;
+}
+
+@keyframes badgePulse {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+        filter: brightness(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}

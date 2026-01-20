@@ -17,8 +17,7 @@ import {
     Forward,
     Maximize2,
     Minimize2,
-    Paperclip,
-    MoreVertical
+    CheckCircle
 } from 'lucide-react';
 import './Mail.css';
 
@@ -485,22 +484,43 @@ const Mail = () => {
                             {threadMessages.map((msg, index) => (
                                 <div key={msg.id} className={`thread-message ${msg.id === selectedMessage.id ? 'active' : ''}`}>
                                     <div className="detail-sender">
-                                        <div className="sender-avatar">{msg.from[0]}</div>
+                                        <div className="sender-avatar">{msg.from ? msg.from[0] : '?'}</div>
                                         <div className="sender-info">
-                                            <div className="sender-name">{msg.from}</div>
+                                            <div className="sender-name">
+                                                {msg.from || 'Utilisateur inconnu'}
+                                                {(msg.sender_role?.toLowerCase() === 'root' || msg.sender_role?.toLowerCase() === 'teacher') && (
+                                                    <span className={`verified-badge ${msg.sender_role.toLowerCase()}`} title={`Compte Officiel (${msg.sender_role})`} style={{ marginLeft: '6px' }}>
+                                                        <CheckCircle size={10} />
+                                                    </span>
+                                                )}
+                                            </div>
                                             <div className="sender-email">{msg.email}</div>
 
                                             {/* Recipients Display */}
-                                            {msg.recipients && msg.recipients.length > 0 && (
-                                                <div className="recipients-list" style={{ fontSize: '12px', color: '#5f6368', marginTop: '4px' }}>
+                                            {Array.isArray(msg.recipients) && msg.recipients.length > 0 && (
+                                                <div className="recipients-list">
                                                     {msg.recipients.filter(r => r.type === 'to').length > 0 && (
-                                                        <div>
-                                                            <strong>À:</strong> {msg.recipients.filter(r => r.type === 'to').map(r => r.name || r.email).join(', ')}
+                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
+                                                            <strong>À:</strong> {msg.recipients.filter(r => r.type === 'to').map((r, i, arr) => (
+                                                                <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                                                    {r.name || r.email}{i < arr.length - 1 ? ',' : ''}
+                                                                    {(r.role?.toLowerCase() === 'root' || r.role?.toLowerCase() === 'teacher') && (
+                                                                        <CheckCircle size={10} fill="var(--primary-green)" color="white" />
+                                                                    )}
+                                                                </span>
+                                                            ))}
                                                         </div>
                                                     )}
                                                     {msg.recipients.filter(r => r.type === 'cc').length > 0 && (
-                                                        <div>
-                                                            <strong>Cc:</strong> {msg.recipients.filter(r => r.type === 'cc').map(r => r.name || r.email).join(', ')}
+                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
+                                                            <strong>Cc:</strong> {msg.recipients.filter(r => r.type === 'cc').map((r, i, arr) => (
+                                                                <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                                                    {r.name || r.email}{i < arr.length - 1 ? ',' : ''}
+                                                                    {(r.role?.toLowerCase() === 'root' || r.role?.toLowerCase() === 'teacher') && (
+                                                                        <CheckCircle size={10} fill="var(--primary-green)" color="white" />
+                                                                    )}
+                                                                </span>
+                                                            ))}
                                                         </div>
                                                     )}
                                                 </div>

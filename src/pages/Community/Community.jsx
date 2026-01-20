@@ -1,764 +1,1169 @@
-import React, { useState, useEffect } from 'react';
-import { API_BASE_URL } from '../../apiConfig';
-import './style.css';
-import Logo from './assets/Logo-supnum.jpg';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import {
+    MessageSquare,
+    Users,
+    Heart,
+    Share2,
+    Send,
+    Image as ImageIcon,
+    Paperclip,
+    MoreVertical,
+    Trash2,
+    Bookmark,
+    BookmarkCheck,
+    Loader2,
 
-// const socket = io.connect("http://localhost:5000");
+    Menu,
+    X,
+    Shield,
+    CheckCircle,
+    Plus
+} from 'lucide-react';
+import { API_BASE_URL } from '../Dashboard/apiConfig';
+import { useLocation } from 'react-router-dom';
+import UserProfile from '../Dashboard/components/UserProfile';
+import './Community.css';
 
+const Community = ({ user }) => {
+    const location = useLocation();
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState('');
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [isSending, setIsSending] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [showOnlySaved, setShowOnlySaved] = useState(false);
+    const [replyTo, setReplyTo] = useState(null);
+    const [stats, setStats] = useState({ totalMembers: 0, activeMembers: 0 });
 
-
-export default function Community({ currentUser: propUser, onLogout }) {
-  const [activeSection, setActiveSection] = useState('Ccommunauté');
-  const [messages, setMessages] = useState([]);
-  const [filteredMessages, setFilteredMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [commentInputs, setCommentInputs] = useState({});
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSending, setIsSending] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const fileInputRef = React.useRef(null);
-
-  // Notification State
-  const [notifications, setNotifications] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
-
-  // Lifted state for comments expansion to control it via notifications
-  const [expandedComments, setExpandedComments] = useState({});
-
-  const toggleComments = (msgId) => {
-    setExpandedComments(prev => ({
-      ...prev,
-      [msgId]: !prev[msgId]
-    }));
-  };
-
-  // Use propUser if available, otherwise default (though auth should prevent this)
-  const currentUser = propUser || { id: 1, username: 'Anonymous' };
-
-  const sections = [
-    { id: 'dashword', title: 'Communauté' },
-    { id: 'archives', title: 'Archives (Saved)' },
-  ];
-
-  // Ref for scrolling
-  const messagesEndRef = React.useRef(null);
-  const scrollContainerRef = React.useRef(null);
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
-
-  // ONLY scroll to bottom on initial page load - then never auto-scroll again
-  React.useLayoutEffect(() => {
-    if (isFirstLoad && messages.length > 0) {
-      // Scroll to bottom instantly on first load
-      messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-      setIsFirstLoad(false);
-    }
-  }, [messages, isFirstLoad]);
-
-  // Scroll to bottom whenever user changes section (navigates to different page)
-  useEffect(() => {
-    if (!isFirstLoad && filteredMessages.length > 0) {
-      // Scroll to show latest message when changing sections
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSection]); // Only trigger on section change, not on every message update
-
-  const fetchMessages = React.useCallback(async (query = '', section = 'dashword') => {
-    try {
+    // Notifications state
 
 
-      // Simulate network delay
-      // await new Promise(resolve => setTimeout(resolve, 500));
+    // Comments state
+    const [commentInputs, setCommentInputs] = useState({});
+    const [expandedComments, setExpandedComments] = useState({});
 
-      // setMessages(data);
-      // setFilteredMessages(data);
+    // New features state
+    const [showUserProfile, setShowUserProfile] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [showMembersList, setShowMembersList] = useState(false);
+    const [members, setMembers] = useState([]);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-      // Original API Call
-      let url = `${API_BASE_URL}/community_messages.php?user_id=${currentUser.id}`;
-      if (query) url += `&search=${encodeURIComponent(query)}`;
-      if (section === 'archives') url += `&only_archived=true`;
+    const pollInterval = useRef(null);
 
-      const res = await fetch(url);
-      const data = await res.json();
-      // Ensure data is always an array
-      const messagesArray = Array.isArray(data) ? data : [];
-      setMessages(messagesArray);
-      setFilteredMessages(messagesArray); // Backend handles filtering now
-    } catch (err) {
-      console.error(err);
-      // Set empty arrays on error to prevent map errors
-      setMessages([]);
-      setFilteredMessages([]);
-    }
-  }, [currentUser.id]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [messageToDelete, setMessageToDelete] = useState(null);
 
-  const fetchNotifications = React.useCallback(async () => {
-    try {
-      // Original API Call
-      const res = await fetch(`${API_BASE_URL}/community_notifications.php?user_id=${currentUser.id}`);
-      if (res.ok) {
-        const data = await res.json();
-        // Ensure data is always an array
-        const notificationsArray = Array.isArray(data) ? data : [];
-        setNotifications(notificationsArray);
-      } else {
-        setNotifications([]);
-      }
-    } catch (err) {
-      console.error(err);
-      // Set empty array on error to prevent array method errors
-      setNotifications([]);
-    }
-  }, [currentUser.id]);
+    const fetchMessages = useCallback(async () => {
+        if (!user) return;
+        try {
+            let url = `${API_BASE_URL}/community_messages.php?user_id=${user.id}`;
+            if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
+            if (showOnlySaved) url += `&only_archived=true`;
 
-  // Polling with safety against overlapping requests
-  useEffect(() => {
-    let isMounted = true;
-    let timeoutId;
+            const response = await fetch(url);
+            const data = await response.json();
+            if (Array.isArray(data)) {
+                setMessages(data);
+            }
+        } catch (error) {
+            console.error('Error fetching messages:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [user?.id, searchQuery, showOnlySaved]);
 
-    const poll = async () => {
-      if (!isMounted) return;
-      // Skip polling if we are currently sending a message (especially large files)
-      if (!isSending) {
-        await fetchMessages(searchQuery, activeSection);
-        await fetchNotifications();
-      }
-      if (isMounted) {
-        timeoutId = setTimeout(poll, 3000); // Wait 3s AFTER fetch completes
-      }
+    const fetchStats = useCallback(async () => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/community_stats.php`);
+            const data = await res.json();
+            if (data && !data.error) {
+                setStats(data);
+            }
+        } catch (error) {
+            console.error('Error fetching stats:', error);
+        }
+    }, []);
+
+    const fetchMembers = useCallback(async () => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/community_members.php`);
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                setMembers(data);
+            }
+        } catch (error) {
+            console.error('Error fetching members:', error);
+        }
+    }, []);
+
+    const handleUserClick = (userId) => {
+        setSelectedUserId(userId);
+        setShowUserProfile(true);
     };
 
-    poll(); // Start polling
-
-    return () => {
-      isMounted = false;
-      clearTimeout(timeoutId);
+    const handleBackToCommunity = () => {
+        setShowUserProfile(false);
+        setSelectedUserId(null);
     };
-  }, [searchQuery, isSending, activeSection, fetchMessages, fetchNotifications]);
 
 
 
-  const handleNotificationClick = async (notif) => {
-    // Mark as read
-    if (!notif.is_read) {
-      try {
-        await fetch(`${API_BASE_URL}/community_notifications.php`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id: notif.id })
-        });
-        setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, is_read: 1 } : n));
-      } catch (e) { console.error(e); }
-    }
+    useEffect(() => {
+        fetchMessages();
+        fetchStats();
+        fetchMembers();
 
-    setShowNotifications(false);
+        pollInterval.current = setInterval(() => {
+            fetchMessages();
+            fetchStats();
+        }, 5000);
 
-    // Navigate to message
-    if (activeSection !== 'dashword') setActiveSection('dashword');
+        return () => {
+            if (pollInterval.current) clearInterval(pollInterval.current);
+        };
+    }, [fetchMessages, fetchStats, fetchMembers]);
 
-    // Expand comments for this message so user sees it
-    setExpandedComments(prev => ({ ...prev, [notif.message_id]: true }));
-
-    // Scroll after slight delay for render
-    setTimeout(() => {
-      const msgEl = document.getElementById(`msg-${notif.message_id}`);
-      if (msgEl) {
-        msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        msgEl.style.transition = 'background 0.5s';
-        msgEl.style.background = '#e7f3ff'; // Highlight
-        setTimeout(() => msgEl.style.background = '', 2000);
-      }
-    }, 300);
-  };
-
-  const handleToggleArchive = async (messageId) => {
-    try {
-      // Original API Call
-      // Optimistic update
-      const updatedMessages = messages.map(m => {
-        if (m.id === messageId) {
-          return { ...m, is_archived: !m.is_archived };
+    // Handle Deep Linking (Scroll to Message)
+    useEffect(() => {
+        if (location.state?.scrollToMessage && messages.length > 0) {
+            const msgId = location.state.scrollToMessage;
+            const element = document.getElementById(`msg-${msgId}`);
+            if (element) {
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.style.transition = 'background-color 0.5s';
+                    element.style.backgroundColor = 'rgba(102, 126, 234, 0.2)';
+                    setTimeout(() => {
+                        element.style.backgroundColor = 'transparent';
+                    }, 2500);
+                }, 100); // Small delay to ensure rendering
+            }
         }
-        return m;
-      });
+    }, [location.state, messages]);
 
-      if (activeSection === 'archives') {
-        setFilteredMessages(updatedMessages.filter(m => m.is_archived));
-        setMessages(updatedMessages.filter(m => m.is_archived));
-      } else {
-        setMessages(updatedMessages);
-        setFilteredMessages(updatedMessages);
-      }
+    const uploadFileInChunks = async (file) => {
+        const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        const uploadId = Date.now().toString(36) + Math.random().toString(36).substr(2);
 
-      const res = await fetch(`${API_BASE_URL}/community_archives.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: currentUser.id, message_id: messageId })
-      });
+        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+            const start = chunkIndex * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, file.size);
+            const chunk = file.slice(start, end);
 
-      if (!res.ok) {
-        // Revert on error? For now just log
-        console.error('Failed to toggle archive');
-        fetchMessages(searchQuery, activeSection);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+            const formData = new FormData();
+            formData.append('chunk', chunk);
+            formData.append('upload_id', uploadId);
+            formData.append('chunk_index', chunkIndex);
+            formData.append('total_chunks', totalChunks);
+            formData.append('file_name', file.name);
 
+            const res = await fetch(`${API_BASE_URL}/community_upload.php`, {
+                method: 'POST',
+                body: formData,
+            });
 
+            if (!res.ok) throw new Error('Chunk upload failed');
 
-  const uploadFileInChunks = async (file) => {
-    const CHUNK_SIZE = 1024 * 1024; // 1MB chunks
-    const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE));
-    const uploadId = Date.now().toString(36) + Math.random().toString(36).substr(2); // Unique ID for this upload session
+            const data = await res.json();
+            const percent = Math.round(((chunkIndex + 1) / totalChunks) * 100);
+            setUploadProgress(percent);
 
-    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-      const start = chunkIndex * CHUNK_SIZE;
-      const end = Math.min(start + CHUNK_SIZE, file.size);
-      const chunk = file.slice(start, end);
-
-      const formData = new FormData();
-      formData.append('chunk', chunk);
-      formData.append('upload_id', uploadId);
-      formData.append('chunk_index', chunkIndex);
-      formData.append('total_chunks', totalChunks);
-      formData.append('file_name', file.name);
-
-      try {
-        const res = await fetch(`${API_BASE_URL}/community_upload.php`, {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!res.ok) {
-          throw new Error('Chunk upload failed');
+            if (data.status === 'done') {
+                return { media_url: data.media_url, type: data.type };
+            }
         }
+    };
 
-        const data = await res.json();
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+        console.log('Sending message...', { newMessage, selectedFile, userId: user?.id });
+        if ((!newMessage.trim() && !selectedFile) || isSending) return;
 
-        // Calculate progress percentage
-        const percent = Math.round(((chunkIndex + 1) / totalChunks) * 100);
-        setUploadProgress(percent);
+        setIsSending(true);
+        setUploadProgress(0);
 
-        if (data.status === 'done') {
-          return { media_url: data.media_url, type: data.type };
-        }
-      } catch (err) {
-        console.error('Upload error:', err);
-        throw err;
-      }
-    }
-  };
-
-  const handleSendMessage = async () => {
-    if ((!newMessage.trim() && !selectedFile) || isSending) return;
-
-    setIsSending(true); // Start loading
-
-    let mediaUrl = null;
-    let mediaType = null;
-    setUploadProgress(0);
-
-    try {
-      console.log('Sending message...', currentUser.id, newMessage); // Debug
-
-      // 1. Upload file if exists
-      let mediaUrl = null;
-      let mediaType = null;
-
-      if (selectedFile) {
         try {
-          // For very small files we could skip chunking, but for consistency we use it for all
-          // or at least for files > 1MB. Let's use it for all to ensure "chunk upload" requirement is met.
-          const uploadResult = await uploadFileInChunks(selectedFile);
-          mediaUrl = uploadResult.media_url;
-          mediaType = uploadResult.type;
-        } catch (uploadErr) {
-          alert('File upload failed: ' + uploadErr.message);
-          setIsSending(false);
-          return;
+            let mediaUrl = null;
+            let mediaType = 'text';
+
+            if (selectedFile) {
+                console.log('Uploading file...', selectedFile.name);
+                const uploadResult = await uploadFileInChunks(selectedFile);
+                mediaUrl = uploadResult.media_url;
+                mediaType = uploadResult.type;
+                console.log('Upload success:', mediaUrl);
+            }
+
+            const formData = new FormData();
+            formData.append('user_id', user.id);
+            formData.append('content', newMessage);
+            if (mediaUrl) {
+                formData.append('media_url', mediaUrl);
+                formData.append('media_type', mediaType);
+            }
+            if (replyTo) {
+                formData.append('reply_to_id', replyTo.id);
+            }
+
+            console.log('POSTing message to API...');
+            const res = await fetch(`${API_BASE_URL}/community_messages.php`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            console.log('API Response Status:', res.status);
+            if (res.ok) {
+                const data = await res.json();
+                console.log('Message sent successfully:', data);
+                setNewMessage('');
+                setSelectedFile(null);
+                setReplyTo(null);
+                fetchMessages();
+            } else {
+                const text = await res.text();
+                console.error('API Error Response:', text);
+                throw new Error(`Server returned ${res.status}`);
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            alert('Erreur lors de l\'envoi du message: ' + error.message);
+        } finally {
+            setIsSending(false);
+            setUploadProgress(0);
         }
-      }
+    };
 
-      // 2. Send Message Data
-      const formData = new FormData();
-      formData.append('user_id', currentUser.id);
-      formData.append('content', newMessage);
-      if (mediaUrl) {
-        formData.append('media_url', mediaUrl);
-        formData.append('media_type', mediaType);
-      }
+    const handleSendComment = async (messageId) => {
+        const content = commentInputs[messageId];
+        if (!content || !content.trim()) return;
 
-      const res = await fetch(`${API_BASE_URL}/community_messages.php`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (res.ok) {
-        const savedMessage = await res.json();
-        console.log('Message sent successfully!', savedMessage);
-
-        // Optimistic update (or rather, using the confirmed saved message)
-        setMessages(prev => [savedMessage, ...prev]);
-        setFilteredMessages(prev => [savedMessage, ...prev]);
-
-        setNewMessage('');
-        setSelectedFile(null);
-
-        // Clear file input value physically
-        const fileInput = document.getElementById('file-input');
-        if (fileInput) fileInput.value = '';
-
-        // Switch to dashword if in filtered view so user sees their message
-        // Always ensure we are on dashword (though we only have one section now)
-        setActiveSection('dashword');
-
-        // await fetchMessages(searchQuery); // Skip re-fetch to avoid race condition where DB isn't updated yet
-      } else {
-        const errText = await res.text();
-        console.error('Send failed raw:', errText);
         try {
-          const err = JSON.parse(errText);
-          console.error('Send failed JSON:', err);
-          alert('Failed to send message: ' + (err.error || 'Unknown error'));
-        } catch (e) {
-          alert('Failed to send message: ' + errText);
+            const res = await fetch(`${API_BASE_URL}/community_comments.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message_id: messageId,
+                    user_id: user.id,
+                    content: content
+                }),
+            });
+            if (res.ok) {
+                setCommentInputs(prev => ({ ...prev, [messageId]: '' }));
+                fetchMessages();
+            }
+        } catch (error) {
+            console.error('Error sending comment:', error);
         }
-      }
-    } catch (err) {
-      console.error('Network error:', err);
-      alert('Network error sending message.');
-    } finally {
-      setUploadProgress(0);
-      setIsSending(false); // Stop loading
+    };
+
+    const handleToggleSave = async (messageId) => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/community_archives.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user.id, message_id: messageId })
+            });
+            if (res.ok) {
+                fetchMessages();
+            }
+        } catch (error) {
+            console.error('Error toggling save:', error);
+        }
+    };
+
+    const confirmDeleteMessage = (msgId) => {
+        setMessageToDelete(msgId);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteMessage = async () => {
+        if (!messageToDelete) return;
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/community_messages.php`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message_id: messageToDelete, user_id: user.id })
+            });
+            if (res.ok) {
+                fetchMessages();
+                setShowDeleteModal(false);
+                setMessageToDelete(null);
+            }
+        } catch (error) {
+            console.error('Error deleting message:', error);
+        }
+    };
+
+    const handleReportMessage = async (msgId) => {
+        const reason = prompt("Raison du signalement :");
+        if (!reason) return;
+
+        try {
+            await fetch(`${API_BASE_URL}/admin/reports.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message_id: msgId,
+                    reporter_id: user.id,
+                    reason: reason
+                })
+            });
+            alert('Signalement envoyé aux administrateurs.');
+        } catch (error) {
+            alert('Erreur lors du signalement.');
+        }
+    };
+
+    const toggleComments = (messageId) => {
+        setExpandedComments(prev => ({
+            ...prev,
+            [messageId]: !prev[messageId]
+        }));
+    };
+
+    if (!user) return <div style={{ padding: '4rem', textAlign: 'center' }}>Chargement...</div>;
+
+    // Show user profile if selected
+    if (showUserProfile && selectedUserId) {
+        return <UserProfile userId={selectedUserId} onBack={handleBackToCommunity} currentUser={user} />;
     }
-  };
 
-  const handleSendComment = async (messageId) => {
-    const content = commentInputs[messageId];
-    if (!content || !content.trim()) return;
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/community_comments.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message_id: messageId,
-          user_id: currentUser.id,
-          content: content
-        }),
-      });
-      if (res.ok) {
-        setCommentInputs({ ...commentInputs, [messageId]: '' });
-        fetchMessages(searchQuery); // Refresh list
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Render main content
-  return (
-    <div className="community-container">
-      <input
-        type="file"
-        id="whatsapp-file"
-        ref={fileInputRef}
-        style={{ display: 'none' }}
-        accept="image/*,video/*,.pdf,.doc,.docx"
-        onChange={(e) => {
-          const file = e.target.files[0];
-          if (file) {
-            console.log('File selected (Secondary):', file.name, file.size, 'bytes');
-            setSelectedFile(file);
-          }
-        }}
-      />
-      <nav className="nav_left">
-        <div className="sidebar-header">
-          <h1>facechat</h1>
-          <div style={{ position: 'relative' }}>
-            <button className="notif-btn" onClick={() => setShowNotifications(!showNotifications)}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-              {Array.isArray(notifications) && notifications.some(n => !n.is_read) && (
-                <span className="notif-badge">{notifications.filter(n => !n.is_read).length}</span>
-              )}
-            </button>
-            {showNotifications && (
-              <div className="notif-dropdown">
-                {!Array.isArray(notifications) || notifications.length === 0 ? <div style={{ padding: '10px' }}>No notifications</div> : (
-                  notifications.map(n => (
-                    <div key={n.id} className={`notif-item ${!n.is_read ? 'unread' : ''}`} onClick={() => handleNotificationClick(n)}>
-                      <strong>{n.actor_name}</strong> commented on your {n.message_type || 'post'}.
-                      <div style={{ fontSize: '11px', color: '#888' }}>{new Date(n.created_at).toLocaleString()}</div>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          {sections.map(sec => (
-            <a
-              href={`#${sec.id}`}
-              key={sec.id}
-              className={activeSection === sec.id ? 'active' : ''}
-              onClick={(e) => {
-                e.preventDefault();
-                setActiveSection(sec.id);
-              }}
-            >
-              {sec.title}
-            </a>
-          ))}
-        </div>
-      </nav>
-
-      <nav>
-        <div className="nave_top">
-          {/* Logo removed - using global header */}
-
-          <div className="recherche_bare">
-            <div style={{ position: 'relative', width: '100%' }}>
-              <input
-                type="text"
-                id="bar_recherche"
-                placeholder="Search in group..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ paddingRight: searchQuery ? '30px' : '10px' }}
-              />
-              {searchQuery && (
+    return (
+        <div className="community-whatsapp-container" style={{
+            display: 'grid',
+            gridTemplateColumns: window.innerWidth > 768 ? '350px 1fr' : '1fr',
+            height: 'calc(100vh - 120px)',
+            background: 'rgba(255, 255, 255, 0.4)',
+            backdropFilter: 'blur(40px)',
+            borderRadius: '24px',
+            border: '1px solid rgba(255, 255, 255, 0.5)',
+            overflow: 'hidden',
+            margin: '0 auto',
+            maxWidth: '1600px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
+            position: 'relative'
+        }}>
+            {/* Mobile Menu Button */}
+            {window.innerWidth <= 768 && (
                 <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery('');
-                    fetchMessages(''); // Immediate fetch on clear
-                  }}
-                  style={{
-                    position: 'absolute',
-                    right: '5px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    fontSize: '16px',
-                    cursor: 'pointer',
-                    color: '#666'
-                  }}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-          </div>
-          <button id="searchButton" type="button" onClick={() => fetchMessages(searchQuery)}>
-            <svg
-              width="20px"
-              height="20px"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
-                stroke="#333333"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M21 21L16.65 16.65"
-                stroke="#333333"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-
-          {/* Logout removed - using global header */}
-
-        </div>
-      </nav>
-
-      <section id="dashword">
-        <div className="dashword-content">
-
-          <MessageList
-            items={filteredMessages}
-            currentUser={currentUser}
-            commentInputs={commentInputs}
-            setCommentInputs={setCommentInputs}
-            handleSendComment={handleSendComment}
-            handleToggleArchive={handleToggleArchive}
-            scrollContainerRef={scrollContainerRef}
-            messagesEndRef={messagesEndRef}
-            expandedComments={expandedComments}
-            toggleComments={toggleComments}
-          />
-
-        </div>
-      </section>
-
-      {/* Message Bar - Always visible */}
-      <div className="bar_mes">
-        <div className="file-upload-wrapper">
-          <label htmlFor="whatsapp-file" id="enleve" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-            <span className="enlevee">
-              <svg width="20px" height="20px" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none">
-                <g fill={selectedFile ? "#007bff" : "#333333"}>
-                  <path d="M4.24 5.8a.75.75 0 001.06-.04l1.95-2.1v6.59a.75.75 0 001.5 0V3.66l1.95 2.1a.75.75 0 101.1-1.02l-3.25-3.5a.75.75 0 00-1.101.001L4.2 4.74a.75.75 0 00.04 1.06z" />
-                  <path d="M1.75 9a.75.75 0 01.75.75v3c0 .414.336.75.75.75h9.5a.75.75 0 00.75-.75v-3a.75.75 0 011.5 0v3A2.25 2.25 0 0112.75 15h-9.5A2.25 2.25 0 011 12.75v-3A.75.75 0 011.75 9z" />
-                </g>
-              </svg>
-            </span>
-          </label>
-          {selectedFile && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <span className="file-name">{selectedFile.name}</span>
-              <button onClick={() => { setSelectedFile(null); }} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer' }}>✕</button>
-            </div>
-          )}
-        </div>
-
-        {/* Preview removed */}
-
-        <textarea
-          name="messages"
-          id="mes"
-          cols="30"
-          rows="3"
-          placeholder="Type a message..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-        ></textarea>
-
-        <button className="envoyer" type="button" onClick={handleSendMessage} disabled={isSending} style={{ opacity: isSending ? 0.6 : 1, cursor: isSending ? 'not-allowed' : 'pointer' }}>
-          <span className="arrow">
-            {isSending ? (
-              <div style={{ position: 'relative', width: '24px', height: '24px' }}>
-                <div className="spinner-border text-primary" role="status" style={{ width: '20px', height: '20px', border: '2px solid #ccc', borderTop: '2px solid #333', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                {uploadProgress > 0 && uploadProgress < 100 && (
-                  <span style={{ position: 'absolute', top: '24px', left: '-10px', fontSize: '10px', width: '50px' }}>{uploadProgress}%</span>
-                )}
-              </div>
-            ) : (
-              <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61359 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.6367 14.1886C19.1797 13.4942 19.9512 13.1471 20.1896 12.6648C20.3968 12.2458 20.3968 11.7541 20.1896 11.3351C19.9512 10.8529 19.1797 10.5057 17.6367 9.81135L7.48483 5.24303C5.90879 4.53382 5.12078 4.17921 4.59799 4.32468C4.14397 4.45101 3.77572 4.78336 3.60365 5.22209C3.40551 5.72728 3.67772 6.54741 4.22215 8.18767L5.24829 11.2793C5.34179 11.561 5.38855 11.7019 5.407 11.8459C5.42338 11.9738 5.42321 12.1032 5.40651 12.231C5.38768 12.375 5.34057 12.5157 5.24634 12.7972Z" stroke="#333333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-          </span>
-        </button>
-      </div>
-
-    </div>
-  );
-}
-
-// Defined OUTSIDE to prevent remounting - FACEBOOK STYLE COMMENTS
-const MessageList = ({ items, currentUser, commentInputs, setCommentInputs, handleSendComment, handleToggleArchive, scrollContainerRef, messagesEndRef, expandedComments, toggleComments }) => {
-  const INITIAL_COMMENTS_SHOW = 2;
-  const ADMIN_USER_ID = 24212; // Admin user ID
-
-  // State for managing open menu for each post
-  const [openMenuId, setOpenMenuId] = React.useState(null);
-
-  // Helper to get display name from email
-  const getDisplayName = (email) => {
-    if (!email) return 'User';
-    return email.split('@')[0];
-  };
-
-  // Handle menu toggle
-  const toggleMenu = (msgId, e) => {
-    e.stopPropagation();
-    setOpenMenuId(openMenuId === msgId ? null : msgId);
-  };
-
-  // Close menu when clicking outside
-  React.useEffect(() => {
-    const handleClickOutside = () => {
-      if (openMenuId !== null) {
-        setOpenMenuId(null);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, [openMenuId]);
-
-  // Handle delete post
-  const handleDeletePost = async (msgId, e) => {
-    e.stopPropagation();
-
-    if (!window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/community_messages.php`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message_id: msgId,
-          user_id: currentUser.id
-        })
-      });
-
-      if (res.ok) {
-        // Reload the page or refetch messages
-        window.location.reload();
-      } else {
-        const error = await res.json();
-        alert(error.error || 'Failed to delete post');
-      }
-    } catch (err) {
-      console.error('Delete error:', err);
-      alert('Network error while deleting post');
-    }
-
-    setOpenMenuId(null);
-  };
-
-  // Check if user can delete a message
-  const canDelete = (msg) => {
-    return msg.user_id === currentUser.id || currentUser.role === 'admin';
-  };
-
-  return (
-    <div className="messages-container" ref={scrollContainerRef} style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-      {(!items || items.length === 0) && <p style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}>No items found.</p>}
-      {Array.isArray(items) && items.map((msg, index) => {
-        const isOwnMessage = msg.user_id === currentUser.id;
-        const comments = msg.comments || [];
-        const isExpanded = expandedComments[msg.id];
-        const displayedComments = isExpanded ? comments : comments.slice(-INITIAL_COMMENTS_SHOW);
-        const hasMoreComments = comments.length > INITIAL_COMMENTS_SHOW;
-        const hiddenCount = comments.length - INITIAL_COMMENTS_SHOW;
-        const isMenuOpen = openMenuId === msg.id;
-
-        // Ensure unique key
-        const itemKey = msg.id ? msg.id : `msg-${index}`;
-
-        return (
-          <div key={itemKey} id={`msg-${msg.id}`} className={`message-item ${isOwnMessage ? 'message-me' : 'message-others'}`}>
-            <div className="message-header">
-              <strong>{msg.email ? getDisplayName(msg.email) : (isOwnMessage ? getDisplayName(currentUser.email) : msg.username)}</strong>
-              <span>{new Date(msg.created_at).toLocaleString()}</span>
-
-              {/* Three-Dot Menu Button */}
-              <button
-                className="post-menu-btn"
-                onClick={(e) => toggleMenu(msg.id, e)}
-                title="Post options"
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <circle cx="12" cy="5" r="2" />
-                  <circle cx="12" cy="12" r="2" />
-                  <circle cx="12" cy="19" r="2" />
-                </svg>
-              </button>
-
-              {/* Dropdown Menu */}
-              {isMenuOpen && (
-                <div className="post-menu-dropdown" onClick={(e) => e.stopPropagation()}>
-                  {/* Save/Archive Option */}
-                  <button
-                    className={`post-menu-item ${msg.is_archived ? 'saved' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleArchive(msg.id);
-                      setOpenMenuId(null);
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    style={{
+                        position: 'absolute',
+                        top: '1rem',
+                        left: '1rem',
+                        zIndex: 1001,
+                        background: 'white',
+                        border: 'none',
+                        borderRadius: '12px',
+                        padding: '0.75rem',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}
-                  >
-                    <svg viewBox="0 0 24 24" fill={msg.is_archived ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
-                      <path d="M5 7.8C5 6.11984 5 5.27976 5.32698 4.63803C5.6146 4.07354 6.07354 3.6146 6.63803 3.32698C7.27976 3 8.11984 3 9.8 3H14.2C15.8802 3 16.7202 3 17.362 3.32698C17.9265 3.6146 18.3854 4.07354 18.673 4.63803C19 5.27976 19 6.11984 19 7.8V21L12 17L5 21V7.8Z" />
-                    </svg>
-                    {msg.is_archived ? 'Unsave post' : 'Save post'}
-                  </button>
-
-                  {/* Delete Option - Only if user owns the post or is admin */}
-                  {canDelete(msg) && (
-                    <button
-                      className="post-menu-item delete-item"
-                      onClick={(e) => handleDeletePost(msg.id, e)}
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                        <line x1="14" y1="11" x2="14" y2="17"></line>
-                      </svg>
-                      Delete post
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="message-content">
-              {msg.content && <p>{msg.content}</p>}
-              {msg.type === 'image' && <img src={`${API_BASE_URL.replace('/api', '')}${msg.media_url}`} alt="upload" className="msg-media" />}
-              {msg.type === 'video' && <video src={`${API_BASE_URL.replace('/api', '')}${msg.media_url}`} controls className="msg-media" />}
-              {msg.type === 'file' && <a href={`${API_BASE_URL.replace('/api', '')}${msg.media_url}`} target="_blank" rel="noopener noreferrer">Download File</a>}
-            </div>
-
-            <div className="comments-section">
-              {hasMoreComments && !isExpanded && (
-                <button
-                  className="show-more-comments"
-                  onClick={() => toggleComments(msg.id)}
                 >
-                  View {hiddenCount} more {hiddenCount === 1 ? 'comment' : 'comments'}
+                    {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                 </button>
-              )}
+            )}
 
-              {displayedComments.map((comment, idx) => (
-                <div key={comment.id || `comment-${idx}`} className="comment-item">
-                  <div>
-                    <div>
-                      <strong>{comment.email ? getDisplayName(comment.email) : comment.username}</strong>
-                      <span className="comment-text">{comment.content}</span>
+            {/* Sidebar */}
+            <div className="whatsapp-sidebar" style={{
+                borderRight: '1px solid rgba(0,0,0,0.05)',
+                display: window.innerWidth <= 768 && !isMobileMenuOpen ? 'none' : 'flex',
+                flexDirection: 'column',
+                background: 'rgba(255, 255, 255, 0.2)',
+                position: window.innerWidth <= 768 ? 'absolute' : 'relative',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: window.innerWidth <= 768 ? '80%' : 'auto',
+                maxWidth: window.innerWidth <= 768 ? '350px' : 'none',
+                zIndex: 1000,
+                boxShadow: window.innerWidth <= 768 ? '4px 0 20px rgba(0,0,0,0.1)' : 'none'
+            }}>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary-blue)' }}>Publications</h2>
+                        <div style={{ position: 'relative' }}>
+                            {/* Notifications removed from here and moved to Header */}
+                        </div>
                     </div>
-                    <span className="comment-time">{new Date(comment.created_at).toLocaleString()}</span>
-                  </div>
+
+                    <div style={{ position: 'relative' }}>
+                        <input
+                            type="text"
+                            className="auth-input"
+                            placeholder="Rechercher..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            style={{ padding: '0.75rem 1rem 0.75rem 2.5rem', fontSize: '0.9rem', borderRadius: '12px' }}
+                        />
+                        <ImageIcon size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray-400)' }} />
+                    </div>
                 </div>
-              ))}
 
-              {hasMoreComments && isExpanded && (
-                <button
-                  className="show-more-comments"
-                  onClick={() => toggleComments(msg.id)}
-                >
-                  Show less
-                </button>
-              )}
+                <div style={{ flex: 1, overflowY: 'auto' }}>
+                    <div
+                        onClick={() => { setShowOnlySaved(false); setShowMembersList(false); }}
+                        style={{
+                            padding: '1.2rem 1.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1.2rem',
+                            cursor: 'pointer',
+                            background: !showOnlySaved ? 'rgba(28, 53, 134, 0.05)' : 'transparent',
+                            borderLeft: !showOnlySaved ? '5px solid var(--primary-blue)' : '5px solid transparent',
+                            transition: 'all 0.33s cubic-bezier(0.4, 0, 0.2, 1)'
+                        }}
+                    >
+                        <div style={{ width: '56px', height: '56px', borderRadius: '18px', background: 'var(--primary-blue)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(28, 53, 134, 0.2)' }}>
+                            <Users size={28} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Flux Global</h4>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--primary-green)', fontWeight: 700 }}>{stats.activeMembers} actifs</span>
+                            </div>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: 0 }}>
+                                {messages.length > 0 ? messages[0].content : 'Voir les publications...'}
+                            </p>
+                        </div>
+                    </div>
 
-              <div className={`add-comment ${commentInputs[msg.id] ? 'has-content' : ''}`}>
-                <textarea
-                  placeholder="Write a comment..."
-                  value={commentInputs[msg.id] || ''}
-                  onChange={(e) => setCommentInputs({ ...commentInputs, [msg.id]: e.target.value })}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendComment(msg.id);
-                    }
-                  }}
-                />
-                <button onClick={() => handleSendComment(msg.id)}>➤</button>
-              </div>
+                    <div
+                        onClick={() => { setShowOnlySaved(true); setShowMembersList(false); }}
+                        style={{
+                            padding: '1.2rem 1.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1.2rem',
+                            cursor: 'pointer',
+                            background: showOnlySaved ? 'rgba(28, 53, 134, 0.05)' : 'transparent',
+                            borderLeft: showOnlySaved ? '5px solid var(--primary-blue)' : '5px solid transparent',
+                            transition: 'all 0.33s cubic-bezier(0.4, 0, 0.2, 1)'
+                        }}
+                    >
+                        <div style={{ width: '56px', height: '56px', borderRadius: '18px', background: 'var(--primary-blue)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(28, 53, 134, 0.2)' }}>
+                            <Bookmark size={28} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <h4 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Favoris</h4>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', margin: 0 }}>Messages enregistrés</p>
+                        </div>
+                    </div>
+
+                    <div
+                        onClick={() => { setShowMembersList(true); setShowOnlySaved(false); }}
+                        style={{
+                            padding: '1.2rem 1.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '1.2rem',
+                            cursor: 'pointer',
+                            background: showMembersList ? 'rgba(46, 171, 78, 0.05)' : 'transparent',
+                            borderLeft: showMembersList ? '5px solid var(--primary-green)' : '5px solid transparent',
+                            transition: 'all 0.33s cubic-bezier(0.4, 0, 0.2, 1)'
+                        }}
+                    >
+                        <div style={{ width: '56px', height: '56px', borderRadius: '18px', background: 'var(--primary-green)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(46, 171, 78, 0.2)' }}>
+                            <Users size={28} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <h4 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0 }}>Membres</h4>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', margin: 0 }}>{stats.totalMembers} personnes</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        );
-      })}
-      <div ref={messagesEndRef} />
-    </div>
-  );
+
+            {/* Chat Area */}
+            <div className="whatsapp-chat" style={{
+                display: 'flex',
+                flexDirection: 'column',
+                background: 'rgba(255, 255, 255, 0.6)',
+                height: '100%',
+                minHeight: 0
+            }}>
+                {/* Chat Header */}
+                <div id='whatsapp-chat-header' style={{ padding: '1.2rem 2.5rem', background: 'white', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+
+                        <div style={{ width: '48px', height: '48px', borderRadius: '15px', background: showMembersList ? 'var(--primary-green)' : (showOnlySaved ? 'var(--primary-blue)' : 'var(--primary-blue)'), color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                            {showMembersList ? <Users size={24} /> : (showOnlySaved ? <Bookmark size={24} /> : <Users size={24} />)}
+                        </div>
+                        <div>
+                            <h3 style={{ fontSize: '1.3rem', fontWeight: 900, margin: 0 }}>{showMembersList ? 'Membres' : (showOnlySaved ? 'Favoris' : 'Share-Differ-Respect')}</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary-green)' }}></div>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--gray-500)', fontWeight: 600, margin: 0 }}>{stats.activeMembers} actifs maintenant</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => window.location.href = '/'}
+                        style={{
+                            background: 'rgba(0,0,0,0.05)',
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '0.6rem',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'var(--gray-700)',
+                            transition: 'all 0.2s'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.1)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
+                    >
+                        <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Return</span>
+                    </button>
+                </div>
+
+                <div style={{
+                    flex: 1,
+                    overflowY: 'auto',
+                    padding: '2.5rem',
+                    display: 'flex',
+                    flexDirection: 'column-reverse',
+                    gap: '1.5rem',
+                    background: 'rgba(240, 242, 245, 0.3)',
+                    minHeight: 0
+                }}>
+                    {/* Members List View */}
+                    {showMembersList ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {members.map(member => (
+                                <div key={member.id} style={{
+                                    background: 'white',
+                                    padding: '1.2rem 1.5rem',
+                                    borderRadius: '16px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '1rem',
+                                    cursor: 'pointer',
+                                    border: '1px solid rgba(0,0,0,0.05)',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                                    transition: 'transform 0.2s, box-shadow 0.2s'
+                                }}
+                                    onClick={() => handleUserClick(member.id)}
+                                    onMouseOver={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.08)';
+                                    }}
+                                    onMouseOut={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.03)';
+                                    }}>
+                                    <div style={{
+                                        width: '50px',
+                                        height: '50px',
+                                        borderRadius: '14px',
+                                        background: member.is_active ? 'var(--primary-blue)' : '#e5e7eb',
+                                        overflow: 'hidden',
+                                        flexShrink: 0,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        position: 'relative'
+                                    }}>
+                                        {member.profile_path ? (
+                                            <img src={`${API_BASE_URL}${member.profile_path}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <span style={{ fontSize: '1rem', fontWeight: 900, color: member.is_active ? 'white' : 'var(--gray-600)' }}>
+                                                {member.username?.substring(0, 2).toUpperCase()}
+                                            </span>
+                                        )}
+                                        {member.is_active && (
+                                            <div style={{ position: 'absolute', bottom: '2px', right: '2px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--primary-green)', border: '2px solid white' }}></div>
+                                        )}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, marginBottom: '2px' }}>{member.username}</h4>
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', margin: 0 }}>
+                                            {member.message_count} message{member.message_count !== 1 ? 's' : ''}
+                                            {member.is_active && <span style={{ color: 'var(--primary-green)', marginLeft: '0.5rem', fontWeight: 600 }}>• Actif</span>}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : loading ? (
+                        <div style={{ margin: 'auto' }}><Loader2 className="animate-spin" size={48} color="var(--primary-blue)" /></div>
+                    ) : messages.length === 0 ? (
+                        <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--gray-400)' }}>
+                            <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(0,0,0,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                                <MessageSquare size={48} style={{ opacity: 0.2 }} />
+                            </div>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--gray-600)' }}>Pas encore de messages</h3>
+                            <p>Envoyez le premier message pour lancer la discussion !</p>
+                        </div>
+                    ) : (
+                        messages.map(msg => {
+                            const isMe = msg.user_id == user.id;
+                            return (
+                                <div key={msg.id} id={`msg-${msg.id}`} style={{
+                                    alignSelf: 'flex-start',
+                                    width: '100%',
+                                    maxWidth: '900px',
+                                    marginBottom: '1.5rem'
+                                }}>
+                                    {/* Header with ID and timestamp */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem', marginLeft: '1rem' }}>
+                                        {/* Profile Picture */}
+                                        <div
+                                            onClick={() => handleUserClick(msg.user_id)}
+                                            style={{
+                                                width: '48px',
+                                                height: '48px',
+                                                borderRadius: '14px',
+                                                background: 'linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-green) 100%)',
+                                                overflow: 'hidden',
+                                                flexShrink: 0,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                                                cursor: 'pointer',
+                                                transition: 'transform 0.2s'
+                                            }}
+                                            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                        >
+                                            {msg.profile_path ? (
+                                                <img src={`${API_BASE_URL}${msg.profile_path}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <span style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white' }}>
+                                                    {msg.username?.substring(0, 2).toUpperCase() || 'U'}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* User ID Badge */}
+                                        <div style={{
+                                            background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+                                            backdropFilter: 'blur(10px)',
+                                            padding: '0.5rem 1rem',
+                                            borderRadius: '12px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            border: '1px solid rgba(102, 126, 234, 0.2)'
+                                        }}>
+                                            <div style={{
+                                                width: '24px',
+                                                height: '24px',
+                                                borderRadius: '8px',
+                                                background: (msg.role === 'Root' || msg.role === 'teacher')
+                                                    ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'
+                                                    : 'linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-green) 100%)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                color: 'white',
+                                                fontSize: '0.7rem',
+                                                fontWeight: 900,
+                                                boxShadow: (msg.role === 'Root' || msg.role === 'teacher') ? '0 0 10px rgba(255, 215, 0, 0.5)' : 'none'
+                                            }}>
+                                                {(msg.role === 'Root' || msg.role === 'teacher') ? <CheckCircle size={14} /> : <Users size={14} />}
+                                            </div>
+                                            <span
+                                                onClick={(e) => { e.stopPropagation(); handleUserClick(msg.user_id); }}
+                                                style={{
+                                                    fontSize: '0.9rem',
+                                                    fontWeight: 700,
+                                                    color: 'var(--primary-blue)',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px'
+                                                }}
+                                                onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
+                                                onMouseOut={(e) => e.target.style.textDecoration = 'none'}
+                                            >
+                                                {msg.username || `User ${msg.user_id}`}
+                                                {(msg.role === 'Root' || msg.role === 'teacher') && (
+                                                    <span style={{
+                                                        fontSize: '0.65rem',
+                                                        background: msg.role === 'Root' ? 'var(--primary-blue)' : 'var(--primary-green)',
+                                                        color: 'white',
+                                                        padding: '2px 6px',
+                                                        borderRadius: '100px',
+                                                        fontWeight: 800,
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.5px'
+                                                    }}>
+                                                        {msg.role}
+                                                    </span>
+                                                )}
+                                            </span>
+                                        </div>
+
+                                        {/* Timestamp Badge */}
+                                        <div style={{
+                                            background: 'rgba(0, 0, 0, 0.03)',
+                                            padding: '0.5rem 1rem',
+                                            borderRadius: '12px',
+                                            fontSize: '0.85rem',
+                                            color: 'var(--gray-500)',
+                                            fontWeight: 600
+                                        }}>
+                                            {new Date(msg.created_at).toLocaleString('fr-FR', {
+                                                day: '2-digit',
+                                                month: '2-digit',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </div>
+
+                                        {/* Bookmark icon */}
+                                        <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                            {/* Reply button */}
+                                            <button
+                                                onClick={() => {
+                                                    setReplyTo(msg);
+                                                    document.getElementById('community-textarea')?.focus();
+                                                }}
+                                                style={{
+                                                    background: 'rgba(102, 126, 234, 0.1)',
+                                                    border: 'none',
+                                                    color: 'var(--primary-blue)',
+                                                    cursor: 'pointer',
+                                                    padding: '0.5rem',
+                                                    borderRadius: '8px',
+                                                    transition: 'all 0.2s',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.3rem'
+                                                }}
+                                                title="Répondre"
+                                            >
+                                                <Share2 size={16} style={{ transform: 'scaleX(-1)' }} />
+                                            </button>
+
+                                            {/* Delete button (Root, admin or owner) */}
+                                            {(user.role === 'Root' || user.role === 'admin' || isMe) && (
+                                                <button
+                                                    onClick={() => confirmDeleteMessage(msg.id)}
+                                                    style={{
+                                                        background: 'rgba(239, 68, 68, 0.1)',
+                                                        border: 'none',
+                                                        color: '#ef4444',
+                                                        cursor: 'pointer',
+                                                        padding: '0.5rem',
+                                                        borderRadius: '8px',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                    title="Supprimer"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            )}
+
+                                            {/* Report Button */}
+                                            {!isMe && (
+                                                <button
+                                                    onClick={() => handleReportMessage(msg.id)}
+                                                    style={{
+                                                        background: 'rgba(245, 158, 11, 0.1)',
+                                                        border: 'none',
+                                                        color: '#f59e0b',
+                                                        cursor: 'pointer',
+                                                        padding: '0.5rem',
+                                                        borderRadius: '8px',
+                                                        transition: 'all 0.2s',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '0.3rem'
+                                                    }}
+                                                    title="Signaler"
+                                                >
+                                                    <Shield size={16} />
+                                                </button>
+                                            )}
+
+                                            {/* Bookmark button */}
+                                            <button
+                                                onClick={() => handleToggleSave(msg.id)}
+                                                style={{
+                                                    background: msg.is_archived ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
+                                                    border: 'none',
+                                                    color: msg.is_archived ? 'var(--primary-blue)' : 'var(--gray-300)',
+                                                    cursor: 'pointer',
+                                                    padding: '0.5rem',
+                                                    borderRadius: '8px',
+                                                    transition: 'all 0.2s'
+                                                }}
+                                                title="Enregistrer"
+                                            >
+                                                {msg.is_archived ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+
+                                        <div style={{
+                                            padding: '1.5rem 1.75rem',
+                                            borderRadius: '24px',
+                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+                                            backdropFilter: 'blur(20px)',
+                                            color: 'var(--dark)',
+                                            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+                                            position: 'relative',
+                                            border: '1px solid rgba(255, 255, 255, 0.8)',
+                                            overflow: 'hidden'
+                                        }}>
+                                            {/* Gradient left border */}
+                                            <div style={{
+                                                position: 'absolute',
+                                                left: 0,
+                                                top: 0,
+                                                bottom: 0,
+                                                width: '5px',
+                                                background: 'linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-green) 100%)',
+                                                borderRadius: '24px 0 0 24px'
+                                            }}></div>
+                                            {/* Reply Context */}
+                                            {msg.reply_to_id && (
+                                                <div style={{
+                                                    background: isMe ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.03)',
+                                                    padding: '8px 12px',
+                                                    borderRadius: '10px',
+                                                    marginBottom: '0.8rem',
+                                                    borderLeft: `4px solid ${isMe ? 'white' : 'var(--primary-blue)'}`
+                                                }}>
+                                                    <p style={{ fontSize: '0.75rem', fontWeight: 900, marginBottom: '2px', color: isMe ? 'white' : 'var(--primary-blue)' }}>@{msg.reply_username}</p>
+                                                    <p style={{ fontSize: '0.8rem', opacity: 0.9, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{msg.reply_content}</p>
+                                                </div>
+                                            )}
+
+                                            {msg.media_url && (
+                                                <div style={{ marginBottom: '1rem', borderRadius: '15px', overflow: 'hidden' }}>
+                                                    {msg.type === 'image' ? (
+                                                        <img
+                                                            src={`${API_BASE_URL}${msg.media_url}`}
+                                                            alt=""
+                                                            style={{
+                                                                borderRadius: '12px',
+                                                                maxWidth: '100%',
+                                                                maxHeight: '400px',
+                                                                width: 'auto',
+                                                                objectFit: 'contain',
+                                                                display: 'block',
+                                                                cursor: 'pointer',
+                                                                transition: 'transform 0.2s'
+                                                            }}
+                                                            onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
+                                                            onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+                                                        />
+                                                    ) : msg.type === 'video' ? (
+                                                        <video
+                                                            controls
+                                                            style={{
+                                                                borderRadius: '12px',
+                                                                maxWidth: '100%',
+                                                                maxHeight: '400px',
+                                                                width: '100%',
+                                                                objectFit: 'contain',
+                                                                display: 'block',
+                                                                background: 'rgba(0,0,0,0.05)'
+                                                            }}
+                                                        >
+                                                            <source src={`${API_BASE_URL}${msg.media_url}`} type="video/mp4" />
+                                                            Votre navigateur ne supporte pas la lecture vidéo.
+                                                        </video>
+                                                    ) : (
+                                                        <a href={`${API_BASE_URL}${msg.media_url}`} target="_blank" rel="noreferrer" style={{
+                                                            color: isMe ? 'white' : 'var(--primary-blue)',
+                                                            fontSize: '0.9rem',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '0.8rem',
+                                                            background: isMe ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.05)',
+                                                            padding: '0.8rem 1.2rem',
+                                                            borderRadius: '12px',
+                                                            textDecoration: 'none',
+                                                            fontWeight: 600
+                                                        }}>
+                                                            <Paperclip size={20} />
+                                                            <span>Fichier attaché</span>
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            )}
+                                            <p style={{ fontSize: '1.05rem', lineHeight: '1.6', margin: 0, fontWeight: 400, color: '#2d3748' }}>{msg.content}</p>
+
+                                            {/* Comments Section */}
+                                            <div style={{ marginTop: '1.5rem', borderTop: '1px solid rgba(0,0,0,0.05)', paddingTop: '1rem' }}>
+                                                {msg.comments && msg.comments.length > 0 && (
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '1rem' }}>
+                                                        {(expandedComments[msg.id] ? msg.comments : msg.comments.slice(0, 2)).map(comment => (
+                                                            <div key={comment.id} style={{
+                                                                padding: '0.8rem 1.2rem',
+                                                                background: 'rgba(0,0,0,0.03)',
+                                                                borderRadius: '16px',
+                                                                fontSize: '0.9rem',
+                                                                position: 'relative'
+                                                            }}>
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                                                    <span style={{ fontWeight: 800, color: 'var(--primary-blue)', fontSize: '0.85rem' }}>{comment.username}</span>
+                                                                    <span style={{ fontSize: '0.75rem', color: 'var(--gray-400)' }}>
+                                                                        {new Date(comment.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
+                                                                    </span>
+                                                                </div>
+                                                                <p style={{ margin: 0, color: '#4a5568', lineHeight: '1.4' }}>{comment.content}</p>
+                                                            </div>
+                                                        ))}
+
+                                                        {msg.comments.length > 2 && (
+                                                            <button
+                                                                onClick={() => toggleComments(msg.id)}
+                                                                style={{
+                                                                    background: 'none',
+                                                                    border: 'none',
+                                                                    color: 'var(--primary-blue)',
+                                                                    fontSize: '0.85rem',
+                                                                    fontWeight: 700,
+                                                                    cursor: 'pointer',
+                                                                    padding: '0.5rem 0',
+                                                                    textAlign: 'left',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '8px',
+                                                                    transition: 'all 0.2s'
+                                                                }}
+                                                            >
+                                                                {expandedComments[msg.id] ? (
+                                                                    <>Voir moins</>
+                                                                ) : (
+                                                                    <>Voir tout ({msg.comments.length})</>
+                                                                )}
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                )}
+
+                                                {/* Comment Input */}
+                                                <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+                                                    <div style={{ flex: 1, position: 'relative' }}>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Ajouter un commentaire..."
+                                                            value={commentInputs[msg.id] || ''}
+                                                            onChange={(e) => setCommentInputs(prev => ({ ...prev, [msg.id]: e.target.value }))}
+                                                            onKeyDown={(e) => e.key === 'Enter' && handleSendComment(msg.id)}
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '0.7rem 1.2rem',
+                                                                borderRadius: '12px',
+                                                                background: 'rgba(0,0,0,0.04)',
+                                                                border: 'none',
+                                                                fontSize: '0.85rem',
+                                                                outline: 'none'
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleSendComment(msg.id)}
+                                                        disabled={!commentInputs[msg.id]?.trim()}
+                                                        style={{
+                                                            background: 'var(--primary-blue)',
+                                                            color: 'white',
+                                                            border: 'none',
+                                                            borderRadius: '10px',
+                                                            padding: '0.6rem',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            opacity: !commentInputs[msg.id]?.trim() ? 0.5 : 1,
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                    >
+                                                        <Send size={16} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+
+                <div style={{ padding: '1.5rem 2.5rem', background: 'white', borderTop: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 -4px 10px rgba(0,0,0,0.01)' }}>
+                    {/* Reply Preview */}
+                    {replyTo && (
+                        <div style={{
+                            marginBottom: '1rem',
+                            padding: '1rem 1.5rem',
+                            background: 'rgba(28, 53, 134, 0.05)',
+                            borderRadius: '16px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            borderLeft: '5px solid var(--primary-blue)',
+                            animation: 'fadeInUp 0.3s ease'
+                        }}>
+                            <div style={{ flex: 1, overflow: 'hidden' }}>
+                                <p style={{ fontSize: '0.85rem', fontWeight: 900, color: 'var(--primary-blue)', marginBottom: '2px' }}>Réponse à @{replyTo.username}</p>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--gray-600)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{replyTo.content}</p>
+                            </div>
+                            <button onClick={() => setReplyTo(null)} style={{ marginLeft: '1rem', width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(0,0,0,0.05)', border: 'none', color: 'var(--gray-500)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>×</button>
+                        </div>
+                    )}
+
+                    {selectedFile && (
+                        <div style={{ marginBottom: '1rem', padding: '0.8rem 1.2rem', background: 'rgba(46, 171, 78, 0.1)', borderRadius: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', animation: 'fadeInUp 0.3s ease' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <ImageIcon size={20} color="var(--primary-green)" />
+                                <span style={{ fontSize: '0.9rem', color: 'var(--primary-green)', fontWeight: 700 }}>{selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)</span>
+                            </div>
+                            <button onClick={() => setSelectedFile(null)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontWeight: 900 }}>×</button>
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '1.2rem', alignItems: 'center' }}>
+                        <input type="file" id="whatsapp-file" style={{ display: 'none' }} accept="image/*,video/*,.pdf,.doc,.docx" onChange={(e) => setSelectedFile(e.target.files[0])} />
+                        <button type="button" onClick={() => document.getElementById('whatsapp-file').click()} className="icon-btn" style={{ color: 'var(--gray-500)', background: 'rgba(0,0,0,0.04)', borderRadius: '18px', width: '56px', height: '56px', flexShrink: 0, transition: 'all 0.2s' }}>
+                            <Paperclip size={26} />
+                        </button>
+
+                        <div style={{ flex: 1, position: 'relative' }}>
+                            <textarea
+                                id="community-textarea"
+                                className="auth-input"
+                                placeholder="Partagez quelque chose avec la communauté..."
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSendMessage(e);
+                                    }
+                                }}
+                                style={{
+                                    minHeight: '56px',
+                                    height: '56px',
+                                    padding: '1rem 1.5rem',
+                                    borderRadius: '18px',
+                                    resize: 'none',
+                                    background: 'rgba(0,0,0,0.04)',
+                                    border: 'none',
+                                    fontSize: '1rem',
+                                    fontWeight: 500,
+                                    lineHeight: '1.4'
+                                }}
+                            ></textarea>
+                        </div>
+
+                        <button type="submit" disabled={isSending || (!newMessage.trim() && !selectedFile)} style={{
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '18px',
+                            background: 'var(--primary-green)',
+                            color: 'white',
+                            border: 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            boxShadow: '0 8px 25px rgba(46, 171, 78, 0.4)',
+                            flexShrink: 0,
+                            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                        }}
+                            onMouseOver={(e) => !isSending && (e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)')}
+                            onMouseOut={(e) => !isSending && (e.currentTarget.style.transform = 'translateY(0) scale(1)')}
+                        >
+                            {isSending ? <Loader2 className="animate-spin" size={24} /> : <Send size={26} />}
+                        </button>
+                    </form>
+                </div>
+                {/* Custom Delete Confirmation Modal */}
+                {showDeleteModal && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(0,0,0,0.5)',
+                        backdropFilter: 'blur(5px)',
+                        zIndex: 9999,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }} onClick={() => setShowDeleteModal(false)}>
+                        <div style={{
+                            background: 'white',
+                            padding: '2rem',
+                            borderRadius: '20px',
+                            width: '90%',
+                            maxWidth: '400px',
+                            textAlign: 'center',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.2)'
+                        }} onClick={e => e.stopPropagation()}>
+                            <div style={{
+                                width: '60px',
+                                height: '60px',
+                                background: '#fee2e2',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 1rem',
+                                color: '#ef4444'
+                            }}>
+                                <Trash2 size={30} />
+                            </div>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.5rem', color: '#1f2937' }}>Supprimer le message ?</h3>
+                            <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>Cette action est irréversible. Êtes-vous sûr de vouloir continuer ?</p>
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                                <button
+                                    onClick={() => setShowDeleteModal(false)}
+                                    style={{
+                                        padding: '0.75rem 1.5rem',
+                                        borderRadius: '12px',
+                                        fontWeight: 600,
+                                        background: '#f3f4f6',
+                                        color: '#4b5563',
+                                        border: 'none',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    Annuler
+                                </button>
+                                <button
+                                    onClick={handleDeleteMessage}
+                                    style={{
+                                        padding: '0.75rem 1.5rem',
+                                        borderRadius: '12px',
+                                        fontWeight: 600,
+                                        background: '#ef4444',
+                                        color: 'white',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+                                    }}
+                                >
+                                    Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };
+
+export default Community;
