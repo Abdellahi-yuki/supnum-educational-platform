@@ -70,7 +70,7 @@ const Mail = () => {
             setIsLoading(true);
             try {
                 const [msgs, users] = await Promise.all([
-                    mailService.fetchMessages(selectedLabel),
+                    mailService.fetchMessages(selectedLabel === 'sent' ? 'inbox' : selectedLabel),
                     mailService.fetchUsers()
                 ]);
                 setMessages(msgs);
@@ -145,27 +145,31 @@ const Mail = () => {
             if (selectedLabel === 'sent') {
                 if (!matchesSearch) return false;
 
-                // Rule: Show if I sent it
-                return Number(msg.sender_id) === currentUserId;
+                // Rule: Show the WHOLE THREAD (represented by the leaf) if I participated in it.
+                // Since we fetched 'inbox' (all active), we have the full tree.
+                // We only show LEAF nodes.
+                if (!isLeaf) return false;
+
+                // Check if I participated in this thread
+                const participated = userParticipatedInThread(msg);
+                return participated;
             }
 
-            // For other labels (Inbox, Starred, etc.), only show leaf nodes to maintain threaded view
-            if (!matchesSearch || !isLeaf) return false;
-
             if (selectedLabel === 'inbox') {
-                // Show if:
-                // a) Message itself is in inbox AND (it's received OR it's a sent reply)
-                const isInbox = msg.labels.includes('inbox');
-                const isSentByMe = Number(msg.sender_id) === currentUserId;
-                const isReply = Number(msg.parentId) !== 0;
+                // Rule: Ignore all messages in thread excluding the leaf.
+                // Includes threads where leaf is sent by user.
+                if (!matchesSearch) return false;
 
-                // User's rule: "when the mail is (sent) by the user then display it in the (Sent section) and don't display it in inbox, 
-                // but if the mail is a part of a thread then display it in both"
-                if (isSentByMe && !isReply) return false;
+                // Only show leaves
+                if (!isLeaf) return false;
 
-                return isInbox;
+                // Ensure it's not trash/spam (already filtered by API 'inbox' usually, but good to check labels if mixed)
+                // The API 'inbox' returns is_trash=0, is_spam=0.
+                return true;
             } else {
                 // Standard label filtering for other views (starred, etc.)
+                // For Starred, we might want to show individual starred messages, or starred threads.
+                // Let's stick to standard label check for now.
                 return msg.labels.includes(selectedLabel);
             }
         });
