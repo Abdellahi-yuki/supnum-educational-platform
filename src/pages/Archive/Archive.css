@@ -54,6 +54,7 @@
    ============================================ */
 .archive-toolbar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2.5rem;
@@ -342,6 +343,7 @@
   gap: var(--spacing-md);
   justify-content: center;
   flex-wrap: wrap;
+  width: clamp(40px,100%,350px);
 }
 
 

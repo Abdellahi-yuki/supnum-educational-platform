@@ -354,6 +354,9 @@ const Mail = () => {
             <aside className={`mail-sidebar ${isSidebarOpen ? 'open' : ''}`}>
                 <div className="mail-sidebar-header">
                     <h2>Mail</h2>
+                    <button className="close-sidebar-btn" onClick={() => setIsSidebarOpen(false)}>
+                        <X size={20} />
+                    </button>
                 </div>
 
                 <nav className="mail-nav">
