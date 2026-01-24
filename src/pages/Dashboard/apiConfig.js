@@ -1,2 +1,2 @@
-import { API_BASE_URL } from '../../apiConfig';
-export { API_BASE_URL };
+import { API_BASE_URL, FILE_BASE_URL } from '../../apiConfig';
+export { API_BASE_URL, FILE_BASE_URL };

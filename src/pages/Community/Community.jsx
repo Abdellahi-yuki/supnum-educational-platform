@@ -19,7 +19,7 @@ import {
     CheckCircle,
     Plus
 } from 'lucide-react';
-import { API_BASE_URL } from '../Dashboard/apiConfig';
+import { API_BASE_URL, FILE_BASE_URL } from '../Dashboard/apiConfig';
 import { useLocation } from 'react-router-dom';
 import UserProfile from '../Dashboard/components/UserProfile';
 import './Community.css';
@@ -417,8 +417,8 @@ const Community = ({ user }) => {
                             alignItems: 'center',
                             gap: '1.2rem',
                             cursor: 'pointer',
-                            background: !showOnlySaved ? 'rgba(28, 53, 134, 0.05)' : 'transparent',
-                            borderLeft: !showOnlySaved ? '5px solid var(--primary-blue)' : '5px solid transparent',
+                            background: (!showOnlySaved && !showMembersList) ? 'rgba(28, 53, 134, 0.05)' : 'transparent',
+                            borderLeft: (!showOnlySaved && !showMembersList) ? '5px solid var(--primary-blue)' : '5px solid transparent',
                             transition: 'all 0.33s cubic-bezier(0.4, 0, 0.2, 1)'
                         }}
                     >
@@ -574,7 +574,7 @@ const Community = ({ user }) => {
                                         position: 'relative'
                                     }}>
                                         {member.profile_path ? (
-                                            <img src={`${API_BASE_URL}${member.profile_path}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            <img src={`${FILE_BASE_URL}${member.profile_path}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         ) : (
                                             <span style={{ fontSize: '1rem', fontWeight: 900, color: member.is_active ? 'white' : 'var(--gray-600)' }}>
                                                 {member.username?.substring(0, 2).toUpperCase()}
@@ -637,7 +637,7 @@ const Community = ({ user }) => {
                                             onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                                         >
                                             {msg.profile_path ? (
-                                                <img src={`${API_BASE_URL}${msg.profile_path}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                <img src={`${FILE_BASE_URL}${msg.profile_path}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             ) : (
                                                 <span style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white' }}>
                                                     {msg.username?.substring(0, 2).toUpperCase() || 'U'}
@@ -849,7 +849,7 @@ const Community = ({ user }) => {
                                                 <div style={{ marginBottom: '1rem', borderRadius: '15px', overflow: 'hidden' }}>
                                                     {msg.type === 'image' ? (
                                                         <img
-                                                            src={`${API_BASE_URL}${msg.media_url}`}
+                                                            src={`${FILE_BASE_URL}${msg.media_url}`}
                                                             alt=""
                                                             style={{
                                                                 borderRadius: '12px',
@@ -877,11 +877,11 @@ const Community = ({ user }) => {
                                                                 background: 'rgba(0,0,0,0.05)'
                                                             }}
                                                         >
-                                                            <source src={`${API_BASE_URL}${msg.media_url}`} type="video/mp4" />
+                                                            <source src={`${FILE_BASE_URL}${msg.media_url}`} type="video/mp4" />
                                                             Votre navigateur ne supporte pas la lecture vidéo.
                                                         </video>
                                                     ) : (
-                                                        <a href={`${API_BASE_URL}${msg.media_url}`} target="_blank" rel="noreferrer" style={{
+                                                        <a href={`${FILE_BASE_URL}${msg.media_url}`} target="_blank" rel="noreferrer" style={{
                                                             color: isMe ? 'white' : 'var(--primary-blue)',
                                                             fontSize: '0.9rem',
                                                             display: 'flex',

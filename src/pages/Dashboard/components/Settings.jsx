@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { API_BASE_URL } from '../apiConfig';
+import { API_BASE_URL, FILE_BASE_URL } from '../apiConfig';
 import { Camera, Lock, User, Mail } from 'lucide-react';
 
 const Settings = ({ user, onUpdateUser }) => {
@@ -12,7 +12,7 @@ const Settings = ({ user, onUpdateUser }) => {
         new_password: ''
     });
     const [profilePic, setProfilePic] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState(user?.profile_pic ? `${API_BASE_URL}/${user.profile_pic}` : null);
+    const [previewUrl, setPreviewUrl] = useState(user?.profile_pic ? `${FILE_BASE_URL}${user.profile_pic}` : null);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);

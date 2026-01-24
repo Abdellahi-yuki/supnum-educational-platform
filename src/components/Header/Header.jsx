@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, LogOut, Menu, X, Bell, Sun, Moon } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { API_BASE_URL } from '../../apiConfig';
+import { API_BASE_URL, FILE_BASE_URL } from '../../apiConfig';
 import { useTheme } from '../../context/ThemeContext';
 import './Header.css';
 
@@ -76,7 +76,7 @@ const Header = ({ user, onLogout }) => {
     const navLinks = [
         { name: 'Tableau de bord', path: '/dashboard' },
         { name: 'Cours/Annales', path: '/archive' },
-        { name: 'Notes', path: '/results'},
+        { name: 'Notes', path: '/results' },
         { name: 'Messagerie', path: '/mail' },
         { name: 'Communauté', path: '/community' },
     ];
@@ -192,7 +192,7 @@ const Header = ({ user, onLogout }) => {
                                     <div className="user-avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         {user?.profile_pic ? (
                                             <img
-                                                src={`${API_BASE_URL}/${user.profile_pic}`}
+                                                src={`${FILE_BASE_URL}${user.profile_pic}`}
                                                 alt="Avatar"
                                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                             />

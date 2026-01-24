@@ -12,3 +12,4 @@ const getBaseUrl = () => {
 };
 
 export const API_BASE_URL = getBaseUrl();
+export const FILE_BASE_URL = API_BASE_URL.replace('/api', '');
