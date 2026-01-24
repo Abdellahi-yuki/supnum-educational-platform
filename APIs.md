@@ -73,7 +73,7 @@ This document outlines the API endpoints required for the unified messaging syst
           "email": "brahim.hmeida@supnum.mr",
           "content": "",
           "type": "video",
-          "media_url": "/uploads/video.mp4",
+          "media_url": "/uploads/community/video.mp4",
           "created_at": "2025-12-28 11:11:35",
           "is_saved": true, // Computed: true if current user has archived this message
           "comments": [
@@ -93,7 +93,7 @@ This document outlines the API endpoints required for the unified messaging syst
 - `POST /community/upload/chunk`: Upload a file in chunks.
     - Body: `FormData` with `chunk`, `upload_id`, `chunk_index`, `total_chunks`, `file_name`
     - Response: `{ "status": "done" | "part", "media_url": "string", "type": "string" }`
-    - **Note**: `media_url` is returned relative to the root (e.g., `/uploads/...`). The frontend should prepend the base URL (excluding `/api`) for display.
+    - **Note**: `media_url` is returned as an absolute path from the server root (e.g., `/uploads/community/...`). The frontend should prepend the `FILE_BASE_URL` (which points to the server root) for display.
 - `GET /community/notifications`: Get user notifications.
     - Query: `user_id`
     - Response: `[{ id, user_id, actor_id, actor_name, message_id, type, is_read, created_at }]`

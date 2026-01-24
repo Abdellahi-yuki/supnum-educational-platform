@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import mailService from '../../services/mailService';
+import { API_BASE_URL, FILE_BASE_URL } from '../../apiConfig';
 import {
     Inbox,
     Star,
@@ -17,7 +18,10 @@ import {
     Forward,
     Maximize2,
     Minimize2,
-    CheckCircle
+    CheckCircle,
+    Paperclip,
+    File,
+    Download
 } from 'lucide-react';
 import './Mail.css';
 
@@ -39,7 +43,8 @@ const Mail = () => {
         bcc: [],
         subject: '',
         body: '',
-        parentId: null
+        parentId: null,
+        attachments: []
     });
 
     // Handle pre-filling from Community profile
@@ -260,7 +265,8 @@ const Mail = () => {
             bcc: [],
             subject: msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
             body: '',
-            parentId: msg.id
+            parentId: msg.id,
+            attachments: []
         });
         setIsComposeOpen(true);
         setIsMinimized(false);
@@ -273,7 +279,8 @@ const Mail = () => {
             bcc: [],
             subject: msg.subject.startsWith('Re:') ? msg.subject : `Re: ${msg.subject}`,
             body: '',
-            parentId: msg.id
+            parentId: msg.id,
+            attachments: []
         });
         setIsComposeOpen(true);
         setIsMinimized(false);
@@ -286,7 +293,8 @@ const Mail = () => {
             bcc: [],
             subject: msg.subject.startsWith('Fwd:') ? msg.subject : `Fwd: ${msg.subject}`,
             body: `\n\n---------- Forwarded message ---------\nFrom: ${msg.from} <${msg.email}>\nDate: ${msg.date}\nSubject: ${msg.subject}\n\n${msg.content}`,
-            parentId: null
+            parentId: null,
+            attachments: []
         });
         setIsComposeOpen(true);
         setIsMinimized(false);
@@ -296,7 +304,22 @@ const Mail = () => {
         setIsComposeOpen(false);
         setIsMinimized(false);
         setIsMaximized(false);
-        setComposeData({ to: '', cc: [], bcc: [], subject: '', body: '', parentId: null });
+        setComposeData({ to: '', cc: [], bcc: [], subject: '', body: '', parentId: null, attachments: [] });
+    };
+
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        setComposeData(prev => ({
+            ...prev,
+            attachments: [...prev.attachments, ...files]
+        }));
+    };
+
+    const removeAttachment = (index) => {
+        setComposeData(prev => ({
+            ...prev,
+            attachments: prev.attachments.filter((_, i) => i !== index)
+        }));
     };
 
     const handleMessageClick = async (msg) => {
@@ -362,7 +385,7 @@ const Mail = () => {
 
                 <div className="sidebar-compose">
                     <button className="compose-btn" onClick={() => {
-                        setComposeData({ to: '', cc: [], bcc: [], subject: '', body: '', parentId: null });
+                        setComposeData({ to: '', cc: [], bcc: [], subject: '', body: '', parentId: null, attachments: [] });
                         setIsComposeOpen(true);
                     }}>
                         <Plus size={20} /> Nouveau message
@@ -529,8 +552,59 @@ const Mail = () => {
                                         <div className="detail-date">{msg.date}</div>
                                     </div>
                                     <div className="detail-body">
-                                        <p>{msg.content}</p>
+                                        <p style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</p>
                                     </div>
+
+                                    {/* Attachments Display */}
+                                    {msg.attachments && msg.attachments.length > 0 && (
+                                        <div className="message-attachments" style={{ marginTop: '16px', borderTop: '1px solid #eee', paddingTop: '12px' }}>
+                                            <h4 style={{ fontSize: '13px', color: '#5f6368', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <Paperclip size={14} /> {msg.attachments.length} Pièce(s) jointe(s)
+                                            </h4>
+                                            <div className="attachments-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                                                {msg.attachments.map((att, i) => {
+                                                    const isImage = att.file_type?.startsWith('image/');
+                                                    const fileUrl = `${FILE_BASE_URL}${att.file_path}`;
+                                                    return (
+                                                        <a
+                                                            key={i}
+                                                            href={fileUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="attachment-card"
+                                                            style={{
+                                                                display: 'flex',
+                                                                flexDirection: 'column',
+                                                                width: '140px',
+                                                                border: '1px solid #e0e0e0',
+                                                                borderRadius: '8px',
+                                                                overflow: 'hidden',
+                                                                textDecoration: 'none',
+                                                                color: 'inherit',
+                                                                background: '#f8f9fa'
+                                                            }}
+                                                        >
+                                                            <div className="attachment-preview" style={{ height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isImage ? '#000' : '#e8eaed' }}>
+                                                                {isImage ? (
+                                                                    <img src={fileUrl} alt={att.file_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                ) : (
+                                                                    <File size={32} color="#5f6368" />
+                                                                )}
+                                                            </div>
+                                                            <div className="attachment-info" style={{ padding: '8px', background: 'white', borderTop: '1px solid #e0e0e0' }}>
+                                                                <div style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={att.file_name}>
+                                                                    {att.file_name}
+                                                                </div>
+                                                                <div style={{ fontSize: '11px', color: '#5f6368', marginTop: '2px' }}>
+                                                                    {Math.round(att.file_size / 1024)} KB
+                                                                </div>
+                                                            </div>
+                                                        </a>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="detail-actions">
                                         <button className="action-btn" onClick={() => handleReply(msg)}>
                                             <Reply size={16} /> Répondre
@@ -651,6 +725,20 @@ const Mail = () => {
                                     value={composeData.body}
                                     onChange={(e) => setComposeData({ ...composeData, body: e.target.value })}
                                 ></textarea>
+
+                                {/* Attachment List */}
+                                {composeData.attachments.length > 0 && (
+                                    <div className="attachment-list" style={{ padding: '8px 16px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                                        {composeData.attachments.map((file, index) => (
+                                            <div key={index} className="attachment-item" style={{ background: '#f1f3f4', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <span>{file.name}</span>
+                                                <button onClick={() => removeAttachment(index)} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             <div className="compose-footer">
                                 <button className="send-btn" onClick={async () => {
@@ -680,7 +768,25 @@ const Mail = () => {
                                         }
 
                                         // 3. Send if all valid
-                                        const sentMsg = await mailService.sendMessage(composeData);
+                                        const formData = new FormData();
+                                        formData.append('to', composeData.to);
+                                        composeData.cc.forEach(email => formData.append('cc[]', email));
+                                        composeData.bcc.forEach(email => formData.append('bcc[]', email));
+                                        formData.append('subject', composeData.subject);
+                                        formData.append('body', composeData.body);
+                                        if (composeData.parentId) formData.append('parentId', composeData.parentId);
+
+                                        // Append attachments
+                                        composeData.attachments.forEach(file => {
+                                            formData.append('attachments[]', file);
+                                        });
+
+                                        // We need to update mailService to handle FormData or we can do it here directly if service is strict
+                                        // Assuming mailService.sendMessage can handle FormData or we modify it.
+                                        // Let's check mailService.js. If it uses JSON.stringify, it won't work.
+                                        // For now, let's assume we need to pass FormData.
+
+                                        const sentMsg = await mailService.sendMessage(formData);
                                         setMessages(prev => [...prev, sentMsg]);
                                         handleComposeClose();
                                     } catch (error) {
@@ -690,6 +796,18 @@ const Mail = () => {
                                 }}>
                                     <Send size={16} /> Envoyer
                                 </button>
+                                <div style={{ position: 'relative', display: 'inline-block', marginLeft: '8px' }}>
+                                    <input
+                                        type="file"
+                                        id="file-upload"
+                                        multiple
+                                        onChange={handleFileChange}
+                                        style={{ display: 'none' }}
+                                    />
+                                    <label htmlFor="file-upload" className="action-btn" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '8px', borderRadius: '4px' }}>
+                                        <Paperclip size={18} color="#5f6368" />
+                                    </label>
+                                </div>
                                 <button className="cancel-btn" onClick={handleComposeClose}>
                                     Cancel
                                 </button>

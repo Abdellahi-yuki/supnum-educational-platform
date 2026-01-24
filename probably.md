@@ -55,6 +55,16 @@ This is a unified messaging and collaboration platform for educational instituti
 - **DOM Stability**: Moved file input to a stable position to prevent `NotFoundError` during re-renders.
 - **Simplified UI**: Removed the preview feature at user request to streamline the posting flow.
 
+### ✅ Backend Cleanup & Optimization (January 2026 - Phase 3)
+- **Codebase Cleanup**: Removed unused controllers (`AuthController`, `MessageController`, etc.) and legacy scripts.
+- **Uploads Consolidation**: Centralized uploads into `backend/uploads/` with subdirectories:
+  - `profiles/`: User avatars
+  - `community/`: Chat media
+  - `archive/`: Educational resources
+- **Frontend Path Fixes**: Introduced `FILE_BASE_URL` in `apiConfig.js` to correctly resolve file paths from the server root.
+- **Database Optimization**: Removed legacy `pending_users` table logic from login flow.
+- **Documentation Update**: Updated `README.md` and `APIs.md` to reflect the new structure.
+
 ## Current Project State
 
 ### Completed Features

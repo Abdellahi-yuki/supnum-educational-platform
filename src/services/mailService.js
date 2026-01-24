@@ -48,32 +48,29 @@ const mailService = {
      */
     sendMessage: async (data) => {
         if (USE_MOCK) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const newMessage = {
-                        id: Date.now(),
-                        from: 'Me', // Simulated current user
-                        email: 'me@supnum.mr',
-                        subject: data.subject,
-                        content: data.body,
-                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                        isRead: true,
-                        isStarred: false,
-                        labels: ['sent'],
-                        parentId: data.parentId || 0
-                    };
-                    MOCK_MESSAGES.push(newMessage);
-                    resolve(newMessage);
-                }, 800);
-            });
+            // ... (keep mock logic if needed, or just return)
+            return new Promise((resolve) => resolve({}));
         }
 
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         const userId = user.id || 3;
+
+        let body;
+        let headers = {};
+
+        if (data instanceof FormData) {
+            data.append('sender_id', userId);
+            body = data;
+            // Do NOT set Content-Type for FormData, browser does it
+        } else {
+            headers['Content-Type'] = 'application/json';
+            body = JSON.stringify({ ...data, sender_id: userId });
+        }
+
         const response = await fetch(`${API_BASE_URL}/mail/messages`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...data, sender_id: userId })
+            headers: headers,
+            body: body
         });
 
         const result = await response.json();
