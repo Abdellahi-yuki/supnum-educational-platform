@@ -17,7 +17,8 @@ import {
     X,
     Shield,
     CheckCircle,
-    Plus
+    Plus,
+    User
 } from 'lucide-react';
 import { API_BASE_URL, FILE_BASE_URL } from '../Dashboard/apiConfig';
 import { useLocation } from 'react-router-dom';
@@ -535,16 +536,16 @@ const Community = ({ user }) => {
                                         {member.profile_path ? (
                                             <img src={`${FILE_BASE_URL}${member.profile_path}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         ) : (
-                                            <span style={{ fontSize: '1rem', fontWeight: 900, color: member.is_active ? 'white' : 'var(--gray-600)' }}>
-                                                {member.username?.substring(0, 2).toUpperCase()}
-                                            </span>
+                                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <User size={24} color={member.is_active ? 'white' : 'var(--gray-600)'} />
+                                            </div>
                                         )}
                                         {member.is_active && (
                                             <div style={{ position: 'absolute', bottom: '2px', right: '2px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--primary-green)', border: '2px solid white' }}></div>
                                         )}
                                     </div>
                                     <div style={{ flex: 1 }}>
-                                        <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, marginBottom: '2px' }}>{member.username}</h4>
+                                        <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, marginBottom: '2px' }}>{member.full_name || member.username}</h4>
                                         <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', margin: 0 }}>
                                             {member.message_count} message{member.message_count !== 1 ? 's' : ''}
                                             {member.is_active && <span style={{ color: 'var(--primary-green)', marginLeft: '0.5rem', fontWeight: 600 }}>• Actif</span>}
@@ -593,9 +594,9 @@ const Community = ({ user }) => {
                                             {msg.profile_path ? (
                                                 <img src={`${FILE_BASE_URL}${msg.profile_path}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             ) : (
-                                                <span style={{ fontSize: '1.1rem', fontWeight: 900, color: 'white' }}>
-                                                    {msg.username?.substring(0, 2).toUpperCase() || 'U'}
-                                                </span>
+                                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <User size={24} color="white" />
+                                                </div>
                                             )}
                                         </div>
 
@@ -641,7 +642,7 @@ const Community = ({ user }) => {
                                                 onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
                                                 onMouseOut={(e) => e.target.style.textDecoration = 'none'}
                                             >
-                                                {msg.username || `User ${msg.user_id}`}
+                                                {msg.full_name || msg.username || `User ${msg.user_id}`}
                                                 {(msg.role === 'Root' || msg.role === 'teacher') && (
                                                     <span style={{
                                                         fontSize: '0.65rem',
@@ -858,7 +859,19 @@ const Community = ({ user }) => {
                                                                 position: 'relative'
                                                             }}>
                                                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                                                    <span style={{ fontWeight: 800, color: 'var(--primary-blue)', fontSize: '0.85rem' }}>{comment.username}</span>
+                                                                    <span
+                                                                        onClick={(e) => { e.stopPropagation(); handleUserClick(comment.user_id); }}
+                                                                        style={{
+                                                                            fontWeight: 800,
+                                                                            color: 'var(--primary-blue)',
+                                                                            fontSize: '0.85rem',
+                                                                            cursor: 'pointer'
+                                                                        }}
+                                                                        onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
+                                                                        onMouseOut={(e) => e.target.style.textDecoration = 'none'}
+                                                                    >
+                                                                        {comment.full_name || comment.username}
+                                                                    </span>
                                                                     <span style={{ fontSize: '0.75rem', color: 'var(--gray-400)' }}>
                                                                         {new Date(comment.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
                                                                     </span>
