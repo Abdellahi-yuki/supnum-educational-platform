@@ -334,20 +334,7 @@ const Community = ({ user }) => {
     }
 
     return (
-        <div className="community-whatsapp-container" style={{
-            display: 'grid',
-            gridTemplateColumns: window.innerWidth > 768 ? '350px 1fr' : '1fr',
-            height: 'calc(100vh - 120px)',
-            background: 'rgba(255, 255, 255, 0.4)',
-            backdropFilter: 'blur(40px)',
-            borderRadius: '24px',
-            border: '1px solid rgba(255, 255, 255, 0.5)',
-            overflow: 'hidden',
-            margin: '0 auto',
-            maxWidth: '1600px',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
-            position: 'relative'
-        }}>
+        <div className="community-whatsapp-container">
             {/* Mobile Menu Button */}
             {window.innerWidth <= 768 && (
                 <button
@@ -373,20 +360,7 @@ const Community = ({ user }) => {
             )}
 
             {/* Sidebar */}
-            <div className="whatsapp-sidebar" style={{
-                borderRight: '1px solid rgba(0,0,0,0.05)',
-                display: window.innerWidth <= 768 && !isMobileMenuOpen ? 'none' : 'flex',
-                flexDirection: 'column',
-                background: 'rgba(255, 255, 255, 0.2)',
-                position: window.innerWidth <= 768 ? 'absolute' : 'relative',
-                left: 0,
-                top: 0,
-                bottom: 0,
-                width: window.innerWidth <= 768 ? '80%' : 'auto',
-                maxWidth: window.innerWidth <= 768 ? '350px' : 'none',
-                zIndex: 1000,
-                boxShadow: window.innerWidth <= 768 ? '4px 0 20px rgba(0,0,0,0.1)' : 'none'
-            }}>
+            <div className={`whatsapp-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
                 <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary-blue)' }}>Publications</h2>
@@ -483,13 +457,7 @@ const Community = ({ user }) => {
             </div>
 
             {/* Chat Area */}
-            <div className="whatsapp-chat" style={{
-                display: 'flex',
-                flexDirection: 'column',
-                background: 'rgba(255, 255, 255, 0.6)',
-                height: '100%',
-                minHeight: 0
-            }}>
+            <div className="whatsapp-chat">
                 {/* Chat Header */}
                 <div id='whatsapp-chat-header' style={{ padding: '1.2rem 2.5rem', background: 'white', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
@@ -526,16 +494,7 @@ const Community = ({ user }) => {
                     </button>
                 </div>
 
-                <div style={{
-                    flex: 1,
-                    overflowY: 'auto',
-                    padding: '2.5rem',
-                    display: 'flex',
-                    flexDirection: 'column-reverse',
-                    gap: '1.5rem',
-                    background: 'rgba(240, 242, 245, 0.3)',
-                    minHeight: 0
-                }}>
+                <div className="chat-messages-area">
                     {/* Members List View */}
                     {showMembersList ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -608,12 +567,7 @@ const Community = ({ user }) => {
                         messages.map(msg => {
                             const isMe = msg.user_id == user.id;
                             return (
-                                <div key={msg.id} id={`msg-${msg.id}`} style={{
-                                    alignSelf: 'flex-start',
-                                    width: '100%',
-                                    maxWidth: '900px',
-                                    marginBottom: '1.5rem'
-                                }}>
+                                <div key={msg.id} id={`msg-${msg.id}`} className="message-wrapper">
                                     {/* Header with ID and timestamp */}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem', marginLeft: '1rem' }}>
                                         {/* Profile Picture */}
@@ -810,17 +764,7 @@ const Community = ({ user }) => {
 
                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
 
-                                        <div style={{
-                                            padding: '1.5rem 1.75rem',
-                                            borderRadius: '24px',
-                                            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
-                                            backdropFilter: 'blur(20px)',
-                                            color: 'var(--dark)',
-                                            boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-                                            position: 'relative',
-                                            border: '1px solid rgba(255, 255, 255, 0.8)',
-                                            overflow: 'hidden'
-                                        }}>
+                                        <div className="message-bubble">
                                             {/* Gradient left border */}
                                             <div style={{
                                                 position: 'absolute',
@@ -1000,7 +944,7 @@ const Community = ({ user }) => {
                     )}
                 </div>
 
-                <div style={{ padding: '1.5rem 2.5rem', background: 'white', borderTop: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 -4px 10px rgba(0,0,0,0.01)' }}>
+                <div className="chat-input-area">
                     {/* Reply Preview */}
                     {replyTo && (
                         <div style={{

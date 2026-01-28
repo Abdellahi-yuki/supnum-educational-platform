@@ -277,7 +277,7 @@
 }
 
 .modal-content {
-    background: var(--glass-bg);
+    background:white;
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(20px);
     border-radius: 20px;

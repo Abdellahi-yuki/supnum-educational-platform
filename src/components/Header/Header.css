@@ -39,6 +39,7 @@
   color: var(--gray-600);
   padding: 0.5rem 1.25rem;
   border-radius: 100px;
+  white-space: nowrap;
   font-weight: 600;
   font-size: 0.9rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

@@ -366,7 +366,7 @@ body {
 .input-glass:focus,
 .auth-input:focus {
     outline: none;
-    background: rgba(30, 41, 59, 0.8);
+    background: rgba(248, 248, 248, 0.8);
     border-color: var(--primary-blue);
     box-shadow:
         0 10px 25px -5px rgba(37, 99, 235, 0.15),
