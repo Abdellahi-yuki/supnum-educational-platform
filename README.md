@@ -55,7 +55,7 @@ To run the backend:
 2. Run the following command:
 
 ```bash
-php -S localhost:8000 index.php
+php -S localhost:8000 -t ./ index.php
 ```
 
 > **Note:** The backend must be running on port 8000 for the frontend to connect successfully.

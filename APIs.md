@@ -70,14 +70,24 @@ This document outlines the API endpoints required for the unified messaging syst
           "id": 117,
           "user_id": 2,
           "username": "brahim",
+          "full_name": "Brahim Hmeida", // Added: Full name of the user
           "email": "brahim.hmeida@supnum.mr",
+          "profile_path": "/uploads/profiles/...", // Fixed: Now correctly aliased from profile_pic
           "content": "",
           "type": "video",
           "media_url": "/uploads/community/video.mp4",
           "created_at": "2025-12-28 11:11:35",
           "is_saved": true, // Computed: true if current user has archived this message
           "comments": [
-            { "id": 59, "user_id": 6, "username": "24212", "email": "24212@supnum.mr", "content": "khh", "created_at": "2025-12-28 14:27:12" }
+            { 
+              "id": 59, 
+              "user_id": 6, 
+              "username": "24212", 
+              "full_name": "John Doe", // Added: Full name in comments
+              "email": "24212@supnum.mr", 
+              "content": "khh", 
+              "created_at": "2025-12-28 14:27:12" 
+            }
           ]
         }
       ]

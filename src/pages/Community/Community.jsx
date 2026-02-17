@@ -991,7 +991,7 @@ const Community = ({ user }) => {
 
                     <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '1.2rem', alignItems: 'center' }}>
                         <input type="file" id="whatsapp-file" style={{ display: 'none' }} accept="image/*,video/*,.pdf,.doc,.docx" onChange={(e) => setSelectedFile(e.target.files[0])} />
-                        <button type="button" onClick={() => document.getElementById('whatsapp-file').click()} className="icon-btn" style={{ color: 'var(--gray-500)', background: 'rgba(0,0,0,0.04)', borderRadius: '18px', width: '56px', height: '56px', flexShrink: 0, transition: 'all 0.2s' }}>
+                        <button type="button" onClick={() => document.getElementById('whatsapp-file').click()} className="icon-btn" style={{ color: 'var(--gray-500)', background: 'rgba(0,0,0,0.04)', borderRadius: '18px', width: 'fit-content', height: '56px', flexShrink: 0, transition: 'all 0.2s' }}>
                             <Paperclip size={26} />
                         </button>
 
