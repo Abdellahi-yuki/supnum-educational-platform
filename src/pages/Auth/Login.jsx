@@ -79,6 +79,15 @@ const Login = () => {
                             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                         </button>
                     </div>
+                    <div style={{ textAlign: 'right', marginBottom: '1.5rem', marginTop: '-0.5rem' }}>
+                        <span
+                            className="auth-link-small"
+                            onClick={() => navigate('/forgot-password')}
+                            style={{ fontSize: '0.85rem', cursor: 'pointer', color: 'var(--primary-blue)', fontWeight: '600' }}
+                        >
+                            Mot de passe oublié ?
+                        </span>
+                    </div>
                     <button type="submit" className="btn btn-primary btn-block">Se connecter</button>
                 </form>
                 <p className="auth-link" onClick={() => navigate('/register')}>Pas encore de compte ? S'inscrire</p>

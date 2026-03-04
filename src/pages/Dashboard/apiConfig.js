@@ -1,2 +1,4 @@
-import { API_BASE_URL, FILE_BASE_URL } from '../../apiConfig';
-export { API_BASE_URL, FILE_BASE_URL };
+import { API_BASE_URL as GLOBAL_API, FILE_BASE_URL as GLOBAL_FILE } from '../../apiConfig';
+
+export const API_BASE_URL = GLOBAL_API;
+export const FILE_BASE_URL = GLOBAL_FILE;

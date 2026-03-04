@@ -75,10 +75,12 @@ const Header = ({ user, onLogout }) => {
 
     const navLinks = [
         { name: 'Tableau de bord', path: '/dashboard' },
+        { name: 'Emploi du temps', path: '/timetable' },
         { name: 'Cours/Annales', path: '/archive' },
         { name: 'Notes', path: '/results' },
         { name: 'Messagerie', path: '/mail' },
         { name: 'Communauté', path: '/community' },
+        { name: 'Quiz', path: '/quiz' },
     ];
 
     const isActive = (path) => {

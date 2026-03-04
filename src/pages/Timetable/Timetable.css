@@ -1,0 +1,223 @@
+/* ═══════════════════════════════════════════════
+   TIMETABLE PAGE
+   ═══════════════════════════════════════════════ */
+
+.timetable-page {
+    padding: 2.5rem;
+    min-height: calc(100vh - 90px);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--p-text-main);
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* ── Header ─────────────────────────────────── */
+.timetable-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.timetable-header h1 {
+    font-size: 2.75rem;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+    background: var(--supnum-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+}
+
+.date-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    background: rgba(var(--primary-blue-rgb, 28, 53, 134), 0.08);
+    border: 1px solid rgba(var(--primary-blue-rgb, 28, 53, 134), 0.18);
+    border-radius: 50px;
+    padding: 0.35rem 1.1rem;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.2px;
+}
+
+.timetable-header>p:not(.date-display) {
+    color: var(--p-text-dim);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* ── Controls bar ───────────────────────────── */
+.timetable-controls {
+    display: grid;
+    grid-template-columns: auto auto auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 0.875rem 1.25rem;
+    margin-bottom: 1.75rem;
+    box-shadow: var(--shadow-card);
+}
+
+/* ── Pill tab groups ────────────────────────── */
+.level-tabs,
+.semester-tabs,
+.group-tabs {
+    display: flex;
+    gap: 0.3rem;
+    background: rgba(0, 0, 0, 0.06);
+    padding: 0.3rem;
+    border-radius: 50px;
+    border: 1px solid var(--glass-border);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tab-btn,
+.semester-btn,
+.group-btn {
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: 50px;
+    background: transparent;
+    color: var(--p-text-dim);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.88rem;
+    transition: background 0.25s, color 0.25s, box-shadow 0.25s;
+    white-space: nowrap;
+}
+
+.tab-btn.active,
+.semester-btn.active {
+    background: var(--primary-blue);
+    color: #fff;
+    box-shadow: 0 3px 12px var(--glow-blue);
+}
+
+.group-btn.active {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-green));
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(28, 53, 134, 0.28);
+}
+
+.tab-btn:hover:not(.active),
+.semester-btn:hover:not(.active),
+.group-btn:hover:not(.active) {
+    background: var(--glass-bg-hover);
+    color: var(--primary-blue);
+}
+
+/* ── Week selector ──────────────────────────── */
+.week-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    justify-content: flex-end;
+    background: rgba(0, 0, 0, 0.06);
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    border: 1px solid var(--glass-border);
+    margin-left: auto;
+}
+
+.selector-label {
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: var(--primary-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.week-dropdown {
+    background: transparent;
+    border: none;
+    font-weight: 700;
+    color: var(--p-text-main);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.88rem;
+    padding: 0;
+}
+
+.week-dropdown:focus {
+    outline: none;
+}
+
+/* ── Grid container ─────────────────────────── */
+.timetable-container {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    position: relative;
+}
+
+/* ── Loading spinner ────────────────────────── */
+.loading-spinner {
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.loading-spinner::before {
+    content: '';
+    width: 44px;
+    height: 44px;
+    border: 4px solid var(--glass-border);
+    border-top-color: var(--primary-blue);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ── Responsive ─────────────────────────────── */
+@media (max-width: 1200px) {
+    .timetable-controls {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+    }
+
+    .week-selector {
+        grid-column: 1 / -1;
+        justify-content: center;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .timetable-page {
+        padding: 1.25rem 0.875rem;
+    }
+
+    .timetable-header h1 {
+        font-size: 2rem;
+    }
+
+    .timetable-controls {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .week-selector {
+        grid-column: 1;
+    }
+}

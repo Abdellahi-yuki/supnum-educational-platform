@@ -1,5 +1,6 @@
 import React from 'react';
-import { Archive, Mail, MessageSquare, Layers, Award } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Archive, Mail, MessageSquare, Layers, Award, BookOpen } from 'lucide-react';
 
 const DashboardCard = ({ icon: Icon, colorClass, title, description, buttonText, buttonClass, onClick }) => (
     <div className="card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
@@ -19,6 +20,7 @@ const DashboardCard = ({ icon: Icon, colorClass, title, description, buttonText,
 );
 
 const CardsGrid = ({ onCardClick }) => {
+    const navigate = useNavigate();
     const cards = [
         {
             id: 'results',
@@ -59,6 +61,7 @@ const CardsGrid = ({ onCardClick }) => {
     ];
 
     return (
+
         <div className="cards-grid">
             {cards.map((card, index) => (
                 <DashboardCard
@@ -67,6 +70,16 @@ const CardsGrid = ({ onCardClick }) => {
                     onClick={() => onCardClick(card.id)}
                 />
             ))}
+            {/* Quiz card — navigates to top-level /quiz route */}
+            <DashboardCard
+                icon={BookOpen}
+                colorClass="purple"
+                title="Quiz & Évaluations"
+                description="Testez vos connaissances avec des quiz interactifs par matière et semestre."
+                buttonText="Accéder aux quiz"
+                buttonClass="btn-outline"
+                onClick={() => navigate('/quiz')}
+            />
         </div>
     );
 };

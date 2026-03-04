@@ -260,3 +260,154 @@
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
     position: relative;
 }
+
+/* ─── Poll Card ─────────────────────────────────────────────────── */
+.poll-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07);
+    width: 100%;
+    max-width: 900px;
+    align-self: flex-start;
+    animation: fadeInUp 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.poll-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-green) 100%);
+    border-radius: 24px 0 0 24px;
+}
+
+/* ─── Poll Option Button ─────────────────────────────────────────── */
+.poll-option-btn {
+    position: relative;
+    width: 100%;
+    padding: 0.75rem 1.1rem;
+    border-radius: 12px;
+    border: 1.5px solid rgba(28, 53, 134, 0.12);
+    background: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: left;
+    color: #1f2937;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+}
+
+.poll-option-btn:not([disabled]):hover {
+    border-color: var(--primary-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(28, 53, 134, 0.1);
+}
+
+.poll-option-btn.voted {
+    border-color: rgba(28, 53, 134, 0.3);
+    background: rgba(28, 53, 134, 0.04);
+    font-weight: 700;
+}
+
+/* Progress bar inside option */
+.poll-option-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(28, 53, 134, 0.1), rgba(46, 171, 78, 0.1));
+    border-radius: 10px;
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+}
+
+/* ─── Poll Creator Modal ─────────────────────────────────────────── */
+.poll-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+@media (min-width: 600px) {
+    .poll-modal-overlay {
+        align-items: center;
+    }
+}
+
+.poll-creator-panel {
+    background: white;
+    border-radius: 28px 28px 0 0;
+    padding: 2rem;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.15);
+    animation: slideUpPanel 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 600px) {
+    .poll-creator-panel {
+        border-radius: 28px;
+        animation: popIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+}
+
+@keyframes slideUpPanel {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(12px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

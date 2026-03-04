@@ -1,0 +1,86 @@
+.timetable-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.admin-controls {
+    display: flex;
+    gap: 3rem;
+    padding: 2rem !important;
+    background: var(--glass-bg-light) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    border: 1px solid var(--glass-border) !important;
+}
+
+.control-group h3 {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+.mini-tabs {
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.3rem;
+    border-radius: 12px;
+}
+
+.mini-tab {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--gray-600);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.mini-tab.active {
+    background: #fff;
+    color: var(--primary-blue);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.mini-select {
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.05);
+    font-weight: 700;
+    color: var(--gray-700);
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.admin-grid-container {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.admin-grid-container .timetable-grid-wrapper {
+    padding: 1rem;
+}
+
+/* Override Grid styles for Admin context if needed */
+.timetable-admin .slot-cell {
+    height: 120px;
+}
+
+.timetable-admin .time-col {
+    width: 110px;
+}
+
+@media (max-width: 768px) {
+    .admin-controls {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}

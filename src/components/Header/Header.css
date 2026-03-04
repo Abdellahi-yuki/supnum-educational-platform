@@ -18,8 +18,8 @@
 }
 
 .header-container {
-  width: 95%;
-  max-width: 1400px;
+  width: 98%;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 1.5rem;
   display: flex;
@@ -30,8 +30,9 @@
 /* Floating Pill Navigation */
 .nav-menu {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: center;
+  margin: 0 2rem;
 }
 
 .nav-link {
@@ -87,7 +88,7 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .icon-btn {
