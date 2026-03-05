@@ -26,6 +26,7 @@ import { API_BASE_URL, FILE_BASE_URL } from '../Dashboard/apiConfig';
 import { useLocation } from 'react-router-dom';
 import UserProfile from '../Dashboard/components/UserProfile';
 import './Community.css';
+import FileViewer from '../../components/Common/FileViewer';
 
 const Community = ({ user }) => {
     const location = useLocation();
@@ -39,6 +40,7 @@ const Community = ({ user }) => {
     const [showOnlySaved, setShowOnlySaved] = useState(false);
     const [replyTo, setReplyTo] = useState(null);
     const [stats, setStats] = useState({ totalMembers: 0, activeMembers: 0 });
+    const [viewingFile, setViewingFile] = useState(null);
 
     // Notifications state
 
@@ -996,6 +998,7 @@ const Community = ({ user }) => {
                                                                 <img
                                                                     src={`${FILE_BASE_URL}${msg.media_url}`}
                                                                     alt=""
+                                                                    onClick={() => setViewingFile(msg)}
                                                                     style={{
                                                                         borderRadius: '12px',
                                                                         maxWidth: '100%',
@@ -1006,8 +1009,6 @@ const Community = ({ user }) => {
                                                                         cursor: 'pointer',
                                                                         transition: 'transform 0.2s'
                                                                     }}
-                                                                    onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
-                                                                    onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
                                                                 />
                                                             ) : msg.type === 'video' ? (
                                                                 <video
@@ -1026,21 +1027,25 @@ const Community = ({ user }) => {
                                                                     Votre navigateur ne supporte pas la lecture vidéo.
                                                                 </video>
                                                             ) : (
-                                                                <a href={`${FILE_BASE_URL}${msg.media_url}`} target="_blank" rel="noreferrer" style={{
-                                                                    color: isMe ? 'white' : 'var(--primary-blue)',
-                                                                    fontSize: '0.9rem',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '0.8rem',
-                                                                    background: isMe ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.05)',
-                                                                    padding: '0.8rem 1.2rem',
-                                                                    borderRadius: '12px',
-                                                                    textDecoration: 'none',
-                                                                    fontWeight: 600
-                                                                }}>
+                                                                <div
+                                                                    onClick={() => setViewingFile(msg)}
+                                                                    style={{
+                                                                        color: isMe ? 'white' : 'var(--primary-blue)',
+                                                                        fontSize: '0.9rem',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '0.8rem',
+                                                                        background: isMe ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.05)',
+                                                                        padding: '0.8rem 1.2rem',
+                                                                        borderRadius: '12px',
+                                                                        textDecoration: 'none',
+                                                                        fontWeight: 600,
+                                                                        cursor: 'pointer'
+                                                                    }}
+                                                                >
                                                                     <Paperclip size={20} />
                                                                     <span>Fichier attaché</span>
-                                                                </a>
+                                                                </div>
                                                             )}
                                                         </div>
                                                     )}
@@ -1445,6 +1450,13 @@ const Community = ({ user }) => {
                     </div>
                 )}
             </div>
+
+            {viewingFile && (
+                <FileViewer
+                    file={viewingFile}
+                    onClose={() => setViewingFile(null)}
+                />
+            )}
         </div>
     );
 };

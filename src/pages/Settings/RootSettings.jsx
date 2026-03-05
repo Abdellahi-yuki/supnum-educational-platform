@@ -33,7 +33,7 @@ const RootSettings = () => {
         setLoading(true);
         try {
             const res = await axios.get(`${API_BASE_URL}/admin/users.php`);
-            setUsers(res.data);
+            setUsers(Array.isArray(res.data) ? res.data : []);
         } catch (e) {
             console.error(e);
         }
@@ -44,7 +44,7 @@ const RootSettings = () => {
         setLoading(true);
         try {
             const res = await axios.get(`${API_BASE_URL}/admin/reports.php`);
-            setReports(res.data);
+            setReports(Array.isArray(res.data) ? res.data : []);
         } catch (e) {
             console.error(e);
         }
@@ -151,7 +151,7 @@ const RootSettings = () => {
         setLoading(true);
         try {
             const res = await axios.get(`${API_BASE_URL}/admin/mailing_lists.php`);
-            setMailingLists(res.data);
+            setMailingLists(Array.isArray(res.data) ? res.data : []);
         } catch (e) { console.error(e); }
         setLoading(false);
     };
@@ -177,7 +177,7 @@ const RootSettings = () => {
         setSelectedList(list);
         try {
             const res = await axios.get(`${API_BASE_URL}/admin/mailing_lists.php?id=${list.id}&members=true`);
-            setListMembers(res.data);
+            setListMembers(Array.isArray(res.data) ? res.data : []);
             setShowListModal(true);
         } catch (e) { alert('Error fetching members'); }
     };
@@ -467,7 +467,7 @@ const RootSettings = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users
+                                {Array.isArray(users) && users
                                     .filter(u => {
                                         const matchesSearch = (
                                             (u.first_name + ' ' + u.last_name).toLowerCase().includes(userSearchQuery.toLowerCase()) ||

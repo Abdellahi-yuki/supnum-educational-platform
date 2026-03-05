@@ -24,6 +24,7 @@ import {
     Download
 } from 'lucide-react';
 import './Mail.css';
+import FileViewer from '../../components/Common/FileViewer';
 
 const Mail = () => {
     const location = useLocation();
@@ -35,6 +36,7 @@ const Mail = () => {
     const [isMaximized, setIsMaximized] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [allUsers, setAllUsers] = useState([]);
+    const [viewingFile, setViewingFile] = useState(null);
 
     // Compose state to handle pre-filling data for replies/forwards
     const [composeData, setComposeData] = useState({
@@ -587,12 +589,10 @@ const Mail = () => {
                                                     const isImage = att.file_type?.startsWith('image/');
                                                     const fileUrl = `${FILE_BASE_URL}${att.file_path}`;
                                                     return (
-                                                        <a
+                                                        <div
                                                             key={i}
-                                                            href={fileUrl}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
                                                             className="attachment-card"
+                                                            onClick={() => setViewingFile(att)}
                                                             style={{
                                                                 display: 'flex',
                                                                 flexDirection: 'column',
@@ -602,7 +602,8 @@ const Mail = () => {
                                                                 overflow: 'hidden',
                                                                 textDecoration: 'none',
                                                                 color: 'inherit',
-                                                                background: '#f8f9fa'
+                                                                background: '#f8f9fa',
+                                                                cursor: 'pointer'
                                                             }}
                                                         >
                                                             <div className="attachment-preview" style={{ height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isImage ? '#000' : '#e8eaed' }}>
@@ -620,7 +621,7 @@ const Mail = () => {
                                                                     {Math.round(att.file_size / 1024)} KB
                                                                 </div>
                                                             </div>
-                                                        </a>
+                                                        </div>
                                                     );
                                                 })}
                                             </div>
@@ -836,6 +837,13 @@ const Mail = () => {
                         </>
                     )}
                 </div>
+            )}
+
+            {viewingFile && (
+                <FileViewer
+                    file={viewingFile}
+                    onClose={() => setViewingFile(null)}
+                />
             )}
 
             {/* Mobile Backdrop */}

@@ -260,7 +260,7 @@
 .m-icon-box {
     width: 70px;
     height: 70px;
-    background: rgba(30, 41, 59, 0.6);
+    background: #d9e0ed0f;
     border-radius: 20px;
     display: flex;
     align-items: center;

@@ -166,8 +166,8 @@
 }
 
 .auth-container .auth-error {
-    color: #fca5a5;
-    background: rgba(127, 29, 29, 0.5);
+    color: #ffffff;
+    background: #dd0a0aba;
     padding: 0.75rem;
     border-radius: 12px;
     font-size: 0.9rem;

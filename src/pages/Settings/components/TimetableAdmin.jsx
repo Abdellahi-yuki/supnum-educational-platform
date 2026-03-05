@@ -21,7 +21,7 @@ const TimetableAdmin = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/timetable.php?level=${level}&semester=${semester}&week=${week}`);
             const data = await response.json();
-            setEntries(data);
+            setEntries(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error fetching timetable:', error);
         } finally {

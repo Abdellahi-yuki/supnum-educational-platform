@@ -422,6 +422,11 @@
     font-weight: 800;
 }
 
+.remove-recipient-btn {
+    background-color: transparent;
+    border: none;
+}
+
 .detail-body {
     line-height: 1.8;
     font-size: 1.2rem;

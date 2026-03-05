@@ -16,6 +16,7 @@ import { database as initialDatabase } from './data/database';
 import axios from 'axios';
 import { API_BASE_URL } from '../../apiConfig';
 import './Archive.css';
+import FileViewer from '../../components/Common/FileViewer';
 
 const loadDataFromAPI = async () => {
     try {
@@ -276,99 +277,6 @@ const DocumentList = ({ documents, onSelectDocument, onBack, subjectName }) => {
     );
 };
 
-const FileViewer = ({ file, onClose }) => {
-    const [content, setContent] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    // Construct full URL if it's a relative path from the backend
-    const filepath = file.chemin_fichier.startsWith('http')
-        ? file.chemin_fichier
-        : `${API_BASE_URL}/..${file.chemin_fichier}`;
-
-    const filename = file.nom;
-    const extension = filepath.split('.').pop().toLowerCase();
-
-    useEffect(() => {
-        const loadContent = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                if (filepath.includes('drive.google.com')) {
-                    window.open(filepath, "_blank");
-                    onClose();
-                    return;
-                }
-                if (['pdf'].includes(extension)) {
-                    let embedUrl = filepath;
-                    // If it's a relative path starting with /archives/, it might need full URL if served from different domain, 
-                    // but usually in Vite it should just work if files are in public/archives/.
-                    // However, we'll check if it's a Google Drive link first.
-                    if (filepath.includes('drive.google.com/file/d/')) {
-                        const fileId = filepath.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)[1];
-                        embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-                    }
-                    setContent(
-                        <div style={{ textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <iframe src={embedUrl} style={{ width: '100%', flex: 1, minHeight: '600px', border: 'none', borderRadius: '12px', background: 'white' }} allow="autoplay" title={filename}>
-                                <div style={{ padding: '2rem', textAlign: 'center' }}>
-                                    <p>Impossible d'afficher le PDF dans le navigateur.</p>
-                                    <a href={filepath} target="_blank" rel="noreferrer" style={{ color: 'var(--primary-blue)', fontWeight: 700 }}>Cliquez ici pour l'ouvrir dans un nouvel onglet</a>
-                                </div>
-                            </iframe>
-                        </div>
-                    );
-                } else if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
-                    setContent(
-                        <div style={{ textAlign: 'center' }}>
-                            <img src={filepath} style={{ maxWidth: '100%', maxHeight: '500px', borderRadius: '4px' }} alt={filename} />
-                        </div>
-                    );
-                } else {
-                    setContent(
-                        <div style={{ textAlign: 'center', padding: '40px' }}>
-                            <div style={{ fontSize: '48px', marginBottom: '20px' }}><File size={48} /></div>
-                            <h3>Fichier {extension.toUpperCase()}</h3>
-                            <p>Ce type de fichier nécessite un téléchargement pour être visualisé.</p>
-                            <button onClick={() => downloadFile(filepath, filename)} style={{ background: '#4299e1', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }}>📥 Télécharger le fichier</button>
-                        </div>
-                    );
-                }
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadContent();
-    }, [file]);
-
-    const downloadFile = (filepath, filename) => {
-        const link = document.createElement('a');
-        link.href = filepath;
-        link.download = filename || 'document';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    return (
-        <div id="fileViewer" className="file-viewer-overlay">
-            <div className="file-viewer-content">
-                <div className="file-viewer-header">
-                    <h3>{filename}</h3>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <button onClick={() => downloadFile(filepath, filename)} className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.9rem', marginRight: '10px' }}><Download size={16} /> Télécharger</button>
-                        <button onClick={onClose} className="btn-close"><X size={20} /></button>
-                    </div>
-                </div>
-                <div className="file-viewer-body">
-                    {loading ? <div className="loading-state"><Loader2 className="animate-spin" /> Chargement...</div> : error ? <p>Erreur: {error}</p> : content}
-                </div>
-            </div>
-        </div>
-    );
-};
 
 const SearchResults = ({ results, query, onSelectResult, onBack }) => (
     <div id="search-results" style={{ display: 'block' }}>

@@ -3,7 +3,7 @@ import { Plus, Edit2, Trash2, Clock, MapPin, User, X, Check } from 'lucide-react
 import { API_BASE_URL } from '../../apiConfig';
 import './TimetableGrid.css';
 
-const TimetableGrid = ({ entries, level, semester, group, user, onRefresh }) => {
+const TimetableGrid = ({ entries = [], level, semester, group, user, onRefresh }) => {
     const [editingEntry, setEditingEntry] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
@@ -98,6 +98,7 @@ const TimetableGrid = ({ entries, level, semester, group, user, onRefresh }) => 
     };
 
     const getEntry = (day, startTime) => {
+        if (!Array.isArray(entries)) return null;
         return entries.find(e => e.day === day && e.start_time.startsWith(startTime));
     };
 
