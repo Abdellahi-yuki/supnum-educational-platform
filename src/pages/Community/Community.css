@@ -173,76 +173,10 @@
     box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.01);
 }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .community-whatsapp-container {
-        grid-template-columns: 1fr !important;
-        height: calc(100vh - 80px) !important;
-        border-radius: 0 !important;
-        border: none !important;
-        margin: 0 !important;
-        width: 100% !important;
-    }
 
-    .whatsapp-sidebar {
-        position: absolute !important;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 85% !important;
-        max-width: 320px !important;
-        z-index: 1000;
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(20px);
-        transform: translateX(-100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
 
-    .whatsapp-sidebar.open {
-        transform: translateX(0);
-        box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
-    }
-
-    .whatsapp-chat {
-        width: 100%;
-        min-width: 0;
-        /* Allow shrinking below content size */
-    }
-
-    #whatsapp-chat-header {
-        padding: 1rem !important;
-    }
-
-    .chat-messages-area {
-        padding: 1rem !important;
-    }
-
-    .chat-input-area {
-        padding: 1rem !important;
-    }
-
-    .message-wrapper {
-        max-width: 100% !important;
-        margin-bottom: 1rem !important;
-    }
-
-    .message-bubble {
-        padding: 0.8rem 1rem !important;
-        border-radius: 18px !important;
-        font-size: 0.9rem;
-        word-break: break-word;
-        /* Ensure long words don't overflow */
-    }
-
-    .message-item {
-        max-width: 95% !important;
-        /* Allow more width on small screens */
-        padding: 0.8rem !important;
-    }
-
-    .input-bar {
-        padding: 0.8rem !important;
-    }
+.mobile-menu-btn {
+    display: none !important;
 }
 
 /* Base Layout Overrides */
@@ -409,5 +343,127 @@
     to {
         transform: translateY(0);
         opacity: 1;
+    }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .community-whatsapp-container {
+        grid-template-columns: 1fr !important;
+        height: calc(100vh - 80px) !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+    }
+
+    .whatsapp-sidebar {
+        position: absolute !important;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 85% !important;
+        max-width: 320px !important;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(20px);
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .whatsapp-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
+    }
+
+    .whatsapp-chat {
+        width: 100%;
+        min-width: 0;
+        /* Allow shrinking below content size */
+    }
+
+    #whatsapp-chat-header {
+        padding: 1rem !important;
+    }
+
+    .chat-messages-area {
+        padding: 1rem !important;
+        gap: 1rem !important;
+    }
+
+    .chat-input-area {
+        padding: 0.75rem !important;
+    }
+
+    .chat-input-form {
+        gap: 0.5rem !important;
+    }
+
+    /* Resize input elements on mobile */
+    .chat-input-area .icon-btn,
+    .chat-input-area button[title="Créer un sondage"],
+    .chat-input-area button[type="submit"] {
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 14px !important;
+    }
+
+    .chat-input-area .auth-input {
+        min-height: 44px !important;
+        height: 44px !important;
+        padding: 0.75rem 1rem !important;
+        border-radius: 14px !important;
+        font-size: 0.95rem !important;
+        line-height: 1.2 !important;
+    }
+
+    .message-wrapper {
+        width: auto !important;
+        max-width: 85% !important;
+        margin: 0.5rem 1rem 1rem 1rem !important;
+    }
+
+    .message-bubble {
+        padding: 1rem 1.25rem !important;
+        border-radius: 16px !important;
+        word-break: break-word;
+    }
+
+    .message-bubble p {
+        font-size: 0.95rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .message-item {
+        width: auto !important;
+        max-width: 85% !important;
+        padding: 1rem 1.25rem !important;
+        margin: 0.5rem 1.25rem 1rem 1.25rem !important;
+    }
+
+    .message-item p {
+        font-size: 0.95rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .input-bar {
+        padding: 0.8rem !important;
+    }
+
+    .poll-card {
+        width: auto !important;
+        max-width: 85% !important;
+        padding: 1rem 1.25rem !important;
+        margin: 0.5rem 1rem 1.25rem 1rem !important;
+    }
+
+
+    .poll-creator-panel {
+        padding: 1.5rem !important;
+    }
+
+    .mobile-menu-btn {
+        display: flex !important;
     }
 }

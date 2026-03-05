@@ -461,28 +461,26 @@ const Community = ({ user }) => {
     return (
         <div className="community-whatsapp-container">
             {/* Mobile Menu Button */}
-            {window.innerWidth <= 768 && (
-                <button
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    style={{
-                        position: 'absolute',
-                        top: '1rem',
-                        left: '1rem',
-                        zIndex: 1001,
-                        background: 'white',
-                        border: 'none',
-                        borderRadius: '12px',
-                        padding: '0.75rem',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}
-                >
-                    {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
-            )}
+            <button
+                className="mobile-menu-btn"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    left: '1rem',
+                    zIndex: 1001,
+                    background: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '0.75rem',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    cursor: 'pointer',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}
+            >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
 
             {/* Sidebar */}
             <div className={`whatsapp-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
@@ -584,17 +582,17 @@ const Community = ({ user }) => {
             {/* Chat Area */}
             <div className="whatsapp-chat">
                 {/* Chat Header */}
-                <div id='whatsapp-chat-header' style={{ padding: '1.2rem 2.5rem', background: 'white', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+                <div id='whatsapp-chat-header' style={{ padding: '1.2rem 2.5rem', background: 'white', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', boxShadow: '0 4px 10px rgba(0,0,0,0.02)', position: 'relative' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', paddingLeft: window.innerWidth <= 768 ? '3rem' : '0' }}>
 
                         <div style={{ width: '48px', height: '48px', borderRadius: '15px', background: showMembersList ? 'var(--primary-green)' : (showOnlySaved ? 'var(--primary-blue)' : 'var(--primary-blue)'), color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
                             {showMembersList ? <Users size={24} /> : (showOnlySaved ? <Bookmark size={24} /> : <Users size={24} />)}
                         </div>
                         <div>
-                            <h3 style={{ fontSize: '1.3rem', fontWeight: 900, margin: 0 }}>{showMembersList ? 'Membres' : (showOnlySaved ? 'Favoris' : 'Share-Differ-Respect')}</h3>
+                            <h3 style={{ fontSize: window.innerWidth <= 768 ? '1.1rem' : '1.3rem', fontWeight: 900, margin: 0 }}>{showMembersList ? 'Membres' : (showOnlySaved ? 'Favoris' : 'Share-Differ-Respect')}</h3>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary-green)' }}></div>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--gray-500)', fontWeight: 600, margin: 0 }}>{stats.activeMembers} actifs maintenant</p>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--gray-500)', fontWeight: 600, margin: 0 }}>{stats.activeMembers} actifs</p>
                             </div>
                         </div>
                     </div>
@@ -610,7 +608,8 @@ const Community = ({ user }) => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             color: 'var(--gray-700)',
-                            transition: 'all 0.2s'
+                            transition: 'all 0.2s',
+                            marginLeft: 'auto'
                         }}
                         onMouseOver={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.1)'}
                         onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
@@ -772,7 +771,7 @@ const Community = ({ user }) => {
                                     return (
                                         <div key={`msg-${msg.id}`} id={`msg-${msg.id}`} className="message-wrapper">
                                             {/* Header with ID and timestamp */}
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem', marginLeft: '1rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.75rem', marginLeft: '1rem' }}>
                                                 {/* Profile Picture */}
                                                 <div
                                                     onClick={() => handleUserClick(msg.user_id)}
@@ -1196,7 +1195,7 @@ const Community = ({ user }) => {
                         </div>
                     )}
 
-                    <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '1.2rem', alignItems: 'center' }}>
+                    <form className="chat-input-form" onSubmit={handleSendMessage} style={{ display: 'flex', gap: '1.2rem', alignItems: 'center' }}>
                         <input type="file" id="whatsapp-file" style={{ display: 'none' }} accept="image/*,video/*,.pdf,.doc,.docx" onChange={(e) => setSelectedFile(e.target.files[0])} />
                         <button type="button" onClick={() => document.getElementById('whatsapp-file').click()} className="icon-btn" style={{ color: 'var(--gray-500)', background: 'rgba(0,0,0,0.04)', borderRadius: '18px', width: 'fit-content', height: '56px', flexShrink: 0, transition: 'all 0.2s' }}>
                             <Paperclip size={26} />
