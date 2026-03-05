@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import mailService from '../../services/mailService';
 import { API_BASE_URL, FILE_BASE_URL } from '../../apiConfig';
@@ -64,25 +64,39 @@ const Mail = () => {
     const [messages, setMessages] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Fetch messages on mount
-    useEffect(() => {
-        const loadData = async () => {
-            setIsLoading(true);
-            try {
-                const [msgs, users] = await Promise.all([
-                    mailService.fetchMessages(selectedLabel === 'sent' ? 'inbox' : selectedLabel),
-                    mailService.fetchUsers()
-                ]);
-                setMessages(msgs);
-                setAllUsers(users);
-            } catch (error) {
-                console.error("Failed to fetch data:", error);
-            } finally {
-                setIsLoading(false);
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const currentLabel = selectedLabel === 'sent' ? 'inbox' : selectedLabel; // API fetches all for 'sent' to build thread
+
+    const loadData = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const data = await mailService.fetchMessages(user.id, currentLabel);
+            if (Array.isArray(data)) {
+                setMessages(data);
+            } else {
+                console.error('Expected array of messages, got:', data);
+                setMessages([]);
             }
-        };
+            const users = await mailService.fetchUsers();
+            if (Array.isArray(users)) {
+                setAllUsers(users);
+            } else {
+                console.error('Expected array of users, got:', users);
+                setAllUsers([]);
+            }
+        } catch (error) {
+            console.error('Error loading mail data:', error);
+            setMessages([]);
+            setAllUsers([]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [user.id, currentLabel, selectedLabel]);
+
+    // Fetch messages on mount and label change
+    useEffect(() => {
         loadData();
-    }, [selectedLabel]);
+    }, [loadData, selectedLabel]);
 
     const [selectedMessageIds, setSelectedMessageIds] = useState(new Set());
 
@@ -115,22 +129,22 @@ const Mail = () => {
         const currentUserId = Number(user.id || 3);
 
         // 1. Identify all parent IDs
-        const parentIds = new Set(messages.map(m => Number(m.parentId)));
+        const parentIds = new Set(Array.isArray(messages) ? messages.map(m => Number(m.parentId)) : []);
 
         // Helper to check if user participated in a thread
         const userParticipatedInThread = (msg) => {
             if (Number(msg.sender_id) === currentUserId) return true;
-            let current = messages.find(m => Number(m.id) === Number(msg.parentId));
+            let current = Array.isArray(messages) ? messages.find(m => Number(m.id) === Number(msg.parentId)) : null;
             while (current) {
                 if (Number(current.sender_id) === currentUserId) return true;
                 if (Number(current.parentId) === 0) break;
-                current = messages.find(m => Number(m.id) === Number(current.parentId));
+                current = Array.isArray(messages) ? messages.find(m => Number(m.id) === Number(current.parentId)) : null;
             }
             return false;
         };
 
         // 2. Filter
-        return messages.filter(msg => {
+        return (Array.isArray(messages) ? messages : []).filter(msg => {
             const query = searchQuery.toLowerCase();
             const matchesSearch = !query ||
                 msg.from.toLowerCase().includes(query) ||
@@ -236,13 +250,13 @@ const Mail = () => {
     // Check if a label is active for all selected messages
     const isLabelActiveForSelected = (label) => {
         if (selectedMessageIds.size === 0) return false;
-        const selectedMsgs = messages.filter(msg => selectedMessageIds.has(msg.id));
+        const selectedMsgs = (Array.isArray(messages) ? messages : []).filter(msg => selectedMessageIds.has(msg.id));
         return selectedMsgs.every(msg => msg.labels.includes(label));
     };
 
     // Get Ancestor Path (Branch Isolation)
     // Only show the path from the selected message up to the root.
-    const getThreadPath = (message) => {
+    const getThreadPath = useCallback((message) => {
         if (!message) return [];
 
         const path = [];
@@ -252,11 +266,11 @@ const Mail = () => {
         while (current) {
             path.unshift(current); // Add to beginning (chronological order)
             if (current.parentId === 0) break;
-            current = messages.find(m => m.id === current.parentId);
+            current = (Array.isArray(messages) ? messages : []).find(m => m.id === current.parentId);
         }
 
         return path;
-    };
+    }, [messages]);
 
     const threadMessages = useMemo(() => getThreadPath(selectedMessage), [selectedMessage, messages]);
 
@@ -331,7 +345,7 @@ const Mail = () => {
         if (!msg.isRead) {
             try {
                 await mailService.updateMessage(msg.id, { is_read: true });
-                const updatedMessages = messages.map(m =>
+                const updatedMessages = (Array.isArray(messages) ? messages : []).map(m =>
                     m.id === msg.id ? { ...m, isRead: true } : m
                 );
                 setMessages(updatedMessages);
@@ -382,7 +396,7 @@ const Mail = () => {
                                 <span>{item.label}</span>
                                 {item.id === 'inbox' && (
                                     <span className="count">
-                                        {messages.filter(m => m.labels.includes('inbox') && !m.isRead).length}
+                                        {(Array.isArray(messages) ? messages : []).filter(m => m.labels.includes('inbox') && !m.isRead).length}
                                     </span>
                                 )}
                             </button>

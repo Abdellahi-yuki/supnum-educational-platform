@@ -652,9 +652,20 @@ function Archive() {
         setIsAdminAuthenticated(sessionStorage.getItem('admin-authenticated') === 'true');
         const refreshData = async () => {
             setLoadingItems(true);
-            const data = await loadDataFromAPI();
-            setDatabase(data);
-            setLoadingItems(false);
+            try {
+                const data = await loadDataFromAPI();
+                if (data && data.semestres && data.matieres && data.supports) {
+                    setDatabase(data);
+                } else {
+                    console.error('Unexpected data format from Archive API:', data);
+                    setDatabase({ semestres: [], matieres: [], supports: [] });
+                }
+            } catch (err) {
+                console.error('Failed to refresh archive data:', err);
+                setDatabase({ semestres: [], matieres: [], supports: [] });
+            } finally {
+                setLoadingItems(false);
+            }
         };
         refreshData();
     }, []);

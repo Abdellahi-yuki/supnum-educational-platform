@@ -78,7 +78,11 @@ const Community = ({ user }) => {
     }, [messages, polls]);
 
     const fetchMessages = useCallback(async () => {
-        if (!user) return;
+        if (!user || !user.id || user.id === '0' || user.id === 0) {
+            setMessages([]);
+            setLoading(false);
+            return;
+        }
         try {
             let url = `${API_BASE_URL}/community_messages.php?user_id=${user.id}`;
             if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
@@ -88,6 +92,9 @@ const Community = ({ user }) => {
             const data = await response.json();
             if (Array.isArray(data)) {
                 setMessages(data);
+            } else {
+                console.error('Expected array of community messages, got:', data);
+                setMessages([]);
             }
         } catch (error) {
             console.error('Error fetching messages:', error);
@@ -114,6 +121,9 @@ const Community = ({ user }) => {
             const data = await res.json();
             if (Array.isArray(data)) {
                 setMembers(data);
+            } else {
+                console.error('Expected array of community members, got:', data);
+                setMembers([]);
             }
         } catch (error) {
             console.error('Error fetching members:', error);
@@ -121,11 +131,19 @@ const Community = ({ user }) => {
     }, []);
 
     const fetchPolls = useCallback(async () => {
-        if (!user) return;
+        if (!user || !user.id || user.id === '0' || user.id === 0) {
+            setPolls([]);
+            return;
+        }
         try {
             const res = await fetch(`${API_BASE_URL}/community_polls.php?user_id=${user.id}`);
             const data = await res.json();
-            if (Array.isArray(data)) setPolls(data);
+            if (Array.isArray(data)) {
+                setPolls(data);
+            } else {
+                console.error('Expected array of community polls, got:', data);
+                setPolls([]);
+            }
         } catch (e) {
             console.error('Error fetching polls:', e);
         }
@@ -134,6 +152,10 @@ const Community = ({ user }) => {
     const handleCreatePoll = async () => {
         const nonEmpty = pollOptions.filter(o => o.trim());
         if (!pollQuestion.trim() || nonEmpty.length < 2) return;
+        if (!user || !user.id || user.id === '0' || user.id === 0) {
+            alert('Vous devez être connecté pour créer un sondage.');
+            return;
+        }
         setIsCreatingPoll(true);
         try {
             const res = await fetch(`${API_BASE_URL}/community_polls.php`, {
@@ -160,6 +182,10 @@ const Community = ({ user }) => {
     };
 
     const handleVotePoll = async (pollId, optionId) => {
+        if (!user || !user.id || user.id === '0' || user.id === 0) {
+            alert('Vous devez être connecté pour voter.');
+            return;
+        }
         try {
             await fetch(`${API_BASE_URL}/community_polls.php`, {
                 method: 'POST',
@@ -333,6 +359,10 @@ const Community = ({ user }) => {
     const handleSendComment = async (messageId) => {
         const content = commentInputs[messageId];
         if (!content || !content.trim()) return;
+        if (!user || !user.id || user.id === '0' || user.id === 0) {
+            alert('Vous devez être connecté pour commenter.');
+            return;
+        }
 
         try {
             const res = await fetch(`${API_BASE_URL}/community_comments.php`, {

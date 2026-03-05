@@ -49,7 +49,12 @@ const Timetable = () => {
             const url = `${API_BASE_URL}/timetable.php?level=${level}&semester=${semester}&week=${week}&group=${encodeURIComponent(group)}`;
             const response = await fetch(url);
             const data = await response.json();
-            setEntries(data);
+            if (Array.isArray(data)) {
+                setEntries(data);
+            } else {
+                console.error('Expected array of timetable entries, got:', data);
+                setEntries([]);
+            }
         } catch (error) {
             console.error('Error fetching timetable:', error);
         } finally {
