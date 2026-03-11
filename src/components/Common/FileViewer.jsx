@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import ReactDOM from 'react-dom';
 import { X, Download, File } from 'lucide-react';
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import { FILE_BASE_URL } from '../../apiConfig';
@@ -28,33 +29,44 @@ const FileViewer = ({ file, onClose }) => {
 
     if (!file) return null;
 
+    // Stable properties to avoid re-calculating everything on every parent re-render
+    const fileNom = file.nom || file.file_name || file.name || '';
+    const fileUri = file.chemin_fichier || file.file_path || file.path || file.media_url || '';
+
     // Construct full URL and set up docs for DocViewer
     const docs = useMemo(() => {
-        const rawPath = file.chemin_fichier || file.file_path || file.path || file.media_url || '';
         let filepath = '';
-        if (rawPath.startsWith('http')) {
-            filepath = rawPath;
-        } else if (rawPath.startsWith('/')) {
-            filepath = `${FILE_BASE_URL}${rawPath}`;
+        if (fileUri.startsWith('http')) {
+            filepath = fileUri;
+        } else if (fileUri.startsWith('/')) {
+            filepath = `${FILE_BASE_URL}${fileUri}`;
         } else {
-            filepath = `${FILE_BASE_URL}/${rawPath}`;
-        }
-
-        const ext = filepath.split('.').pop().split('?')[0].toLowerCase();
-
-        const docViewerSupported = ['bmp', 'csv', 'htm', 'html', 'jpg', 'jpeg', 'pdf', 'png', 'tiff', 'txt', 'mp4'];
-
-        if (ext === 'xlsx' || ext === 'xls') {
-            setIsExcel(true);
-        } else if (!docViewerSupported.includes(ext)) {
-            setIsTextFallback(true);
+            filepath = `${FILE_BASE_URL}/${fileUri}`;
         }
 
         return [{
             uri: filepath,
-            fileName: file.nom || file.file_name || file.name || (rawPath.split('/').pop()) || 'document',
+            fileName: fileNom || (fileUri.split('/').pop()) || 'document',
         }];
-    }, [file]);
+    }, [fileUri, fileNom]);
+
+    // Handle File Type Detection (separate from useMemo to avoid side effects there)
+    React.useEffect(() => {
+        const uri = docs[0].uri;
+        const ext = uri.split('.').pop().split('?')[0].toLowerCase();
+        const docViewerSupported = ['bmp', 'csv', 'htm', 'html', 'jpg', 'jpeg', 'pdf', 'png', 'tiff', 'txt', 'mp4'];
+
+        if (ext === 'xlsx' || ext === 'xls') {
+            setIsExcel(true);
+            setIsTextFallback(false);
+        } else if (!docViewerSupported.includes(ext)) {
+            setIsExcel(false);
+            setIsTextFallback(true);
+        } else {
+            setIsExcel(false);
+            setIsTextFallback(false);
+        }
+    }, [docs]);
 
     // Handle Custom Excel Loading
     React.useEffect(() => {
@@ -117,7 +129,7 @@ const FileViewer = ({ file, onClose }) => {
         document.body.removeChild(link);
     };
 
-    return (
+    return ReactDOM.createPortal(
         <div className="fv-overlay">
             {/* Custom Theme Header */}
             <header className="fv-header">
@@ -197,7 +209,8 @@ const FileViewer = ({ file, onClose }) => {
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

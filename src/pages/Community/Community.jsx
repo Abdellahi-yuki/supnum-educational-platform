@@ -27,6 +27,7 @@ import { useLocation } from 'react-router-dom';
 import UserProfile from '../Dashboard/components/UserProfile';
 import './Community.css';
 import FileViewer from '../../components/Common/FileViewer';
+import { useFileViewer } from '../../context/FileViewerContext';
 
 const Community = ({ user }) => {
     const location = useLocation();
@@ -41,7 +42,7 @@ const Community = ({ user }) => {
     const [replyTo, setReplyTo] = useState(null);
     const [stats, setStats] = useState({ totalMembers: 0, activeMembers: 0 });
     const [viewingFile, setViewingFile] = useState(null);
-
+    const { openFile } = useFileViewer();
     // Notifications state
 
 
@@ -997,7 +998,7 @@ const Community = ({ user }) => {
                                                                 <img
                                                                     src={`${FILE_BASE_URL}${msg.media_url}`}
                                                                     alt=""
-                                                                    onClick={() => setViewingFile(msg)}
+                                                                    onClick={() => openFile(msg)}
                                                                     style={{
                                                                         borderRadius: '12px',
                                                                         maxWidth: '100%',
@@ -1027,7 +1028,7 @@ const Community = ({ user }) => {
                                                                 </video>
                                                             ) : (
                                                                 <div
-                                                                    onClick={() => setViewingFile(msg)}
+                                                                    onClick={() => openFile(msg)}
                                                                     style={{
                                                                         color: isMe ? 'white' : 'var(--primary-blue)',
                                                                         fontSize: '0.9rem',
@@ -1450,12 +1451,6 @@ const Community = ({ user }) => {
                 )}
             </div>
 
-            {viewingFile && (
-                <FileViewer
-                    file={viewingFile}
-                    onClose={() => setViewingFile(null)}
-                />
-            )}
         </div>
     );
 };

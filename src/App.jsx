@@ -2,6 +2,7 @@
 import { useLocation, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { FileViewerProvider } from './context/FileViewerContext';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Mail from './pages/Mail/Mail';
 import Community from './pages/Community/Community';
@@ -108,7 +109,9 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AppContent />
+        <FileViewerProvider>
+          <AppContent />
+        </FileViewerProvider>
       </AuthProvider>
     </ThemeProvider>
   );

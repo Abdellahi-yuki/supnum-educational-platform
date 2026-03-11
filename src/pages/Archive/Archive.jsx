@@ -17,6 +17,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '../../apiConfig';
 import './Archive.css';
 import FileViewer from '../../components/Common/FileViewer';
+import { useFileViewer } from '../../context/FileViewerContext';
 
 const loadDataFromAPI = async () => {
     try {
@@ -550,7 +551,7 @@ function Archive() {
     const [currentView, setCurrentView] = useState('semesters');
     const [currentSemester, setCurrentSemester] = useState(null);
     const [currentSubject, setCurrentSubject] = useState(null);
-    const [currentFile, setCurrentFile] = useState(null);
+    const { openFile } = useFileViewer();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [breadcrumbs, setBreadcrumbs] = useState([{ name: 'Accueil', action: 'semesters' }]);
@@ -671,12 +672,11 @@ function Archive() {
                             {currentView !== 'search' && <Breadcrumb items={breadcrumbs} onNavigate={handleNavigate} />}
                             {currentView === 'semesters' && <SemesterList semesters={database.semestres} subjects={database.matieres} onSelectSemester={handleSelectSemester} />}
                             {currentView === 'subjects' && currentSemester && <SubjectList subjects={database.matieres.filter(m => m.id_semestre === currentSemester.id)} supports={database.supports} semesterName={currentSemester.nom} onSelectSubject={handleSelectSubject} onBack={handleBack} />}
-                            {currentView === 'documents' && currentSubject && <DocumentList documents={database.supports.filter(s => s.id_matiere === currentSubject.id)} subjectName={currentSubject.nom} onSelectDocument={(doc) => setCurrentFile(doc)} onBack={handleBack} />}
+                            {currentView === 'documents' && currentSubject && <DocumentList documents={database.supports.filter(s => s.id_matiere === currentSubject.id)} subjectName={currentSubject.nom} onSelectDocument={(doc) => openFile(doc)} onBack={handleBack} />}
                             {currentView === 'search' && <SearchResults results={searchResults} query={searchQuery} onSelectResult={(res) => res.type === 'support' ? handleSelectSubject(res.matiere.id) : handleSelectSubject(res.item.id)} onBack={handleBack} />}
                         </>
                     )}
                 </div>
-                {currentFile && <FileViewer file={currentFile} onClose={() => setCurrentFile(null)} />}
             </div>
         );
     };

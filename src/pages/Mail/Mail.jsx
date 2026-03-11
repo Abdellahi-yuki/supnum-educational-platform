@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import './Mail.css';
 import FileViewer from '../../components/Common/FileViewer';
+import { useFileViewer } from '../../context/FileViewerContext';
 
 const Mail = () => {
     const location = useLocation();
@@ -37,7 +38,7 @@ const Mail = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [allUsers, setAllUsers] = useState([]);
     const [viewingFile, setViewingFile] = useState(null);
-
+    const { openFile } = useFileViewer();
     // Compose state to handle pre-filling data for replies/forwards
     const [composeData, setComposeData] = useState({
         to: '',
@@ -599,7 +600,7 @@ const Mail = () => {
                                                         <div
                                                             key={i}
                                                             className="attachment-card"
-                                                            onClick={() => setViewingFile(att)}
+                                                            onClick={() => openFile(att)}
                                                             style={{
                                                                 display: 'flex',
                                                                 flexDirection: 'column',
@@ -844,13 +845,6 @@ const Mail = () => {
                         </>
                     )}
                 </div>
-            )}
-
-            {viewingFile && (
-                <FileViewer
-                    file={viewingFile}
-                    onClose={() => setViewingFile(null)}
-                />
             )}
 
             {/* Mobile Backdrop */}
