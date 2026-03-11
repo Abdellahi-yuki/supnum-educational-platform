@@ -62,15 +62,18 @@ const Results = () => {
                 const code = key.substring(4);
                 if (!seenCodes.has(code)) {
                     seenCodes.add(code);
+                    const dept = results.Dept === 'DWM' ? 'CNM' : (results.Dept || 'SPEC');
+                    const lookupCode = code.includes('SPEC') ? code.replace('SPEC', dept) : code;
                     subjects.push({
                         code: code,
-                        name: subjectsMap[code]?.name || code,
-                        credits: subjectsMap[code]?.credits || 0,
+                        name: subjectsMap[lookupCode]?.name || subjectsMap[code]?.name || code,
+                        credits: subjectsMap[lookupCode]?.credits || subjectsMap[code]?.credits || 0,
                         ncc: results[`NCC_${code}`],
                         nsn: results[`NSN_${code}`],
                         nsr: results[`NSR_${code}`],
-                        moy: results[`Moy_${code}`],
-                        capit: results[`Capit_${code}`] || results[`Capit_${code.substring(0, 5)}`]
+                        moy: results[`MOY_${code}`],
+                        capit: results[`CAPIT_${code}`] || results[`CAPIT_${code.substring(0, 5)}`],
+                        displayCode: lookupCode
                     });
                 }
             }
@@ -176,7 +179,7 @@ const Results = () => {
                                 <p>
                                     <span style={{ opacity: 0.7 }}>Matricule:</span> <strong>{results.Matricule}</strong>
                                     <span style={{ color: '#cbd5e1' }}>|</span>
-                                    <span style={{ opacity: 0.7 }}>Parcours:</span> <strong>{results.Dept || results.pt}</strong>
+                                    <span style={{ opacity: 0.7 }}>Parcours:</span> <strong>{results.Dept || 'N/A'}</strong>
                                 </p>
                             </div>
                             <div style={{ display: 'flex', gap: '1rem' }}>
@@ -231,7 +234,7 @@ const Results = () => {
                                             <tr key={idx} className="results-table-row">
                                                 <td>
                                                     <div className="subject-name">{sub.name}</div>
-                                                    <div className="subject-code">{sub.code}</div>
+                                                    <div className="subject-code">{sub.displayCode}</div>
                                                 </td>
                                                 <td style={{ textAlign: 'center', fontWeight: 600 }}>{sub.ncc || '-'}</td>
                                                 <td style={{ textAlign: 'center', fontWeight: 600 }}>{sub.nsn || '-'}</td>
@@ -268,7 +271,7 @@ const Results = () => {
                         <div className="results-summary-grid">
                             <div className="summary-card">
                                 <p className="summary-label">Moyenne du Semestre</p>
-                                <h4 className="summary-value" style={{ color: '#1e3a8a' }}>{results.Moy_General}</h4>
+                                <h4 className="summary-value" style={{ color: '#1e3a8a' }}>{results.MOY_GENERAL}</h4>
                                 <Target size={24} color="#1e3a8a" style={{ opacity: 0.2, marginTop: '1rem' }} />
                             </div>
                             <div className="summary-card">

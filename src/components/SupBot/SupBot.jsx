@@ -115,7 +115,7 @@ const extractEntities = (text) => {
     const norm = normalize(text);
     return {
         level: norm.match(/\b(l1|l2|l3|premiere annee|deuxieme annee|troisieme annee)\b/)?.[1] || null,
-        major: norm.match(/\b(dsi|rss|dwm|web|reseau|systeme)\b/)?.[1] || null,
+        major: norm.match(/\b(spec|rss|dwm|web|reseau|systeme)\b/)?.[1] || null,
         semester: norm.match(/\b(s[1-6]|semestre [1-6])\b/)?.[1] || null,
         isQuestion: /\b(comment|pourquoi|quand|quoi|qui|combien|est-ce|c'est|peut-on|peut-il|peux-tu)\b/.test(norm),
     };
@@ -157,7 +157,7 @@ const KB = [
         id: 'who_are_you', category: 'intent', weight: 2,
         keywords: ['qui es tu', "c'est quoi supbot", 'tu es quoi', 'tu fais quoi', 'tu sers a quoi', 'comment tu marches'],
         responses: [
-            "Je suis **SupBot** 🤖, votre assistant académique virtuel de SupNum !\n\nJe peux vous renseigner sur :\n*   📚 Filières (DWM, RSS, DSI)\n*   📊 Notes, moyennes, validation\n*   💼 Stages et débouchés\n*   📅 Emploi du temps\n*   📋 Règlement intérieur\n*   Et bien plus !",
+            "Je suis **SupBot** 🤖, votre assistant académique virtuel de SupNum !\n\nJe peux vous renseigner sur :\n*   📚 Filières (DWM, RSS, SPEC)\n*   📊 Notes, moyennes, validation\n*   💼 Stages et débouchés\n*   📅 Emploi du temps\n*   📋 Règlement intérieur\n*   Et bien plus !",
         ],
         suggestions: ['Filières de SupNum ?', 'Calculer ma moyenne ?'],
     },
@@ -175,7 +175,7 @@ const KB = [
     {
         id: 'about', category: 'général', weight: 1,
         keywords: ["c'est quoi supnum", 'qui est supnum', 'presentation de supnum', 'supnum c est quoi', 'ecole', 'institut'],
-        response: "🏫 **L'Institut Supérieur du Numérique (SupNum)** est une grande école mauritanienne spécialisée dans le numérique.\n\n*   Formation **Licence Professionnelle** (Bachelor Engineering) en **3 ans**\n*   Pédagogie active : 74% pratique, 26% cours magistraux\n*   3 filières professionnalisantes : DWM, RSS, DSI\n*   Partenariats avec des entreprises locales & régionales",
+        split: "🏫 **L'Institut Supérieur du Numérique (SupNum)** est une grande école mauritanienne spécialisée dans le numérique.\n\n*   Formation **Licence Professionnelle** (Bachelor Engineering) en **3 ans**\n*   Pédagogie active : 74% pratique, 26% cours magistraux\n*   3 filières professionnalisantes : DWM, RSS, SPEC\n*   Partenariats avec des entreprises locales & régionales",
         suggestions: ['Quelles sont les filières ?', 'Comment candidater ?'],
     },
     {
@@ -207,15 +207,15 @@ const KB = [
     {
         id: 'list_majors', category: 'filières', weight: 1.1,
         keywords: ['filiere', 'specialite', 'parcours', 'option', 'quels sont les filieres', 'quel filiere choisir', 'quelles filieres'],
-        response: "SupNum propose **3 filières** à partir de la L2 :\n\n🌐 **DWM** — Développement Web & Multimédia\n🛡️ **RSS** — Réseaux, Systèmes & Sécurité\n💻 **DSI** — Développement des Systèmes d'Information\n\n*En L1, le programme est commun à tous.*",
-        suggestions: ['Détails DWM ?', 'Détails RSS ?', 'Détails DSI ?'],
+        response: "SupNum propose **3 filières** à partir de la L2 :\n\n🌐 **DWM** — Développement Web & Multimédia\n🛡️ **RSS** — Réseaux, Systèmes & Sécurité\n💻 **SPEC** — Développement des Systèmes d'Information\n\n*En L1, le programme est commun à tous.*",
+        suggestions: ['Détails DWM ?', 'Détails RSS ?', 'Détails SPEC ?'],
     },
     {
-        id: 'dsi', category: 'filières', weight: 1.5,
-        keywords: ['dsi', "systeme d'information", 'java', 'python', 'base de donnees', 'developpement logiciel', 'architecte si'],
-        response: "💻 **DSI — Développement des Systèmes d'Information**\n\n📚 **Matières clés :**\n*   Java / JEE / Spring\n*   Python & algorithmique avancé\n*   Bases de données SQL & NoSQL\n*   Architecture SOA & microservices\n*   Méthodes Merise & UML\n*   Sécurité des systèmes d'information\n\n🎯 **Débouchés :** Développeur logiciel, Architecte SI, Chef de projet, Analyste-programmeur\n\n💰 Salaire d'entrée moyen : **100 000 – 150 000 MRU/mois**",
-        suggestions: ['Certifications DSI ?', 'Conditions de passage L2 ?'],
-        setContext: 'DSI',
+        id: 'spec', category: 'filières', weight: 1.5,
+        keywords: ['spec', "systeme d'information", 'java', 'python', 'base de donnees', 'developpement logiciel', 'architecte si'],
+        response: "💻 **SPEC — Développement des Systèmes d'Information**\n\n📚 **Matières clés :**\n*   Java / JEE / Spring\n*   Python & algorithmique avancé\n*   Bases de données SQL & NoSQL\n*   Architecture SOA & microservices\n*   Méthodes Merise & UML\n*   Sécurité des systèmes d'information\n\n🎯 **Débouchés :** Développeur logiciel, Architecte SI, Chef de projet, Analyste-programmeur\n\n💰 Salaire d'entrée moyen : **100 000 – 150 000 MRU/mois**",
+        suggestions: ['Certifications SPEC ?', 'Conditions de passage L2 ?'],
+        setContext: 'SPEC',
     },
     {
         id: 'rss', category: 'filières', weight: 1.5,
@@ -317,8 +317,8 @@ const KB = [
     {
         id: 'certifs', category: 'certifications', weight: 1.1,
         keywords: ['certification', 'certif', 'diplome professionnel', 'ccna certif', 'oracle certif', 'pix adobe'],
-        response: "🏆 **Certifications préparées à SupNum** :\n\n| Certification | Filière |\n|---|---|\n| 🔴 Cisco CCNA | RSS |\n| 🟡 Oracle Java | DSI |\n| 🐍 Python Institute PCEP | Tous |\n| 🎨 Adobe Certified | DWM |\n| 🔢 PIX | Tous niveaux |",
-        suggestions: ['Détails RSS ?', 'Détails DSI ?'],
+        response: "🏆 **Certifications préparées à SupNum** :\n\n| Certification | Filière |\n|---|---|\n| 🔴 Cisco CCNA | RSS |\n| 🟡 Oracle Java | SPEC |\n| 🐍 Python Institute PCEP | Tous |\n| 🎨 Adobe Certified | DWM |\n| 🔢 PIX | Tous niveaux |",
+        suggestions: ['Détails RSS ?', 'Détails SPEC ?'],
     },
 
     // ── INSCRIPTION ──────────────────────────────────────────────

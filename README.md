@@ -1,98 +1,70 @@
 # Supnum Educational Platform
 
-This project is an educational platform built with React and Vite.
+A unified messaging and collaboration platform for educational institutions, built with **React** (Vite) and **Pure PHP**.
 
-## Page Structure
+## 🚀 Overview
 
-The application consists of the following main pages:
+The Supnum Educational Platform is a consolidated Single Page Application (SPA) designed to streamline communication and academic resource management.
 
-- **Dashboard** (`/dashboard`): The main landing dashboard.
-  - Component: `src/pages/Dashboard/Dashboard.jsx`
-- **Mail** (`/mail`): A page for messaging or mail-related features.
-  - Component: `src/pages/Mail/Mail.jsx`
-- **Community** (`/community`): A community interaction page.
-  - Component: `src/pages/Community/Community.jsx`
-- **Archive** (`/archive`): An archive page.
-  - Component: `src/pages/Archive/Archive.jsx`
-- **Results** (`/results`): A results/grades page.
-  - Component: `src/pages/Results/Results.jsx`
+### Key Modules:
+- **Dashboard**: Central hub for schedules and profile overview.
+- **Webmail**: Sophisticated branching conversation system with thread isolation.
+- **Community**: Real-time chat with 3-second polling and chunked media uploads.
+- **Archive**: Hierarchical repository for semesters, subjects, and academic materials.
+- **Results**: Academic performance tracking via matricule lookup.
 
-## Getting Started
+---
 
-Follow these instructions to set up and run the development environment.
+## 👥 Role Hierarchy
+
+The platform implements a strict role-based access control system:
+
+| Role | Description | Permissions |
+| :--- | :--- | :--- |
+| **Student** | Primary user | Access Learning, Results, Mail, and Community. |
+| **Teacher** | Academic Staff | All Student permissions + Upload materials to Archive. |
+| **Root** | Super Admin | All Staff permissions + User Banning, Mailing Lists, and Reports. |
+
+---
+
+## 🛠️ Technical Highlights
+
+- **Webmail Branching**: Implements a leaf-node strategy for a clean inbox and direct path traversal for isolated thread views.
+- **Chunked Uploads**: Robust handling of large media files (1MB chunks) in the Community module.
+- **Unified Routing**: Single-entry routing in `src/App.jsx` with centralized API configuration in `src/apiConfig.js`.
+
+---
+
+## 📖 Developer Documentation
+
+For deep technical insights, refer to the following:
+
+- **[probably.md](probably.md)**: Detailed project handover, architecture, and core logic explanations.
+- **[APIs.md](APIs.md)**: Full specification of the Pure PHP backend endpoints.
+- **[INSTRUCTIONS.md](INSTRUCTIONS.md)**: Coding standards and development guidelines.
+
+---
+
+## 💻 Getting Started
 
 ### Prerequisites
+- **Node.js**: v18+
+- **PHP**: 7.4+ (for local backend development)
 
-- Node.js (v18 or higher recommended)
-- npm (comes with Node.js)
+### Running Locally
 
-### Installation
-
-1. Clone the repository (if you haven't already).
-2. Navigate to the project directory.
-3. Install the dependencies:
-
+1. **Backend**:
    ```bash
-   npm install
+   cd supnum-educational-platform-backend-master
+   php -S localhost:8000 index.php
    ```
 
-### Available Scripts
+2. **Frontend**:
+   ```bash
+   cd supnum-educational-platform-master
+   npm install
+   npm run dev
+   ```
 
-In the project directory, you can run:
-
-- **`npm run dev`**: Runs the app in the development mode. Open [http://localhost:5173](http://localhost:5173) to view it in your browser.
-- **`npm run build`**: Builds the app for production to the `dist` folder.
-- **`npm run lint`**: Runs ESLint to check for code quality issues.
-- **`npm run preview`**: Locally preview the production build.
-
-### Running the Backend
-
-The application requires a PHP backend to function. The backend is maintained in a separate directory: `supnum-educational-platform-backend`.
-
-To run the backend:
-
-1. Open a terminal in the `supnum-educational-platform-backend` directory.
-2. Run the following command:
-
-```bash
-php -S localhost:8000 -t ./ index.php
-```
-
-> **Note:** The backend must be running on port 8000 for the frontend to connect successfully.
-
-### Running the Full Stack
-
-To run the full application, you need two terminal windows:
-
-1.  **Terminal 1 (Backend):**
-    ```bash
-    cd ../supnum-educational-platform-backend
-    php -S localhost:8000 index.php
-    ```
-
-2.  **Terminal 2 (Frontend):**
-    ```bash
-    npm run dev
-    ```
-
-
-### Testing on Mobile
-
-To test on a phone, build the project and serve the `dist` folder:
-
-```bash
-npm run build
-cd dist
-python3 -m http.server
-```
-
-Then access it via your computer's local IP address on your phone.
-
-## Developer Documentation
-
-For more detailed information, please refer to the following documents:
-
-- **[INSTRUCTIONS.md](INSTRUCTIONS.md)**: General developer guidelines and rules.
-- **[APIs.md](APIs.md)**: Backend API documentation.
-- **[CSS_REGISTRY.md](CSS_REGISTRY.md)**: Registry of used CSS classes to prevent conflicts.
-- **[probably.md](probably.md)**: Detailed project handover and architecture.
+> [!IMPORTANT]
+> The backend must be running on port **8000** by default for the frontend to connect.

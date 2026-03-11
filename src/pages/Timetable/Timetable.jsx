@@ -7,8 +7,8 @@ import './Timetable.css';
 // Groups definition per level
 const GROUPS = {
     L1: ['G1', 'G2', 'G3', 'G4'],
-    L2: ['G1 - RSS', 'G2 - DSI', 'G3 - DSI', 'G4 - DWM'],
-    L3: ['G1 - RSS', 'G2 - DSI', 'G3 - DSI', 'G4 - DWM'],
+    L2: ['G1 - RSS', 'G2 - SPEC', 'G3 - SPEC', 'G4 - DWM'],
+    L3: ['G1 - RSS', 'G2 - SPEC', 'G3 - SPEC', 'G4 - DWM'],
 };
 
 const Timetable = () => {

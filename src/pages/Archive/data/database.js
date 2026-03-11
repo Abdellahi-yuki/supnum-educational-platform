@@ -43,7 +43,7 @@ export const database = {
         { id: 21, nom: "Systèmes logique", id_semestre: 2 },
         //module specialité
         { id: 22, nom: "Service réseaux (RSS)", id_semestre: 2 },
-        { id: 23, nom: "SGBD Avanceé (DSI)", id_semestre: 2 },
+        { id: 23, nom: "SGBD Avanceé (SPEC)", id_semestre: 2 },
         { id: 24, nom: "CMS et PAO Ⅰ (DWM)", id_semestre: 2 },
         { id: 25, nom: "Projet integrateur PI", id_semestre: 2 },
 
@@ -69,11 +69,11 @@ export const database = {
         { id: 36, nom: "Administration systémes et réseaux (RSS)", id_semestre: 3 },
         { id: 37, nom: "Introduction á la Sécurité info (RSS)", id_semestre: 3 },
         { id: 38, nom: "Bases de données et conception des SI (RSS)", id_semestre: 3 },
-        //module specialité DSI
-        { id: 39, nom: "Genie logiciel (DSI)", id_semestre: 3 },
-        { id: 40, nom: "Bases de données avanceé(oracle) (DSI)", id_semestre: 3 },
-        { id: 41, nom: "Developpement Web avec python (DSI)", id_semestre: 3 },
-        { id: 42, nom: "DevOps (DSI)", id_semestre: 3 },
+        //module specialité SPEC
+        { id: 39, nom: "Genie logiciel (SPEC)", id_semestre: 3 },
+        { id: 40, nom: "Bases de données avanceé(oracle) (SPEC)", id_semestre: 3 },
+        { id: 41, nom: "Developpement Web avec python (SPEC)", id_semestre: 3 },
+        { id: 42, nom: "DevOps (SPEC)", id_semestre: 3 },
         //module specialité DWM
         { id: 43, nom: "CMS et PAO Ⅱ (DWM)", id_semestre: 3 },
         { id: 44, nom: "Numérisation et codage des objets Multimédia (DWM)", id_semestre: 3 },
@@ -95,9 +95,9 @@ export const database = {
         //module spécialité RSS
         { id: 55, nom: "Réseaux et Sécurité avanceé (RSS)", id_semestre: 4 },
         { id: 56, nom: "Voix ToIP(RSS)", id_semestre: 4 },
-        //module spécialité DSI
-        { id: 57, nom: "MongoDB (DSI)", id_semestre: 4 },
-        { id: 58, nom: "Réseaux Sécurité (DSI)", id_semestre: 4 },
+        //module spécialité SPEC
+        { id: 57, nom: "MongoDB (SPEC)", id_semestre: 4 },
+        { id: 58, nom: "Réseaux Sécurité (SPEC)", id_semestre: 4 },
         //module spécialité DWM
         { id: 59, nom: "infographie,animation 2D/3D (DWM)", id_semestre: 4 },
         { id: 60, nom: "Réseaux et Sécurité avanceé (DWM)", id_semestre: 4 },
@@ -118,9 +118,9 @@ export const database = {
         //module spécialité RSS
         { id: 70, nom: "Prep.Certif CCNA (RSS)", id_semestre: 5 },
         { id: 71, nom: "Prep.Certif Reseaux fixes (RSS)", id_semestre: 5 },
-        //module spécialité DSI
-        { id: 72, nom: "Prep.Certif Oracle (DSI)", id_semestre: 5 },
-        { id: 73, nom: "Prep.Certif Python (DSI)", id_semestre: 5 },
+        //module spécialité SPEC
+        { id: 72, nom: "Prep.Certif Oracle (SPEC)", id_semestre: 5 },
+        { id: 73, nom: "Prep.Certif Python (SPEC)", id_semestre: 5 },
         //module spécialité DWM
         { id: 74, nom: "Prep.Certif Ux Design (DWM)", id_semestre: 5 },
         { id: 75, nom: "Indexation ,Recherche info (DWM)", id_semestre: 5 },
