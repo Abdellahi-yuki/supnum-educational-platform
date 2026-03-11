@@ -71,6 +71,22 @@ This is a unified messaging and collaboration platform for educational instituti
 - **Profile Integration**: Fixed profile picture display issues (backend column mismatch) and added a default avatar fallback.
 - **Enhanced Comments**: Comments now display clickable full names that link to user profiles.
 
+## Recent Major Changes (March 2026)
+
+### ✅ Admin Command Center Expansion
+- **Grades Management**: Added `GradesAdmin.jsx` form to manually insert or fetch/update existing student grades via Upsert.
+- **Subjects Management**: Added full management for the new `matieres` table mapping subjects and credits.
+- **Excel Bulk Import**: Interfaced `xlsx` for mass uploading of grades. Groups related sub-columns automatically, maps indices dynamically, and ignores empty rows.
+
+### ✅ Database and Schema Evolution
+- **Consolidated Notes Tables**: Eliminated the redundant Rattrapage tables (`notes_s1_r`, etc.) and collapsed all retrieval logic into the core `notes_sX` tables.
+- **Strict Constraints**: Declared `Matricule` as absolute `PRIMARY KEY` on all `notes_*` tables—this powers the new MySQL `.ON DUPLICATE KEY UPDATE` (Upsert) capabilities.
+- **Department Normalizations**: Renamed "DSI" to "SPEC" across the DB, logic, and frontend mocking. Renamed "PT" to dynamically parse "Dept" within S3 and S4 endpoints.
+
+### ✅ Infrastructure Stabilization
+- **Chatbot Removal**: Completely decommissioned and removed `SupBot` / Chatbot UI patterns from the system.
+- **CORS Hardening**: Moved routing strictly behind `index.php` as a router to prevent PHP internal errors from dropping critical preflight / CORS headers on API requests.
+
 ## Current Project State
 
 ### Completed Features

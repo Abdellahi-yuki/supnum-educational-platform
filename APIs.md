@@ -142,3 +142,18 @@ This document outlines the API endpoints required for the unified messaging syst
         }
       }
       ```
+
+## 6. Admin Service (`/admin`)
+- `GET /admin/grades.php`: Fetch existing grade data.
+    - Query Params:
+        - `semester`: (1, 2, 3, 4, etc.)
+        - `matricule`: (optional string filter)
+    - Response: `[{ Matricule, CODE1, CODE2, MOY_General, ... }]`
+- `POST /admin/grades.php`: Manually insert or update a grade record (Upsert).
+    - Body: `{ action: "add", semester, data: { Matricule, CODE1: score, ... } }`
+    - Response: `{ status, message }`
+- `POST /admin/grades.php` (Import): Bulk import via Excel parsed data.
+    - Body: `{ action: "import", semester, rows: [{ Matricule, CODE1: score, ... }, ...] }`
+- `GET /admin/matieres.php`: List all subjects from the `matieres` table.
+- `POST /admin/matieres.php`: Add or update a subject mapping.
+    - Body: `{ CODE, Intitule, Credits }`

@@ -18,7 +18,7 @@ import Landing from './pages/Landing/Landing';
 import RootSettings from './pages/Settings/RootSettings';
 import Timetable from './pages/Timetable/Timetable';
 import Quiz from './pages/Quiz/Quiz';
-import SupBot from './components/SupBot/SupBot';
+
 import './App.css';
 
 function AppContent() {
@@ -99,7 +99,7 @@ function AppContent() {
         </Routes>
       </div>
       {!isAuthPage && <Footer />}
-      {!isAuthPage && user && <SupBot />}
+
     </>
   );
 }

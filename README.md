@@ -12,6 +12,8 @@ The Supnum Educational Platform is a consolidated Single Page Application (SPA) 
 - **Community**: Real-time chat with 3-second polling and chunked media uploads.
 - **Archive**: Hierarchical repository for semesters, subjects, and academic materials.
 - **Results**: Academic performance tracking via matricule lookup.
+- **Admin Command Center**: Complete suite for managing subjects and executing Upserts on student grades.
+- **Bulk Importer**: High-performance Excel/CSV grade importer with auto-column mapping.
 
 ---
 
@@ -32,6 +34,7 @@ The platform implements a strict role-based access control system:
 - **Webmail Branching**: Implements a leaf-node strategy for a clean inbox and direct path traversal for isolated thread views.
 - **Chunked Uploads**: Robust handling of large media files (1MB chunks) in the Community module.
 - **Unified Routing**: Single-entry routing in `src/App.jsx` with centralized API configuration in `src/apiConfig.js`.
+- **Blockchain Dashboard**: Live, transparent display of recent donations validated using the Hedera Hashgraph (HCS).
 
 ---
 

@@ -411,7 +411,7 @@ const RootSettings = () => {
                     <i className="fas fa-archive"></i> Archive Control
                 </button>
                 <button className={`tab-btn ${activeTab === 'grades' ? 'active' : ''}`} onClick={() => setActiveTab('grades')}>
-                    <GraduationCap size={18} /> Grades & Subjects
+                    <GraduationCap size={18} /> Notes & Matières
                 </button>
                 <button className={`tab-btn ${activeTab === 'mailing-lists' ? 'active' : ''}`} onClick={() => setActiveTab('mailing-lists')}>
                     <Mail size={18} /> Listes de Diffusion
