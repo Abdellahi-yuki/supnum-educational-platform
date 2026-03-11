@@ -26,7 +26,7 @@
 .mini-tabs {
     display: flex;
     gap: 0.5rem;
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--glass-bg-hover);
     padding: 0.3rem;
     border-radius: 12px;
 }
@@ -44,20 +44,28 @@
 }
 
 .mini-tab.active {
-    background: #fff;
-    color: var(--primary-blue);
+    background: var(--primary-blue);
+    color: white;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] .mini-tab.active {
+    background: var(--primary-blue);
 }
 
 .mini-select {
     padding: 0.5rem 1rem;
     border-radius: 12px;
     border: 1px solid var(--glass-border);
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--glass-bg-hover);
     font-weight: 700;
-    color: var(--gray-700);
+    color: var(--p-text-main);
     cursor: pointer;
     font-family: inherit;
+}
+
+[data-theme='dark'] .mini-select {
+    background: rgba(15, 23, 42, 0.6);
 }
 
 .admin-grid-container {

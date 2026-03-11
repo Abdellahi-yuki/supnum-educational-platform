@@ -27,7 +27,7 @@
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--glass-bg-hover);
   padding: 0.5rem;
   border-radius: 12px;
   width: fit-content;
@@ -69,7 +69,7 @@
 }
 
 .import-zone {
-  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border: 2px dashed var(--glass-border);
   border-radius: 20px;
   padding: 3rem;
   text-align: center;
@@ -79,7 +79,7 @@
 
 .import-zone:hover {
   border-color: var(--primary-blue);
-  background: rgba(59, 130, 246, 0.05);
+  background: var(--glass-bg-hover);
 }
 
 .mapping-table {
@@ -88,20 +88,25 @@
   margin-top: 1.5rem;
 }
 
-.mapping-table th, .mapping-table td {
+.mapping-table th,
+.mapping-table td {
   padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .mapping-input {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--glass-bg-hover);
+  border: 1px solid var(--glass-border);
+  color: var(--p-text-main);
   padding: 0.5rem;
   border-radius: 6px;
   width: 60px;
   text-align: center;
+}
+
+[data-theme='dark'] .mapping-input {
+  background: rgba(15, 23, 42, 0.6);
 }
 
 .import-stats {
@@ -109,8 +114,13 @@
   gap: 2rem;
   margin-top: 2rem;
   padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--glass-bg-hover);
   border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+[data-theme='dark'] .import-stats {
+  background: rgba(15, 23, 42, 0.4);
 }
 
 .stat-item {
@@ -151,11 +161,11 @@
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
+  background: var(--glass-bg-light);
+  color: var(--p-text-main);
   padding: 0.8rem 1.5rem;
   border-radius: 10px;
-  border: none;
+  border: 1px solid var(--glass-border);
   font-weight: 600;
   cursor: pointer;
 }

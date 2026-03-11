@@ -366,12 +366,17 @@ body {
 .input-glass:focus,
 .auth-input:focus {
     outline: none;
-    background: rgba(248, 248, 248, 0.8);
+    background: var(--glass-bg-hover);
     border-color: var(--primary-blue);
     box-shadow:
         0 10px 25px -5px rgba(37, 99, 235, 0.15),
         0 0 0 1px var(--primary-blue);
     transform: translateY(-2px);
+}
+
+[data-theme='dark'] select.auth-input {
+    background-color: #1e293b;
+    color: var(--p-text-main);
 }
 
 /* Auth Pages Standard Layout */

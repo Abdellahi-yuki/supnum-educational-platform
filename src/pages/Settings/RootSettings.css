@@ -27,6 +27,16 @@
 }
 
 /* Tabs */
+.new-list-form {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    background: var(--glass-bg-hover);
+    padding: 1.5rem;
+    border-radius: 15px;
+    border: 1px solid var(--glass-border);
+}
+
 .settings-tabs {
     display: flex;
     gap: 1rem;
@@ -124,6 +134,11 @@
 .role-badge.root {
     background: rgba(168, 85, 247, 0.2);
     color: #a855f7;
+}
+
+[data-theme='dark'] .role-badge.root {
+    background: rgba(168, 85, 247, 0.3);
+    color: #c084fc;
 }
 
 .role-badge.admin {
@@ -277,7 +292,7 @@
 }
 
 .modal-content {
-    background:white;
+    background: var(--glass-bg-light);
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(20px);
     border-radius: 20px;
@@ -287,6 +302,12 @@
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    color: var(--p-text-main);
+}
+
+[data-theme='dark'] .modal-content {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 .modal-close {
@@ -303,7 +324,7 @@
 }
 
 .modal-close:hover {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--glass-bg-hover);
     color: var(--p-text-main);
 }
 

@@ -285,9 +285,9 @@
    BUTTONS
    ============================================ */
 .archive-container .back-button {
-  background: white;
+  background: var(--glass-bg-light);
   color: var(--primary-blue);
-  border: 1px solid rgba(28, 53, 134, 0.2);
+  border: 1px solid var(--glass-border);
   padding: 10px 20px;
   border-radius: 14px;
   cursor: pointer;
@@ -297,6 +297,11 @@
   gap: 8px;
   margin-bottom: 1.5rem;
   transition: all 0.3s ease;
+}
+
+[data-theme='dark'] .archive-container .back-button {
+  background: rgba(30, 41, 59, 0.8);
+  color: var(--primary-blue);
 }
 
 .archive-container .back-button:hover {
@@ -343,7 +348,7 @@
   gap: var(--spacing-md);
   justify-content: center;
   flex-wrap: wrap;
-  width: clamp(40px,100%,350px);
+  width: clamp(40px, 100%, 350px);
 }
 
 
@@ -548,11 +553,16 @@
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-sm);
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--glass-bg-light);
   backdrop-filter: blur(10px);
   border-radius: var(--radius-full);
   width: fit-content;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--glass-border);
+}
+
+[data-theme='dark'] .archive-container .admin-top-nav {
+  background: rgba(30, 41, 59, 0.8);
 }
 
 .archive-container .nav-pill {
@@ -1218,7 +1228,8 @@
 }
 
 .archive-container .toast {
-  background: white;
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: var(--spacing-md) var(--spacing-lg);
   box-shadow: var(--shadow-xl);
@@ -1407,9 +1418,19 @@
   font-size: var(--font-size-xs);
 }
 
+[data-theme='dark'] .archive-container .path-instruction {
+  background: rgba(146, 64, 14, 0.2);
+  border-color: #92400e;
+  color: #fef3c7;
+}
+
 .archive-container .path-instruction strong {
   color: #78350f;
   font-family: 'Courier New', monospace;
+}
+
+[data-theme='dark'] .archive-container .path-instruction strong {
+  color: #fcd34d;
 }
 
 /* Responsive adjustments for upload */
@@ -1518,7 +1539,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--glass-bg-light);
     backdrop-filter: blur(10px);
     padding: var(--spacing-xs) var(--spacing-md);
     justify-content: space-around;
@@ -1527,6 +1548,10 @@
     z-index: 1000;
     box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
     padding-bottom: max(var(--spacing-xs), env(safe-area-inset-bottom));
+  }
+
+  [data-theme='dark'] .archive-container .admin-bottom-nav {
+    background: rgba(30, 41, 59, 0.95);
   }
 
   .archive-container .bottom-nav-item {

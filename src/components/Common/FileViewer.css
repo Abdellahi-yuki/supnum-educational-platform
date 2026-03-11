@@ -29,12 +29,15 @@
 /* ------- Custom Dark Header ------- */
 .fv-header {
     width: 100%;
+    height: 72px;
+    /* Fixed height for reliable child positioning */
     padding: 16px 32px;
     background: #161111;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 100001;
+    z-index: 100010;
+    /* Slightly higher */
     flex-shrink: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -92,7 +95,8 @@
 .fv-body {
     flex: 1;
     width: 100%;
-    background: rgba(9, 9, 11, 0.1);
+    background: #525659;
+    /* Standard PDF viewer dark grey background */
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -100,26 +104,26 @@
     overflow: auto;
     position: relative;
     scrollbar-gutter: stable;
+    padding: 40px 0;
+    /* Add some space at top and bottom */
 }
 
 /* ------- Centered A4 DocViewer Container ------- */
 .fv-viewer-container {
     width: fit-content;
     min-width: 60vw;
-    /* A4 Width */
-    /* min-height: 297mm; */
-    /* A4 Height */
-    background: #ffffff;
+    background: transparent;
+    /* Changed from white to transparent to let page shadows work */
     position: relative;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
     cursor: default;
-    margin: auto;
+    margin: 0 auto;
     animation: fvDocSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     flex-shrink: 0;
     border-radius: 4px;
     overflow: visible;
+    /* Reverting to visible to allow sticky headers to work correctly inside the scrollable body if needed */
 }
 
 @keyframes fvDocSlideUp {
@@ -136,18 +140,23 @@
 
 /* ------- Library Overrides for Better Aesthetic ------- */
 #react-doc-viewer {
-    background-color: #ffffff !important;
+    background-color: transparent !important;
     overflow: visible !important;
+    flex: 1;
 }
 
 #proxy-renderer {
-    background-color: #ffffff !important;
+    background-color: transparent !important;
 }
 
 /* Fix for PDF reader background */
 .pdf-reader-container {
-    background-color: #ffffff !important;
+    background-color: transparent !important;
     overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* Gap between pages */
 }
 
 /* Hide library's default header if it leaks */
@@ -157,9 +166,15 @@
 
 /* PDF Page specific overrides */
 .react-pdf__Page {
-    margin: 0 auto !important;
+    margin: 0 auto 12px auto !important;
+    /* Bottom margin for separation */
     background: white !important;
-    box-shadow: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    /* Add shadow to individual pages */
+}
+
+.react-pdf__Page:last-child {
+    margin-bottom: 0 !important;
 }
 
 .react-pdf__Page__canvas {
@@ -175,9 +190,25 @@
 /* Style the internal PDF Controls (Zoom/Nav/Download) */
 #pdf-controls {
     justify-content: center !important;
-    padding: 12px 0 20px 0 !important;
-    gap: 8px !important;
+    padding: 10px 24px !important;
+    gap: 12px !important;
     background-color: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+    position: fixed !important;
+    /* Fixed at the top */
+    top: 72px !important;
+    /* Exactly below header height (72px) */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 100005 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    width: fit-content !important;
+    min-width: 320px !important;
+    border-radius: 0 0 16px 16px !important;
+    /* Elegant bottom rounding */
+    display: flex !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-top: none !important;
 }
 
 #pdf-controls button,

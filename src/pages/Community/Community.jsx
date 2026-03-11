@@ -465,27 +465,13 @@ const Community = ({ user }) => {
             <button
                 className="mobile-menu-btn"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                style={{
-                    position: 'absolute',
-                    top: '1rem',
-                    left: '1rem',
-                    zIndex: 1001,
-                    background: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '0.75rem',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    cursor: 'pointer',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
             >
                 {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
 
             {/* Sidebar */}
             <div className={`whatsapp-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
-                <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                <div className="sidebar-header-wrapper">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary-blue)' }}>Publications</h2>
                         <div style={{ position: 'relative' }}>
@@ -583,7 +569,7 @@ const Community = ({ user }) => {
             {/* Chat Area */}
             <div className="whatsapp-chat">
                 {/* Chat Header */}
-                <div id='whatsapp-chat-header' style={{ padding: '1.2rem 2.5rem', background: 'white', borderBottom: '1px solid rgba(0,0,0,0.05)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', boxShadow: '0 4px 10px rgba(0,0,0,0.02)', position: 'relative' }}>
+                <div id='whatsapp-chat-header'>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', paddingLeft: window.innerWidth <= 768 ? '3rem' : '0' }}>
 
                         <div style={{ width: '48px', height: '48px', borderRadius: '15px', background: showMembersList ? 'var(--primary-green)' : (showOnlySaved ? 'var(--primary-blue)' : 'var(--primary-blue)'), color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
@@ -622,55 +608,20 @@ const Community = ({ user }) => {
                 <div className="chat-messages-area">
                     {/* Members List View */}
                     {showMembersList ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div className="member-list-wrapper">
                             {members.map(member => (
-                                <div key={member.id} style={{
-                                    background: 'white',
-                                    padding: '1.2rem 1.5rem',
-                                    borderRadius: '16px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '1rem',
-                                    cursor: 'pointer',
-                                    border: '1px solid rgba(0,0,0,0.05)',
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-                                    transition: 'transform 0.2s, box-shadow 0.2s'
-                                }}
-                                    onClick={() => handleUserClick(member.id)}
-                                    onMouseOver={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                        e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.08)';
-                                    }}
-                                    onMouseOut={(e) => {
-                                        e.currentTarget.style.transform = 'translateY(0)';
-                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.03)';
-                                    }}>
-                                    <div style={{
-                                        width: '50px',
-                                        height: '50px',
-                                        borderRadius: '14px',
-                                        background: member.is_active ? 'var(--primary-blue)' : '#e5e7eb',
-                                        overflow: 'hidden',
-                                        flexShrink: 0,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        position: 'relative'
-                                    }}>
+                                <div key={member.id} className="member-card" onClick={() => handleUserClick(member.id)}>
+                                    <div className={`member-avatar-box ${member.is_active ? 'active' : ''}`}>
                                         {member.profile_path ? (
                                             <img src={`${FILE_BASE_URL}${member.profile_path}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         ) : (
-                                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                <User size={24} color={member.is_active ? 'white' : 'var(--gray-600)'} />
-                                            </div>
+                                            <User size={24} color={member.is_active ? 'white' : 'var(--p-text-dim)'} />
                                         )}
-                                        {member.is_active && (
-                                            <div style={{ position: 'absolute', bottom: '2px', right: '2px', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--primary-green)', border: '2px solid white' }}></div>
-                                        )}
+                                        {member.is_active && <div className="online-indicator"></div>}
                                     </div>
                                     <div style={{ flex: 1 }}>
-                                        <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, marginBottom: '2px' }}>{member.full_name || member.username}</h4>
-                                        <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', margin: 0 }}>
+                                        <h4 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, marginBottom: '2px', color: 'inherit' }}>{member.full_name || member.username}</h4>
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--p-text-dim)', margin: 0 }}>
                                             {member.message_count} message{member.message_count !== 1 ? 's' : ''}
                                             {member.is_active && <span style={{ color: 'var(--primary-green)', marginLeft: '0.5rem', fontWeight: 600 }}>• Actif</span>}
                                         </p>
@@ -681,11 +632,11 @@ const Community = ({ user }) => {
                     ) : loading ? (
                         <div style={{ margin: 'auto' }}><Loader2 className="animate-spin" size={48} color="var(--primary-blue)" /></div>
                     ) : messages.length === 0 && polls.length === 0 ? (
-                        <div style={{ margin: 'auto', textAlign: 'center', color: 'var(--gray-400)' }}>
-                            <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(0,0,0,0.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                        <div className="empty-state-view">
+                            <div className="empty-state-icon-box">
                                 <MessageSquare size={48} style={{ opacity: 0.2 }} />
                             </div>
-                            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--gray-600)' }}>Pas encore de messages</h3>
+                            <h3>Pas encore de messages</h3>
                             <p>Envoyez le premier message pour lancer la discussion !</p>
                         </div>
                     ) : (
@@ -728,7 +679,7 @@ const Community = ({ user }) => {
                                             </div>
 
                                             {/* Question */}
-                                            <h4 style={{ fontSize: '1.1rem', fontWeight: 800, margin: '0 0 1.2rem', color: '#1f2937', lineHeight: 1.4 }}>{poll.question}</h4>
+                                            <h4 style={{ fontSize: '1.1rem', fontWeight: 800, margin: '0 0 1.2rem', lineHeight: 1.4 }}>{poll.question}</h4>
 
                                             {/* Options */}
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
@@ -1364,13 +1315,13 @@ const Community = ({ user }) => {
                 {/* ── Poll Delete Modal ─────────────────────────────────── */}
                 {showPollDeleteModal && (
                     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowPollDeleteModal(false)}>
-                        <div style={{ background: 'white', padding: '2rem', borderRadius: '20px', width: '90%', maxWidth: '400px', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
-                            <div style={{ width: '60px', height: '60px', background: '#fee2e2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', color: '#ef4444' }}><Trash2 size={30} /></div>
+                        <div className="community-modal" onClick={e => e.stopPropagation()}>
+                            <div className="modal-icon-box"><Trash2 size={30} /></div>
                             <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.5rem' }}>Supprimer le sondage ?</h3>
-                            <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>Cette action est irréversible.</p>
+                            <p style={{ color: 'var(--p-text-dim)', marginBottom: '1.5rem' }}>Cette action est irréversible.</p>
                             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                                <button onClick={() => setShowPollDeleteModal(false)} style={{ padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 600, background: '#f3f4f6', color: '#4b5563', border: 'none', cursor: 'pointer' }}>Annuler</button>
-                                <button onClick={handleDeletePoll} style={{ padding: '0.75rem 1.5rem', borderRadius: '12px', fontWeight: 600, background: '#ef4444', color: 'white', border: 'none', cursor: 'pointer', boxShadow: '0 4px 12px rgba(239,68,68,0.3)' }}>Supprimer</button>
+                                <button onClick={() => setShowPollDeleteModal(false)} className="btn-cancel">Annuler</button>
+                                <button onClick={handleDeletePoll} className="btn-danger-action">Supprimer</button>
                             </div>
                         </div>
                     </div>
@@ -1378,73 +1329,14 @@ const Community = ({ user }) => {
 
                 {/* Custom Delete Confirmation Modal */}
                 {showDeleteModal && (
-                    <div style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'rgba(0,0,0,0.5)',
-                        backdropFilter: 'blur(5px)',
-                        zIndex: 9999,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }} onClick={() => setShowDeleteModal(false)}>
-                        <div style={{
-                            background: 'white',
-                            padding: '2rem',
-                            borderRadius: '20px',
-                            width: '90%',
-                            maxWidth: '400px',
-                            textAlign: 'center',
-                            boxShadow: '0 20px 60px rgba(0,0,0,0.2)'
-                        }} onClick={e => e.stopPropagation()}>
-                            <div style={{
-                                width: '60px',
-                                height: '60px',
-                                background: '#fee2e2',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 1rem',
-                                color: '#ef4444'
-                            }}>
-                                <Trash2 size={30} />
-                            </div>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.5rem', color: '#1f2937' }}>Supprimer le message ?</h3>
-                            <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>Cette action est irréversible. Êtes-vous sûr de vouloir continuer ?</p>
+                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowDeleteModal(false)}>
+                        <div className="community-modal" onClick={e => e.stopPropagation()}>
+                            <div className="modal-icon-box"><Trash2 size={30} /></div>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.5rem' }}>Supprimer le message ?</h3>
+                            <p style={{ color: 'var(--p-text-dim)', marginBottom: '1.5rem' }}>Cette action est irréversible.</p>
                             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                                <button
-                                    onClick={() => setShowDeleteModal(false)}
-                                    style={{
-                                        padding: '0.75rem 1.5rem',
-                                        borderRadius: '12px',
-                                        fontWeight: 600,
-                                        background: '#f3f4f6',
-                                        color: '#4b5563',
-                                        border: 'none',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    Annuler
-                                </button>
-                                <button
-                                    onClick={handleDeleteMessage}
-                                    style={{
-                                        padding: '0.75rem 1.5rem',
-                                        borderRadius: '12px',
-                                        fontWeight: 600,
-                                        background: '#ef4444',
-                                        color: 'white',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
-                                    }}
-                                >
-                                    Supprimer
-                                </button>
+                                <button onClick={() => setShowDeleteModal(false)} className="btn-cancel">Annuler</button>
+                                <button onClick={handleDeleteMessage} className="btn-danger-action">Supprimer</button>
                             </div>
                         </div>
                     </div>

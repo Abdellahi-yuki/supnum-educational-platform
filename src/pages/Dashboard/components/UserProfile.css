@@ -1,0 +1,316 @@
+/* UserProfile.css - Theme-aware User Profile Styling */
+
+.user-profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: calc(100vh - 120px);
+    animation: fadeIn 0.5s ease;
+}
+
+/* Header with back button */
+.profile-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+    background: var(--glass-bg-light);
+    padding: 0.8rem 1.5rem;
+    border-radius: 16px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, background 0.2s;
+    cursor: pointer;
+    border: 1px solid var(--glass-border);
+}
+
+.profile-back-btn:hover {
+    transform: translateX(-5px);
+    background: var(--glass-bg-hover);
+}
+
+/* Profile Card */
+.profile-main-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border-radius: 32px;
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 2.5rem;
+    color: var(--p-text-main);
+}
+
+[data-theme='dark'] .profile-main-card {
+    background: rgba(30, 41, 59, 0.4);
+}
+
+.profile-card-inner {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-header-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+/* Avatar */
+.profile-avatar-wrapper {
+    width: 140px;
+    height: 140px;
+    border-radius: 30px;
+    background: var(--glass-bg-light);
+    padding: 6px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--glass-border);
+}
+
+.profile-avatar-box {
+    width: 100%;
+    height: 100%;
+    border-radius: 24px;
+    background: var(--primary-blue);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: white;
+}
+
+/* Action Buttons */
+.profile-message-btn {
+    margin-bottom: 1rem;
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(46, 171, 78, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: all 0.2s;
+}
+
+.profile-message-btn:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.1);
+}
+
+.profile-info {
+    margin-top: 1.5rem;
+}
+
+.profile-username {
+    font-size: 2.8rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: var(--p-text-main);
+    letter-spacing: -0.02em;
+}
+
+.profile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.profile-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--p-text-dim);
+    background: var(--glass-bg-hover);
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    font-weight: 600;
+}
+
+/* Stats Grid */
+.profile-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.profile-stat-item {
+    padding: 2.5rem 2rem;
+    border-radius: 24px;
+    text-align: center;
+    border: 1px solid var(--glass-border);
+    transition: transform 0.3s;
+}
+
+.profile-stat-item:hover {
+    transform: translateY(-5px);
+}
+
+.profile-stat-item.messages {
+    background: linear-gradient(135deg, rgba(28, 53, 134, 0.08) 0%, rgba(28, 53, 134, 0.02) 100%);
+    border-color: rgba(28, 53, 134, 0.15);
+}
+
+.profile-stat-item.comments {
+    background: linear-gradient(135deg, rgba(46, 171, 78, 0.08) 0%, rgba(46, 171, 78, 0.02) 100%);
+    border-color: rgba(46, 171, 78, 0.15);
+}
+
+.stat-value {
+    font-size: 3.5rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.stat-value.blue {
+    color: var(--primary-blue);
+}
+
+.stat-value.green {
+    color: var(--primary-green);
+}
+
+.stat-label {
+    font-size: 0.95rem;
+    color: var(--p-text-dim);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Recent Messages Section */
+.profile-messages-section {
+    background: var(--glass-bg);
+    backdrop-filter: blur(30px);
+    border-radius: 32px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--glass-border);
+    color: var(--p-text-main);
+}
+
+[data-theme='dark'] .profile-messages-section {
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.section-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.title-icon-box {
+    background: var(--glass-bg-hover);
+    padding: 12px;
+    border-radius: 16px;
+    color: var(--primary-blue);
+    border: 1px solid var(--glass-border);
+}
+
+/* Empty State */
+.profile-empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--glass-bg-light);
+    border-radius: 24px;
+    border: 2px dashed var(--glass-border);
+}
+
+.empty-state-text {
+    color: var(--p-text-dim);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Message Card */
+.profile-msg-card {
+    background: var(--glass-bg-light);
+    padding: 2rem;
+    border-radius: 24px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+[data-theme='dark'] .profile-msg-card {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.profile-msg-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    background: var(--glass-bg-hover);
+}
+
+.msg-media-wrapper {
+    margin-bottom: 1.5rem;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--glass-bg-hover);
+    border: 1px solid var(--glass-border);
+}
+
+.msg-content {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    color: var(--p-text-main);
+    font-weight: 500;
+}
+
+.msg-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--glass-border);
+    color: var(--p-text-dim);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.msg-comments-count {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-blue);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
