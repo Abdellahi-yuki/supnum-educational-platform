@@ -4,7 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import { API_BASE_URL } from '../../apiConfig';
 import ArchiveAdmin from './components/ArchiveAdmin';
 import TimetableAdmin from './components/TimetableAdmin';
-import { UserPlus, X, Ban, Mail, Users, Plus, Trash2, UserMinus, Search, Calendar } from 'lucide-react';
+import GradesAdmin from './components/GradesAdmin';
+import { UserPlus, X, Ban, Mail, Users, Plus, Trash2, UserMinus, Search, Calendar, GraduationCap } from 'lucide-react';
 import './RootSettings.css';
 
 const RootSettings = () => {
@@ -409,6 +410,9 @@ const RootSettings = () => {
                 <button className={`tab-btn ${activeTab === 'archive' ? 'active' : ''}`} onClick={() => setActiveTab('archive')}>
                     <i className="fas fa-archive"></i> Archive Control
                 </button>
+                <button className={`tab-btn ${activeTab === 'grades' ? 'active' : ''}`} onClick={() => setActiveTab('grades')}>
+                    <GraduationCap size={18} /> Grades & Subjects
+                </button>
                 <button className={`tab-btn ${activeTab === 'mailing-lists' ? 'active' : ''}`} onClick={() => setActiveTab('mailing-lists')}>
                     <Mail size={18} /> Listes de Diffusion
                 </button>
@@ -612,6 +616,11 @@ const RootSettings = () => {
                 {activeTab === 'timetable' && (
                     <div className="settings-section" style={{ padding: 0, background: 'transparent', boxShadow: 'none', border: 'none' }}>
                         <TimetableAdmin />
+                    </div>
+                )}
+                {activeTab === 'grades' && (
+                    <div className="settings-section" style={{ padding: 0, background: 'transparent', boxShadow: 'none', border: 'none' }}>
+                        <GradesAdmin />
                     </div>
                 )}
             </div>
