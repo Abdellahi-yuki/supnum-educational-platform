@@ -189,6 +189,13 @@ const Community = ({ user }) => {
             alert('Vous devez être connecté pour voter.');
             return;
         }
+
+        // Check if we already voted for this specific option
+        const currentPoll = polls.find(p => p.id === pollId);
+        if (currentPoll && currentPoll.user_vote === optionId) {
+            return;
+        }
+
         try {
             await fetch(`${API_BASE_URL}/community_polls.php`, {
                 method: 'POST',
@@ -689,10 +696,9 @@ const Community = ({ user }) => {
                                                     return (
                                                         <button
                                                             key={opt.id}
-                                                            onClick={() => !hasVoted && handleVotePoll(poll.id, opt.id)}
-                                                            disabled={hasVoted}
+                                                            onClick={() => handleVotePoll(poll.id, opt.id)}
                                                             className={`poll-option-btn${isMyVote ? ' voted' : ''}`}
-                                                            style={{ cursor: hasVoted ? 'default' : 'pointer' }}
+                                                            style={{ cursor: 'pointer' }}
                                                         >
                                                             <div className="poll-option-bar" style={{ width: hasVoted ? `${pct}%` : '0%' }} />
                                                             <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
@@ -713,7 +719,7 @@ const Community = ({ user }) => {
 
                                             {/* Footer */}
                                             <p style={{ margin: '1rem 0 0', fontSize: '0.8rem', color: 'var(--gray-400)', fontWeight: 600 }}>
-                                                {poll.total_votes} vote{poll.total_votes !== 1 ? 's' : ''}{hasVoted ? ' • Vous avez voté' : ' • Cliquez pour voter'}
+                                                {poll.total_votes} vote{poll.total_votes !== 1 ? 's' : ''}{hasVoted ? ' • Vous avez voté (cliquez pour changer)' : ' • Cliquez pour voter'}
                                             </p>
                                         </div>
                                     );
