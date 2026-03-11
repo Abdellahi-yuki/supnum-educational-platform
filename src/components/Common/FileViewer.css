@@ -1,206 +1,294 @@
-.file-viewer-overlay {
+/* ======= CENTERING A4 DOC-VIEWER LAYOUT (CLEAN) ======= */
+
+.fv-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.file-viewer-content {
-    background: var(--p-bg-paper, #ffffff);
-    width: 100%;
-    max-width: 1000px;
-    height: 90vh;
-    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 99999;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fvFadeIn 0.25s ease-out;
 }
 
-.file-viewer-header {
-    padding: 16px 24px;
-    background: var(--p-bg-header, #f8fafc);
-    border-bottom: 1px solid var(--p-border, #e2e8f0);
+@keyframes fvFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ------- Custom Dark Header ------- */
+.fv-header {
+    width: 100%;
+    padding: 16px 32px;
+    background: #161111;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    z-index: 100001;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.file-info {
+.fv-info {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: var(--p-text, #1e293b);
+    color: #ffffff;
 }
 
-.filename {
-    font-weight: 600;
-    font-size: 1.1rem;
-    max-width: 400px;
+.fv-filename {
+    font-weight: 650;
+    font-size: 0.95rem;
+    max-width: 450px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    letter-spacing: -0.01em;
+    opacity: 0.9;
 }
 
-.viewer-actions {
+.fv-actions {
     display: flex;
-    gap: 8px;
+    gap: 12px;
+    align-items: center;
 }
 
-.btn-action, .btn-close {
-    background: transparent;
-    border: none;
+.fv-btn,
+.fv-btn-close {
+    background: #221c1c;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     cursor: pointer;
-    padding: 8px;
-    border-radius: 8px;
-    transition: all 0.2s;
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--p-text-dim, #64748b);
+    color: #fdfdfd;
 }
 
-.btn-action:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--p-primary, #667eea);
+.fv-btn:hover {
+    background: #5e5e5e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.btn-close:hover {
-    background: #fee2e2;
-    color: #ef4444;
+.fv-btn-close:hover {
+    background: #de3232;
+    border-color: #ff5f5f;
 }
 
-.file-viewer-body {
+/* ------- The Translucent Backdrop ------- */
+.fv-body {
     flex: 1;
-    overflow-y: auto;
-    background: #f1f5f9;
+    width: 100%;
+    background: rgba(9, 9, 11, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    cursor: pointer;
+    overflow: auto;
+    position: relative;
+    scrollbar-gutter: stable;
+}
+
+/* ------- Centered A4 DocViewer Container ------- */
+.fv-viewer-container {
+    width: fit-content;
+    min-width: 60vw;
+    /* A4 Width */
+    /* min-height: 297mm; */
+    /* A4 Height */
+    background: #ffffff;
     position: relative;
     display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.pdf-viewer {
-    width: 100%;
-    height: 100%;
-    border: none;
-    background: white;
-}
-
-.image-container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
-    background-size: 20px 20px;
-}
-
-.image-container img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    border-radius: 4px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.text-viewer {
-    width: 100%;
-    height: 100%;
-    background: #1e293b;
-    color: #e2e8f0;
-    padding: 24px;
-    overflow: auto;
-}
-
-.text-viewer pre {
-    margin: 0;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-.text-viewer code {
-    white-space: pre-wrap;
-    word-break: break-all;
-}
-
-.download-fallback {
-    text-align: center;
-    padding: 48px;
-    color: #64748b;
-}
-
-.btn-download {
-    margin-top: 24px;
-    background: #667eea;
-    color: white;
-    border: none;
-    padding: 12px 32px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
-}
-
-.btn-download:hover {
-    background: #5a67d8;
-    transform: translateY(-2px);
-}
-
-.loading-state, .error-state {
-    display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    color: #64748b;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
+    cursor: default;
+    margin: auto;
+    animation: fvDocSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+    border-radius: 4px;
+    overflow: visible;
 }
 
-.error-state {
-    color: #ef4444;
-    text-align: center;
+@keyframes fvDocSlideUp {
+    from {
+        transform: translateY(60px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
-.animate-spin {
-    animation: spin 1s linear infinite;
+/* ------- Library Overrides for Better Aesthetic ------- */
+#react-doc-viewer {
+    background-color: #ffffff !important;
+    overflow: visible !important;
 }
 
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+#proxy-renderer {
+    background-color: #ffffff !important;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+/* Fix for PDF reader background */
+.pdf-reader-container {
+    background-color: #ffffff !important;
+    overflow: visible !important;
 }
 
-.fade-in {
-    animation: fadeIn 0.3s ease-out;
+/* Hide library's default header if it leaks */
+#header-bar {
+    display: none !important;
 }
 
-/* Mobile adjustments */
-@media (max-width: 640px) {
-    .file-viewer-content {
-        height: 100%;
-        max-height: none;
+/* PDF Page specific overrides */
+.react-pdf__Page {
+    margin: 0 auto !important;
+    background: white !important;
+    box-shadow: none !important;
+}
+
+.react-pdf__Page__canvas {
+    margin: 0 auto !important;
+}
+
+/* Image Viewer specific overrides */
+#image-renderer {
+    max-width: 60vw !important;
+    margin: 0 auto !important;
+}
+
+/* Style the internal PDF Controls (Zoom/Nav/Download) */
+#pdf-controls {
+    justify-content: center !important;
+    padding: 12px 0 20px 0 !important;
+    gap: 8px !important;
+    background-color: #ffffff !important;
+}
+
+#pdf-controls button,
+#pdf-controls a {
+    background: #ffffff !important;
+    /* White background */
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    /* Slightly darker border for contrast on white */
+    cursor: pointer !important;
+    padding: 0 !important;
+    border-radius: 10px !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #000000 !important;
+    /* Black text */
+    font-family: inherit !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+}
+
+#pdf-controls button:hover,
+#pdf-controls a:hover {
+    background: #f4f4f5 !important;
+    /* Very light grey hover on white background */
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+#pdf-controls button:disabled,
+#pdf-controls a:disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Fix span text in pdf controls if any */
+#pdf-controls span {
+    color: #111 !important;
+    font-weight: 600 !important;
+    margin: 0 8px !important;
+}
+
+/* ------- Custom Excel Fallback Styling ------- */
+.fv-excel-container {
+    width: 100%;
+    height: 100%;
+    min-height: 297mm;
+    background: #ffffff;
+    overflow: auto;
+    padding: 20px;
+}
+
+.fv-excel-table table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.fv-excel-table th,
+.fv-excel-table td {
+    border: 1px solid #e2e8f0;
+    padding: 8px 12px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.fv-excel-table th {
+    background-color: #f8fafc;
+    font-weight: 600;
+}
+
+.fv-excel-table tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+/* ------- Custom Text Fallback Styling ------- */
+.fv-text-container {
+    width: 100%;
+    height: 100%;
+    min-height: 297mm;
+    background: #ffffff;
+    overflow: auto;
+    padding: 60px 80px;
+}
+
+.fv-text-content {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #111;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Mobile responsive */
+@media (max-width: 900px) {
+    .fv-header {
+        padding: 12px 20px;
+    }
+
+    .fv-viewer-container {
+        width: 100%;
+        min-height: calc(100vh - 80px);
+        margin: 0;
         border-radius: 0;
-    }
-    .file-viewer-overlay {
-        padding: 0;
-    }
-    .filename {
-        max-width: 200px;
     }
 }

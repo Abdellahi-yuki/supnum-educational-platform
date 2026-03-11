@@ -1,161 +1,199 @@
-import React, { useState, useEffect } from 'react';
-import { X, Download, File, Loader2 } from 'lucide-react';
-import { API_BASE_URL, FILE_BASE_URL } from '../../apiConfig';
+import React, { useMemo } from 'react';
+import { X, Download, File } from 'lucide-react';
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+import { FILE_BASE_URL } from '../../apiConfig';
+import * as XLSX from 'xlsx';
+
+// Fix for PDF warnings
+import "react-pdf/dist/esm/Page/AnnotationLayer.css";
+import "react-pdf/dist/esm/Page/TextLayer.css";
+
 import './FileViewer.css';
 
 /**
  * FileViewer Component
+ * Refined for clean @cyntler/react-doc-viewer integration.
  * @param {Object} file - The file object containing nom and chemin_fichier
  * @param {Function} onClose - Callback to close the viewer
  */
 const FileViewer = ({ file, onClose }) => {
-    const [content, setContent] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [excelData, setExcelData] = React.useState(null);
+    const [isExcel, setIsExcel] = React.useState(false);
+    const [loadingExcel, setLoadingExcel] = React.useState(false);
+
+    const [textContent, setTextContent] = React.useState(null);
+    const [isTextFallback, setIsTextFallback] = React.useState(false);
+    const [loadingText, setLoadingText] = React.useState(false);
+    const [textError, setTextError] = React.useState(null);
 
     if (!file) return null;
 
-    // Construct full URL if it's a relative path starting with /uploads/ or /archives/
-    const rawPath = file.chemin_fichier || file.file_path || file.path || file.media_url || '';
+    // Construct full URL and set up docs for DocViewer
+    const docs = useMemo(() => {
+        const rawPath = file.chemin_fichier || file.file_path || file.path || file.media_url || '';
+        let filepath = '';
+        if (rawPath.startsWith('http')) {
+            filepath = rawPath;
+        } else if (rawPath.startsWith('/')) {
+            filepath = `${FILE_BASE_URL}${rawPath}`;
+        } else {
+            filepath = `${FILE_BASE_URL}/${rawPath}`;
+        }
 
-    let filepath = '';
-    if (rawPath.startsWith('http')) {
-        filepath = rawPath;
-    } else if (rawPath.startsWith('/')) {
-        // Absolute relative path (from domain root)
-        filepath = `${FILE_BASE_URL}${rawPath}`;
-    } else {
-        // Relative path
-        filepath = `${FILE_BASE_URL}/${rawPath}`;
-    }
+        const ext = filepath.split('.').pop().split('?')[0].toLowerCase();
 
-    const filename = file.nom || file.file_name || file.name || (rawPath.split('/').pop()) || 'document';
-    const extension = filepath.split('.').pop().split('?')[0].toLowerCase();
+        const docViewerSupported = ['bmp', 'csv', 'htm', 'html', 'jpg', 'jpeg', 'pdf', 'png', 'tiff', 'txt', 'mp4'];
 
-    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(extension);
-    const isPDF = extension === 'pdf';
-    const isText = ['txt', 'sql', 'html', 'css', 'js', 'json', 'py', 'php', 'md'].includes(extension);
+        if (ext === 'xlsx' || ext === 'xls') {
+            setIsExcel(true);
+        } else if (!docViewerSupported.includes(ext)) {
+            setIsTextFallback(true);
+        }
 
-    useEffect(() => {
-        const loadContent = async () => {
-            setLoading(true);
-            setError(null);
+        return [{
+            uri: filepath,
+            fileName: file.nom || file.file_name || file.name || (rawPath.split('/').pop()) || 'document',
+        }];
+    }, [file]);
+
+    // Handle Custom Excel Loading
+    React.useEffect(() => {
+        if (!isExcel) return;
+
+        const loadExcel = async () => {
+            setLoadingExcel(true);
             try {
-                if (filepath.includes('drive.google.com')) {
-                    window.open(filepath, "_blank");
-                    onClose();
-                    return;
-                }
+                const response = await fetch(docs[0].uri);
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
-                if (isPDF) {
-                    let embedUrl = filepath;
-                    if (filepath.includes('drive.google.com/file/d/')) {
-                        const fileId = filepath.match(/\/file\/d\/([a-zA-Z0-9-_]+)/)[1];
-                        embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-                    }
-                    setContent(
-                        <iframe
-                            src={embedUrl}
-                            className="pdf-viewer"
-                            title={filename}
-                        >
-                            <div className="viewer-fallback">
-                                <p>Impossible d'afficher le PDF dans le navigateur.</p>
-                                <a href={filepath} target="_blank" rel="noreferrer">Ouvrir dans un nouvel onglet</a>
-                            </div>
-                        </iframe>
-                    );
-                } else if (isImage) {
-                    setContent(
-                        <div className="image-container">
-                            <img src={filepath} alt={filename} />
-                        </div>
-                    );
-                } else if (isText) {
-                    const response = await fetch(filepath);
-                    if (!response.ok) throw new Error('Échec du chargement du contenu du fichier');
-                    const textContent = await response.text();
-                    setContent(
-                        <div className="text-viewer">
-                            <pre><code>{textContent}</code></pre>
-                        </div>
-                    );
-                } else {
-                    setContent(
-                        <div className="download-fallback">
-                            <File size={48} />
-                            <h3>Fichier {extension.toUpperCase()}</h3>
-                            <p>Ce type de fichier nécessite un téléchargement pour être visualisé.</p>
-                            <button
-                                onClick={() => downloadFile(filepath, filename)}
-                                className="btn-download"
-                            >
-                                📥 Télécharger le fichier
-                            </button>
-                        </div>
-                    );
-                }
+                // Get first sheet
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert to HTML table
+                const html = XLSX.utils.sheet_to_html(worksheet);
+                setExcelData(html);
             } catch (err) {
-                console.error('FileViewer Error:', err);
-                setError(err.message);
+                console.error("Error loading excel:", err);
+                setExcelData('<div style="padding:20px; color:red;">Erreur lors du chargement du fichier Excel.</div>');
             } finally {
-                setLoading(false);
+                setLoadingExcel(false);
             }
         };
 
-        if (file) {
-            loadContent();
-        }
-    }, [file, filepath, extension, isImage, isPDF, isText, filename, onClose]);
+        loadExcel();
+    }, [isExcel, docs]);
 
-    const downloadFile = (url, name) => {
+    // Handle Custom Text Fallback Loading
+    React.useEffect(() => {
+        if (!isTextFallback) return;
+
+        const loadText = async () => {
+            setLoadingText(true);
+            setTextError(null);
+            try {
+                const response = await fetch(docs[0].uri);
+                if (!response.ok) throw new Error("Erreur de téléchargement du fichier");
+                const text = await response.text();
+                setTextContent(text);
+            } catch (err) {
+                console.error("Error loading text fallback:", err);
+                setTextError("Impossible de charger l'aperçu du texte pour ce fichier.");
+            } finally {
+                setLoadingText(false);
+            }
+        };
+
+        loadText();
+    }, [isTextFallback, docs]);
+
+    const download = () => {
         const link = document.createElement('a');
-        link.href = url;
-        link.download = name;
+        link.href = docs[0].uri;
+        link.download = docs[0].fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     };
 
     return (
-        <div className="file-viewer-overlay" onClick={(e) => e.target.classList.contains('file-viewer-overlay') && onClose()}>
-            <div className="file-viewer-content fade-in">
-                <div className="file-viewer-header">
-                    <div className="file-info">
-                        <File size={18} />
-                        <span className="filename">{filename}</span>
-                    </div>
-                    <div className="viewer-actions">
-                        <button
-                            onClick={() => downloadFile(filepath, filename)}
-                            className="btn-action"
-                            title="Télécharger"
-                        >
-                            <Download size={18} />
-                        </button>
-                        <button
-                            onClick={onClose}
-                            className="btn-close"
-                            title="Fermer"
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
+        <div className="fv-overlay">
+            {/* Custom Theme Header */}
+            <header className="fv-header">
+                <div className="fv-info">
+                    <File size={18} />
+                    <span className="fv-filename">{docs[0].fileName}</span>
                 </div>
-                <div className="file-viewer-body">
-                    {loading ? (
-                        <div className="loading-state">
-                            <Loader2 className="animate-spin" />
-                            <span>Chargement du document...</span>
+                <div className="fv-actions">
+                    <button onClick={download} className="fv-btn" title="Télécharger">
+                        <Download size={20} />
+                    </button>
+                    <button onClick={onClose} className="fv-btn-close" title="Fermer">
+                        <X size={22} />
+                    </button>
+                </div>
+            </header>
+
+            {/* Backdrop Area */}
+            <div className="fv-body" onClick={onClose}>
+                {/* DocViewer Container */}
+                <div className="fv-viewer-container" onClick={(e) => e.stopPropagation()}>
+                    {isExcel ? (
+                        <div className="fv-excel-container">
+                            {loadingExcel ? (
+                                <div style={{ padding: '40px', textAlign: 'center' }}>Chargement d'Excel...</div>
+                            ) : (
+                                <div
+                                    className="fv-excel-table"
+                                    dangerouslySetInnerHTML={{ __html: excelData }}
+                                />
+                            )}
                         </div>
-                    ) : error ? (
-                        <div className="error-state">
-                            <p>Oups ! Une erreur est survenue lors du chargement.</p>
-                            <small>{error}</small>
-                            <button onClick={onClose} className="btn-primary">Retour</button>
+                    ) : isTextFallback ? (
+                        <div className="fv-text-container">
+                            {loadingText ? (
+                                <div style={{ padding: '40px', textAlign: 'center' }}>Chargement du texte...</div>
+                            ) : textError ? (
+                                <div style={{ padding: '40px', textAlign: 'center', color: '#de3232' }}>
+                                    <p>{textError}</p>
+                                    <br />
+                                    <button onClick={download} className="fv-btn" style={{ margin: '0 auto', background: '#fdfdfd', color: '#333' }}>
+                                        Télécharger le fichier
+                                    </button>
+                                </div>
+                            ) : (
+                                <pre className="fv-text-content">
+                                    <code>{textContent}</code>
+                                </pre>
+                            )}
                         </div>
                     ) : (
-                        content
+                        <DocViewer
+                            documents={docs}
+                            pluginRenderers={DocViewerRenderers}
+                            theme={{
+                                primary: "#1c3586",
+                                secondary: "#ffffff",
+                                tertiary: "#ffffff", // Force white background for header area
+                                textPrimary: "#18181b",
+                                textSecondary: "#71717a",
+                                textTertiary: "#94a3b8",
+                                disableThemeScrollbar: true,
+                            }}
+                            config={{
+                                header: {
+                                    disableHeader: true,
+                                    disableFileName: true,
+                                },
+                                pdfZoom: {
+                                    defaultZoom: 1.1,
+                                    zoomJump: 0.2,
+                                },
+                                pdfVerticalScrollByDefault: true,
+                            }}
+                            className="react-doc-viewer-custom"
+                        />
                     )}
                 </div>
             </div>

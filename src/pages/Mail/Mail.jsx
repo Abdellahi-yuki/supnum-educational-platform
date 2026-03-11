@@ -172,21 +172,28 @@ const Mail = () => {
             }
 
             if (selectedLabel === 'inbox') {
-                // Rule: Ignore all messages in thread excluding the leaf.
-                // Includes threads where leaf is sent by user.
                 if (!matchesSearch) return false;
 
-                // Only show leaves
+                // Maintain clean inbox by only showing the latest message (leaf) of a conversation thread
                 if (!isLeaf) return false;
 
-                // Ensure it's not trash/spam (already filtered by API 'inbox' usually, but good to check labels if mixed)
-                // The API 'inbox' returns is_trash=0, is_spam=0.
-                return true;
+                // Locally exclude messages marked as spam, trash, or archive
+                const labels = msg.labels || [];
+                if (labels.includes('spam') || labels.includes('trash') || labels.includes('archive')) {
+                    return false;
+                }
+
+                // Rule: (received) OR (has parent_id != 0, received or sent)
+                // Note: The API already ensures these are neither archived, spam, nor trash for 'inbox' label requests.
+                const isReceived = msg.sender_id !== undefined && Number(msg.sender_id) !== currentUserId;
+                const hasParent = Number(msg.parentId) !== 0;
+
+                return isReceived || hasParent;
             } else {
                 // Standard label filtering for other views (starred, etc.)
                 // For Starred, we might want to show individual starred messages, or starred threads.
                 // Let's stick to standard label check for now.
-                return msg.labels.includes(selectedLabel);
+                return (msg.labels || []).includes(selectedLabel);
             }
         });
     }, [messages, selectedLabel, searchQuery]);
