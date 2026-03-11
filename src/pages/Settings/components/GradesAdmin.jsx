@@ -5,7 +5,7 @@ import { API_BASE_URL } from '../../../apiConfig';
 import {
     LayoutDashboard, Plus, Upload, Database, Save,
     X, Trash2, Edit3, CheckCircle2, AlertCircle, FileSpreadsheet,
-    Loader2, ChevronRight
+    Loader2, ChevronRight, Search
 } from 'lucide-react';
 import './GradesAdmin.css';
 
@@ -15,15 +15,13 @@ const GradesAdmin = () => {
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
 
+    // Form/Search state
+    const [searchMatricule, setSearchMatricule] = useState('');
+    const [manualSemester, setManualSemester] = useState(1);
+
     // Manual Grade Form
-    const [gradeForm, setGradeForm] = useState({
-        semester: 1,
-        Matricule: '',
-        Dept: '',
-        Prenom: '',
-        Nom: '',
-        // Dynamic subject grades go here
-    });
+    const [manualData, setManualData] = useState({});
+    const [isManualExpanded, setIsManualExpanded] = useState(false);
 
     // Excel Import State
     const [excelData, setExcelData] = useState(null);
@@ -32,8 +30,6 @@ const GradesAdmin = () => {
     const [colMapping, setColMapping] = useState({});
     const [tableCols, setTableCols] = useState([]);
     const [manualCols, setManualCols] = useState([]);
-    const [manualData, setManualData] = useState({});
-    const [isManualExpanded, setIsManualExpanded] = useState(false);
     const [importProgress, setImportProgress] = useState({ current: 0, total: 0, status: 'idle' });
     const [columnGroups, setColumnGroups] = useState({ groups: {}, individual: [], orderedUnits: [] });
 
@@ -117,8 +113,8 @@ const GradesAdmin = () => {
     };
 
     useEffect(() => {
-        handleFetchTableCols(gradeForm.semester, true);
-    }, [gradeForm.semester]);
+        handleFetchTableCols(manualSemester, true);
+    }, [manualSemester]);
 
     useEffect(() => {
         handleFetchTableCols(importSemester);
@@ -231,14 +227,62 @@ const GradesAdmin = () => {
         try {
             await axios.post(`${API_BASE_URL}/admin/grades.php`, {
                 action: 'upsert',
-                semester: gradeForm.semester,
+                semester: manualSemester,
                 record: manualData
             });
-            alert('Notes enregistrées avec succès');
+            alert('Données enregistrées avec succès.');
         } catch (e) {
             alert('Erreur lors de l\'enregistrement');
         }
         setSaving(false);
+    };
+
+    const handleSearchStudent = async () => {
+        if (!searchMatricule) {
+            alert('Veuillez entrer un matricule');
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await axios.get(`${API_BASE_URL}/admin/grades.php`, {
+                params: {
+                    semester: manualSemester,
+                    matricule: searchMatricule
+                }
+            });
+
+            if (res.data && (res.data.Matricule || res.data.matricule)) {
+                const result = res.data;
+                const updatedData = { ...manualData };
+
+                // Create a map for case-insensitive lookup from the API response
+                const resultLowerKeys = Object.keys(result).reduce((acc, key) => {
+                    acc[key.toLowerCase()] = result[key];
+                    return acc;
+                }, {});
+
+                // Align fetched data with our manualCols (which match the DB casing)
+                manualCols.forEach(col => {
+                    const lowerCol = col.toLowerCase();
+                    if (resultLowerKeys[lowerCol] !== undefined) {
+                        updatedData[col] = resultLowerKeys[lowerCol];
+                    } else {
+                        updatedData[col] = ''; // Clear if not found
+                    }
+                });
+
+                setManualData(updatedData);
+                setIsManualExpanded(true);
+                alert('Données de l\'étudiant chargées.');
+            } else {
+                alert('Aucun étudiant trouvé pour ce matricule dans ce semestre.');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Erreur lors de la recherche');
+        }
+        setLoading(false);
     };
 
     return (
@@ -255,7 +299,7 @@ const GradesAdmin = () => {
                     className={`m-tab-btn ${activeTab === 'manual' ? 'active' : ''}`}
                     onClick={() => setActiveTab('manual')}
                 >
-                    <Plus size={18} /> Saisie Manuelle
+                    <Plus size={18} /> Saisie & Modification
                 </button>
                 <button
                     className={`m-tab-btn ${activeTab === 'import' ? 'active' : ''}`}
@@ -274,35 +318,59 @@ const GradesAdmin = () => {
             <div className="admin-body-content">
                 {activeTab === 'manual' && (
                     <div className="admin-form-card admin-view-fade">
-                        <h2>Saisie de Notes Individuelle</h2>
-                        <form onSubmit={handleManualGradeSave}>
-                            <div className="form-grid" style={{ marginBottom: '2rem' }}>
-                                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                        <h2>Saisie & Modification</h2>
+
+                        <div className="search-section" style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', borderRadius: '15px', marginBottom: '2rem', border: '1px solid var(--glass-border)' }}>
+                            <div className="form-grid">
+                                <div className="form-group">
                                     <label>Semestre</label>
                                     <select
                                         className="auth-input"
-                                        style={{ maxWidth: '300px' }}
-                                        value={gradeForm.semester}
-                                        onChange={e => setGradeForm({ ...gradeForm, semester: parseInt(e.target.value) })}
+                                        value={manualSemester}
+                                        onChange={e => setManualSemester(parseInt(e.target.value))}
                                     >
                                         <option value={1}>Semestre 1</option>
-                                        <option value={11}>Semestre 1 (Rattrapage)</option>
                                         <option value={2}>Semestre 2</option>
-                                        <option value={22}>Semestre 2 (Rattrapage)</option>
                                         <option value={3}>Semestre 3</option>
                                         <option value={4}>Semestre 4</option>
                                     </select>
                                 </div>
+                                <div className="form-group">
+                                    <label>Rechercher un Matricule</label>
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <input
+                                            className="auth-input"
+                                            placeholder="Ex: 22001"
+                                            value={searchMatricule}
+                                            onChange={e => setSearchMatricule(e.target.value)}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn-primary"
+                                            onClick={handleSearchStudent}
+                                            style={{ minWidth: '120px' }}
+                                        >
+                                            {loading ? <Loader2 className="spinning" size={18} /> : <Search size={18} />} Rechercher
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                                {manualCols.filter(c => ['Dept', 'Matricule', 'Prenom', 'Nom'].includes(c)).map(col => (
+                        <form onSubmit={handleManualGradeSave}>
+                            <div className="form-grid">
+                                {manualCols.filter(c => ['Dept', 'Matricule', 'Prenom', 'Nom'].includes(c) || ['dept', 'matricule', 'prenom', 'nom'].includes(c.toLowerCase())).map(col => (
                                     <div key={col} className="form-group">
                                         <label>{col}</label>
                                         <input
                                             className="auth-input"
                                             placeholder={`Valeur pour ${col}`}
                                             value={manualData[col] || ''}
-                                            onChange={e => setManualData({ ...manualData, [col]: e.target.value })}
-                                            required={col === 'Matricule'}
+                                            onChange={e => {
+                                                setManualData({ ...manualData, [col]: e.target.value });
+                                                if (col.toLowerCase() === 'matricule') setSearchMatricule(e.target.value);
+                                            }}
+                                            required={col.toLowerCase() === 'matricule'}
                                         />
                                     </div>
                                 ))}
@@ -374,9 +442,7 @@ const GradesAdmin = () => {
                                             onChange={e => setImportSemester(parseInt(e.target.value))}
                                         >
                                             <option value={1}>Semestre 1</option>
-                                            <option value={11}>Semestre 1 (Rattrapage)</option>
                                             <option value={2}>Semestre 2</option>
-                                            <option value={22}>Semestre 2 (Rattrapage)</option>
                                             <option value={3}>Semestre 3</option>
                                             <option value={4}>Semestre 4</option>
                                         </select>
