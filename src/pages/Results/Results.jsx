@@ -72,7 +72,7 @@ const Results = () => {
                         nsn: results[`NSN_${code}`],
                         nsr: results[`NSR_${code}`],
                         moy: results[`MOY_${code}`],
-                        capit: results[`CAPIT_${code}`] || results[`CAPIT_${code.substring(0, 5)}`],
+                        capit: results[`CAPIT_${code}`] || results[`CAPIT_${code.substring(1)}`] || results[`CAPIT_${code.substring(0, 5)}`],
                         displayCode: lookupCode
                     });
                 }

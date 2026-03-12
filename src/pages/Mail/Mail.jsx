@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import mailService from '../../services/mailService';
-import { API_BASE_URL, FILE_BASE_URL } from '../../apiConfig';
+import { API_BASE_URL, getFileUrl } from '../../apiConfig';
 import {
     Inbox,
     Star,
@@ -448,8 +448,8 @@ const Mail = () => {
 
                 {/* Selection Toolbar (Conditional) */}
                 {selectedMessageIds.size > 0 && (
-                    <div className="selection-toolbar" style={{ padding: '10px 16px', background: '#f8f9fa', borderBottom: '1px solid #e0e0e0', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <span style={{ fontSize: '14px', color: '#5f6368', marginRight: '8px' }}>{selectedMessageIds.size} selected</span>
+                    <div className="selection-toolbar">
+                        <span className="selection-count">{selectedMessageIds.size} selected</span>
                         {availableLabels.map(item => {
                             // Map string icon names to Lucide components
                             const IconMap = {
@@ -464,19 +464,6 @@ const Mail = () => {
                                     key={item.id}
                                     className={`label-choice-btn ${isLabelActiveForSelected(item.id) ? 'selected' : ''}`}
                                     onClick={() => toggleLabelForSelected(item.id)}
-                                    style={{
-                                        padding: '6px 12px',
-                                        borderRadius: '16px',
-                                        border: `1px solid ${isLabelActiveForSelected(item.id) ? '#00a86b' : '#dadce0'}`,
-                                        background: isLabelActiveForSelected(item.id) ? '#d1f2e5' : 'white',
-                                        color: isLabelActiveForSelected(item.id) ? '#00a86b' : '#5f6368',
-                                        cursor: 'pointer',
-                                        fontSize: '13px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        fontWeight: '500'
-                                    }}
                                 >
                                     <Icon size={14} /> {item.label}
                                 </button>
@@ -484,7 +471,7 @@ const Mail = () => {
                         })}
                         <button
                             onClick={() => setSelectedMessageIds(new Set())}
-                            style={{ marginLeft: 'auto', border: 'none', background: 'transparent', cursor: 'pointer', color: '#5f6368' }}
+                            className="clear-selection-btn"
                         >
                             <X size={18} />
                         </button>
@@ -494,7 +481,7 @@ const Mail = () => {
                 {/* Message List */}
                 <div className="message-list">
                     {filteredMessages.length === 0 ? (
-                        <div style={{ padding: '40px', textAlign: 'center', color: '#5f6368' }}>No messages in {selectedLabel}</div>
+                        <div className="empty-message-state">No messages in {selectedLabel}</div>
                     ) : (
                         filteredMessages.map(msg => (
                             <div
@@ -554,9 +541,9 @@ const Mail = () => {
                                             {Array.isArray(msg.recipients) && msg.recipients.length > 0 && (
                                                 <div className="recipients-list">
                                                     {msg.recipients.filter(r => r.type === 'to').length > 0 && (
-                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
+                                                        <div className="recipients-row">
                                                             <strong>À:</strong> {msg.recipients.filter(r => r.type === 'to').map((r, i, arr) => (
-                                                                <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                                                <span key={i} className="recipient-item">
                                                                     {r.name || r.email}{i < arr.length - 1 ? ',' : ''}
                                                                     {(r.role?.toLowerCase() === 'root' || r.role?.toLowerCase() === 'teacher') && (
                                                                         <CheckCircle size={10} fill="var(--primary-green)" color="white" />
@@ -566,9 +553,9 @@ const Mail = () => {
                                                         </div>
                                                     )}
                                                     {msg.recipients.filter(r => r.type === 'cc').length > 0 && (
-                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', alignItems: 'center' }}>
+                                                        <div className="recipients-row">
                                                             <strong>Cc:</strong> {msg.recipients.filter(r => r.type === 'cc').map((r, i, arr) => (
-                                                                <span key={i} style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                                                <span key={i} className="recipient-item">
                                                                     {r.name || r.email}{i < arr.length - 1 ? ',' : ''}
                                                                     {(r.role?.toLowerCase() === 'root' || r.role?.toLowerCase() === 'teacher') && (
                                                                         <CheckCircle size={10} fill="var(--primary-green)" color="white" />
@@ -583,49 +570,37 @@ const Mail = () => {
                                         <div className="detail-date">{msg.date}</div>
                                     </div>
                                     <div className="detail-body">
-                                        <p style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</p>
+                                        <p>{msg.content}</p>
                                     </div>
 
                                     {/* Attachments Display */}
                                     {msg.attachments && msg.attachments.length > 0 && (
-                                        <div className="message-attachments" style={{ marginTop: '16px', borderTop: '1px solid #eee', paddingTop: '12px' }}>
-                                            <h4 style={{ fontSize: '13px', color: '#5f6368', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <div className="message-attachments">
+                                            <h4>
                                                 <Paperclip size={14} /> {msg.attachments.length} Pièce(s) jointe(s)
                                             </h4>
-                                            <div className="attachments-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                                            <div className="attachments-grid">
                                                 {msg.attachments.map((att, i) => {
                                                     const isImage = att.file_type?.startsWith('image/');
-                                                    const fileUrl = `${FILE_BASE_URL}${att.file_path}`;
+                                                    const fileUrl = getFileUrl(att.file_path);
                                                     return (
                                                         <div
                                                             key={i}
                                                             className="attachment-card"
                                                             onClick={() => openFile(att)}
-                                                            style={{
-                                                                display: 'flex',
-                                                                flexDirection: 'column',
-                                                                width: '140px',
-                                                                border: '1px solid #e0e0e0',
-                                                                borderRadius: '8px',
-                                                                overflow: 'hidden',
-                                                                textDecoration: 'none',
-                                                                color: 'inherit',
-                                                                background: '#f8f9fa',
-                                                                cursor: 'pointer'
-                                                            }}
                                                         >
-                                                            <div className="attachment-preview" style={{ height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: isImage ? '#000' : '#e8eaed' }}>
+                                                            <div className={`attachment-preview ${isImage ? 'image-preview' : 'file-preview'}`}>
                                                                 {isImage ? (
-                                                                    <img src={fileUrl} alt={att.file_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                    <img src={fileUrl} alt={att.file_name} />
                                                                 ) : (
-                                                                    <File size={32} color="#5f6368" />
+                                                                    <File size={32} />
                                                                 )}
                                                             </div>
-                                                            <div className="attachment-info" style={{ padding: '8px', background: 'white', borderTop: '1px solid #e0e0e0' }}>
-                                                                <div style={{ fontSize: '12px', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={att.file_name}>
+                                                            <div className="attachment-info">
+                                                                <div className="attachment-filename" title={att.file_name}>
                                                                     {att.file_name}
                                                                 </div>
-                                                                <div style={{ fontSize: '11px', color: '#5f6368', marginTop: '2px' }}>
+                                                                <div className="attachment-size">
                                                                     {Math.round(att.file_size / 1024)} KB
                                                                 </div>
                                                             </div>
@@ -635,6 +610,7 @@ const Mail = () => {
                                             </div>
                                         </div>
                                     )}
+
                                     <div className="detail-actions">
                                         <button className="action-btn" onClick={() => handleReply(msg)}>
                                             <Reply size={16} /> Répondre
@@ -845,13 +821,16 @@ const Mail = () => {
                         </>
                     )}
                 </div>
-            )}
+            )
+            }
 
             {/* Mobile Backdrop */}
-            {isSidebarOpen && (
-                <div className="backdrop" onClick={() => setIsSidebarOpen(false)}></div>
-            )}
-        </div>
+            {
+                isSidebarOpen && (
+                    <div className="backdrop" onClick={() => setIsSidebarOpen(false)}></div>
+                )
+            }
+        </div >
     );
 };
 

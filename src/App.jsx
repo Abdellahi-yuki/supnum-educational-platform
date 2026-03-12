@@ -30,6 +30,7 @@ function AppContent() {
   const authRoutes = ['/login', '/register', '/verify', '/forgot-password', '/reset-password'];
   const isLandingPage = location.pathname === '/';
   const isAuthPage = authRoutes.includes(location.pathname);
+  const isCommunityPage = location.pathname.startsWith('/community');
 
   // Protected Route Wrapper
   const ProtectedRoute = ({ children }) => {
@@ -99,7 +100,7 @@ function AppContent() {
           <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
         </Routes>
       </div>
-      {!isAuthPage && <Footer />}
+      {!isAuthPage && !isCommunityPage && <Footer />}
 
     </>
   );

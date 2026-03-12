@@ -699,6 +699,189 @@
     background: rgba(102, 126, 234, 0.2);
 }
 
+/* Selection Toolbar */
+.selection-toolbar {
+    padding: 10px 16px;
+    background: var(--mail-glass-bg);
+    border-bottom: 1px solid var(--mail-glass-border);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    backdrop-filter: var(--mail-glass-blur);
+    -webkit-backdrop-filter: var(--mail-glass-blur);
+}
+
+.selection-count {
+    font-size: 14px;
+    color: var(--mail-text-muted);
+    margin-right: 8px;
+}
+
+.label-choice-btn {
+    padding: 6px 12px;
+    border-radius: 16px;
+    border: 1px solid var(--mail-glass-border);
+    background: var(--mail-card-bg);
+    color: var(--mail-text-main);
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.label-choice-btn:hover {
+    background: var(--mail-card-hover);
+    border-color: var(--mail-accent-blue);
+}
+
+.label-choice-btn.selected {
+    border-color: var(--mail-accent-green);
+    background: rgba(52, 211, 153, 0.1);
+    color: var(--mail-accent-green);
+}
+
+.clear-selection-btn {
+    margin-left: auto;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--mail-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.clear-selection-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.empty-message-state {
+    padding: 40px;
+    text-align: center;
+    color: var(--mail-text-muted);
+    font-weight: 600;
+}
+
+/* Recipient Styles */
+.recipient-item {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.recipients-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+}
+
+/* Attachments */
+.message-attachments {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--mail-glass-border);
+    padding-top: 1.25rem;
+}
+
+.message-attachments h4 {
+    font-size: 0.85rem;
+    color: var(--mail-text-muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+}
+
+.attachments-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.attachment-card {
+    display: flex;
+    flex-direction: column;
+    width: 140px;
+    border: 1px solid var(--mail-glass-border);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    background: var(--mail-card-bg);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.attachment-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--mail-accent-blue);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.attachment-preview {
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.attachment-preview.image-preview {
+    background: #000;
+}
+
+.attachment-preview.file-preview {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.attachment-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.attachment-preview svg {
+    color: var(--mail-text-muted);
+}
+
+.attachment-info {
+    padding: 0.75rem;
+    background: var(--mail-card-bg);
+    border-top: 1px solid var(--mail-glass-border);
+}
+
+.attachment-filename {
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--mail-text-main);
+}
+
+.attachment-size {
+    font-size: 0.7rem;
+    color: var(--mail-text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Dark Theme Adjustments */
+[data-theme='dark'] .attachment-preview.file-preview {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme='dark'] .label-choice-btn.selected {
+    background: rgba(52, 211, 153, 0.2);
+}
+
 /* Mobile Responsive */
 @media (max-width: 1024px) {
     .message-detail {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, MessageSquare, Calendar, Mail, User, Loader2, Send } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL, FILE_BASE_URL } from '../apiConfig';
+import { API_BASE_URL, getFileUrl } from '../apiConfig';
 import './UserProfile.css';
 
 const UserProfile = ({ userId, onBack, currentUser }) => {
@@ -65,7 +65,7 @@ const UserProfile = ({ userId, onBack, currentUser }) => {
                         <div className="profile-avatar-wrapper">
                             <div className="profile-avatar-box">
                                 {user.profile_path ? (
-                                    <img src={`${FILE_BASE_URL}${user.profile_path}`} alt="" className="profile-avatar-img" />
+                                    <img src={getFileUrl(user.profile_path)} alt="" className="profile-avatar-img" />
                                 ) : (
                                     <span className="profile-avatar-placeholder">
                                         {user.username?.substring(0, 2).toUpperCase()}
@@ -148,7 +148,7 @@ const UserProfile = ({ userId, onBack, currentUser }) => {
                                     <div className="msg-media-wrapper">
                                         {msg.type === 'image' ? (
                                             <img
-                                                src={`${FILE_BASE_URL}${msg.media_url}`}
+                                                src={getFileUrl(msg.media_url)}
                                                 alt=""
                                                 style={{
                                                     maxWidth: '100%',
@@ -167,7 +167,7 @@ const UserProfile = ({ userId, onBack, currentUser }) => {
                                                     display: 'block'
                                                 }}
                                             >
-                                                <source src={`${FILE_BASE_URL}${msg.media_url}`} />
+                                                <source src={getFileUrl(msg.media_url)} />
                                             </video>
                                         ) : null}
                                     </div>

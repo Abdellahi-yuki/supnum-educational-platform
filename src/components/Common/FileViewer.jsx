@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import ReactDOM from 'react-dom';
 import { X, Download, File } from 'lucide-react';
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import { FILE_BASE_URL } from '../../apiConfig';
+import { getFileUrl } from '../../apiConfig';
 import * as XLSX from 'xlsx';
 
 // Fix for PDF warnings
@@ -35,15 +35,7 @@ const FileViewer = ({ file, onClose }) => {
 
     // Construct full URL and set up docs for DocViewer
     const docs = useMemo(() => {
-        let filepath = '';
-        if (fileUri.startsWith('http')) {
-            filepath = fileUri;
-        } else if (fileUri.startsWith('/')) {
-            filepath = `${FILE_BASE_URL}${fileUri}`;
-        } else {
-            filepath = `${FILE_BASE_URL}/${fileUri}`;
-        }
-
+        const filepath = fileUri.startsWith('http') ? fileUri : getFileUrl(fileUri);
         return [{
             uri: filepath,
             fileName: fileNom || (fileUri.split('/').pop()) || 'document',
@@ -75,7 +67,7 @@ const FileViewer = ({ file, onClose }) => {
         const loadExcel = async () => {
             setLoadingExcel(true);
             try {
-                const response = await fetch(docs[0].uri);
+                const response = await fetch(docs[0].uri, { credentials: 'include' });
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
@@ -105,7 +97,7 @@ const FileViewer = ({ file, onClose }) => {
             setLoadingText(true);
             setTextError(null);
             try {
-                const response = await fetch(docs[0].uri);
+                const response = await fetch(docs[0].uri, { credentials: 'include' });
                 if (!response.ok) throw new Error("Erreur de téléchargement du fichier");
                 const text = await response.text();
                 setTextContent(text);

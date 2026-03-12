@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, LogOut, Menu, X, Bell, Sun, Moon } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { API_BASE_URL, FILE_BASE_URL } from '../../apiConfig';
+import { API_BASE_URL, getFileUrl } from '../../apiConfig';
 import { useTheme } from '../../context/ThemeContext';
 import './Header.css';
 
@@ -20,7 +20,7 @@ const Header = ({ user, onLogout }) => {
         const fetchNotifications = async () => {
             if (!user) return;
             try {
-                const response = await fetch(`${API_BASE_URL}/community_notifications.php?user_id=${user.id}`);
+                const response = await fetch(`${API_BASE_URL}/community_notifications.php?user_id=${user.id}`, { credentials: 'include' });
                 const data = await response.json();
                 if (Array.isArray(data)) {
                     setNotifications(data);
@@ -40,7 +40,8 @@ const Header = ({ user, onLogout }) => {
             await fetch(`${API_BASE_URL}/community_notifications.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id })
+                body: JSON.stringify({ id }),
+                credentials: 'include'
             });
             // Optimistic update
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
@@ -194,7 +195,7 @@ const Header = ({ user, onLogout }) => {
                                     <div className="user-avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         {user?.profile_pic ? (
                                             <img
-                                                src={`${FILE_BASE_URL}${user.profile_pic}`}
+                                                src={getFileUrl(user.profile_pic)}
                                                 alt="Avatar"
                                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                             />
