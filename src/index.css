@@ -442,6 +442,20 @@ body {
     text-decoration: underline;
 }
 
+/* Global Container for consistent padding */
+.main-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        padding: 0 1rem;
+    }
+}
+
 /* =========================================
    Mobile Responsive Utilities & Breakpoints
    ========================================= */

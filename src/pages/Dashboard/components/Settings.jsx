@@ -69,54 +69,28 @@ const Settings = ({ user, onUpdateUser }) => {
     };
 
     return (
-        <div className="settings-container" style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-            <div className="settings-card glass-card" style={{ padding: '2rem', borderRadius: '24px', background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(40px)' }}>
-                <h2 className="settings-title" style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--primary-blue)' }}>Mon Profil</h2>
-                <p className="settings-subtitle" style={{ color: '#475569', marginBottom: '2rem' }}>Modifiez vos informations personnelles et votre photo</p>
+        <div className="settings-container">
+            <div className="settings-card glass-card">
+                <h2 className="settings-title">Mon Profil</h2>
+                <p className="settings-subtitle">Modifiez vos informations personnelles et votre photo</p>
 
-                {message && <p className="success-message" style={{ color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem' }}>{message}</p>}
-                {error && <p className="auth-error" style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem' }}>{error}</p>}
+                {message && <p className="success-message">{message}</p>}
+                {error && <p className="auth-error">{error}</p>}
 
                 <form onSubmit={handleSubmit} className="settings-form">
                     {/* Profile Picture Upload */}
-                    <div style={{ textAlign: 'center', marginBottom: '2.5rem', position: 'relative', display: 'inline-block', left: '50%', transform: 'translateX(-50%)' }}>
-                        <div style={{
-                            width: '120px',
-                            height: '120px',
-                            borderRadius: '50%',
-                            overflow: 'hidden',
-                            border: '4px solid rgba(255, 255, 255, 0.5)',
-                            boxShadow: '0 8px 32px rgba(28, 53, 134, 0.15)',
-                            background: 'rgba(255, 255, 255, 0.4)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
+                    <div className="profile-upload-section">
+                        <div className="profile-pic-preview">
                             {previewUrl ? (
-                                <img src={previewUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                <img src={previewUrl} alt="Preview" />
                             ) : (
-                                <User size={60} color="#64748b" />
+                                <User size={60} className="default-user-icon" />
                             )}
                         </div>
                         <button
                             type="button"
                             onClick={() => fileInputRef.current.click()}
-                            style={{
-                                position: 'absolute',
-                                bottom: '0',
-                                right: '0',
-                                background: '#3b82f6',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '36px',
-                                height: '36px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
-                            }}
+                            className="camera-upload-btn"
                         >
                             <Camera size={18} />
                         </button>
@@ -129,48 +103,45 @@ const Settings = ({ user, onUpdateUser }) => {
                         />
                     </div>
 
-                    <div className="form-group-row" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-                        <div style={{ flex: 1 }}>
-                            <label className="form-label" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#334155', fontWeight: '600' }}>Prénom</label>
+                    <div className="form-group-row">
+                        <div className="form-field">
+                            <label className="form-label">Prénom</label>
                             <input
                                 name="first_name"
                                 type="text"
                                 value={formData.first_name}
                                 onChange={handleChange}
                                 className="auth-input"
-                                style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.05)', color: '#0f172a' }}
                                 required
                             />
                         </div>
-                        <div style={{ flex: 1 }}>
-                            <label className="form-label" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#334155', fontWeight: '600' }}>Nom</label>
+                        <div className="form-field">
+                            <label className="form-label">Nom</label>
                             <input
                                 name="last_name"
                                 type="text"
                                 value={formData.last_name}
                                 onChange={handleChange}
                                 className="auth-input"
-                                style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.05)', color: '#0f172a' }}
                                 required
                             />
                         </div>
                     </div>
 
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label className="form-label" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#334155', fontWeight: '600' }}>Email</label>
+                    <div className="form-field">
+                        <label className="form-label">Email</label>
                         <input
                             name="email"
                             type="email"
                             value={formData.email}
                             onChange={handleChange}
                             className="auth-input"
-                            style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.05)', color: '#0f172a' }}
                             required
                         />
                     </div>
 
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label className="form-label" style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: '#334155', fontWeight: '600' }}>Nouveau mot de passe (optionnel)</label>
+                    <div className="form-field">
+                        <label className="form-label">Nouveau mot de passe (optionnel)</label>
                         <input
                             name="new_password"
                             type="password"
@@ -178,18 +149,11 @@ const Settings = ({ user, onUpdateUser }) => {
                             value={formData.new_password}
                             onChange={handleChange}
                             className="auth-input"
-                            style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0, 0, 0, 0.05)', color: '#0f172a' }}
                         />
                     </div>
 
-                    <div style={{
-                        marginTop: '2rem',
-                        padding: '1.5rem',
-                        borderRadius: '16px',
-                        background: 'rgba(28, 53, 134, 0.05)',
-                        border: '1px solid rgba(28, 53, 134, 0.1)'
-                    }}>
-                        <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem', fontSize: '0.9rem', color: 'var(--primary-blue)', fontWeight: '700' }}>
+                    <div className="confirmation-box">
+                        <label className="form-label confirmation-label">
                             <Lock size={16} /> Confirmation requise
                         </label>
                         <input
@@ -199,7 +163,6 @@ const Settings = ({ user, onUpdateUser }) => {
                             value={formData.current_password}
                             onChange={handleChange}
                             className="auth-input"
-                            style={{ width: '100%', padding: '0.8rem', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.9)', border: '1px solid rgba(28, 53, 134, 0.2)', color: '#0f172a' }}
                             required
                         />
                     </div>
@@ -207,16 +170,7 @@ const Settings = ({ user, onUpdateUser }) => {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="btn btn-primary btn-block"
-                        style={{
-                            marginTop: '1.5rem',
-                            padding: '1rem',
-                            fontSize: '1rem',
-                            fontWeight: '600',
-                            opacity: isSubmitting ? 0.7 : 1,
-                            cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                            borderRadius: '16px'
-                        }}
+                        className="btn btn-primary btn-block submit-btn"
                     >
                         {isSubmitting ? 'Enregistrement...' : 'Enregistrer les modifications'}
                     </button>

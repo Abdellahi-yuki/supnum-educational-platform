@@ -361,3 +361,91 @@
         opacity: 1;
     }
 }
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .settings-container {
+        padding: 1rem;
+    }
+
+    .settings-title {
+        font-size: 1.8rem;
+    }
+
+    .settings-subtitle {
+        font-size: 0.95rem;
+    }
+
+    .settings-tabs {
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        display: flex;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        gap: 0.5rem;
+    }
+
+    .tab-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .settings-section {
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+    }
+
+    .data-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .new-list-form {
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .file-tree {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .file-node {
+        padding: 1rem;
+    }
+
+    .file-icon-lg {
+        font-size: 1.8rem;
+    }
+
+    .file-name {
+        font-size: 0.8rem;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .file-tree {
+        grid-template-columns: 1fr;
+    }
+}

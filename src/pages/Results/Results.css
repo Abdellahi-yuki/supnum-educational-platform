@@ -437,12 +437,76 @@
 }
 
 @media (max-width: 768px) {
+    .results-container {
+        padding: 1rem;
+    }
+
     .results-settings-card {
-        padding: 1.5rem;
+        padding: 1.25rem;
+        overflow-x: hidden;
+    }
+
+    .results-filters {
+        flex-direction: column;
+    }
+
+    .results-title {
+        font-size: 1.6rem;
+    }
+
+    .results-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
     }
 
     .results-form-row {
+        padding: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .results-form-group {
+        min-width: 140px;
+    }
+
+    .results-student-header {
         padding: 1.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+
+    .student-info h3 {
+        font-size: 1.4rem;
+    }
+
+    .student-info p {
+        font-size: 0.9rem;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .results-table-container {
+        padding: 0.75rem;
+        overflow-x: auto;
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .summary-card {
+        padding: 1.5rem;
+    }
+
+    .summary-value {
+        font-size: 2rem;
+    }
+
+    .summary-label {
+        font-size: 0.7rem;
     }
 
     .results-summary-grid {
@@ -453,18 +517,13 @@
         grid-column: auto;
     }
 
-    .results-title {
-        font-size: 1.8rem;
-    }
-
-    /* Mobile Table adaptation */
+    /* Mobile Table adaptation - Override previous hide to allow scroll */
     .results-table th:nth-child(2),
     .results-table td:nth-child(2),
     .results-table th:nth-child(3),
     .results-table td:nth-child(3),
     .results-table th:nth-child(4),
     .results-table td:nth-child(4) {
-        display: none;
-        /* Hide intermediate notes on small mobile if needed, or keep scroll */
+        display: table-cell;
     }
 }

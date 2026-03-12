@@ -11,7 +11,7 @@ import {
     CheckCircle2
 } from 'lucide-react';
 import './Landing.css';
-import heroArt from '../../assets/images/landing-hero.png';
+import heroArt from '../../../public/logo-supnum.png';
 
 const Landing = () => {
     const navigate = useNavigate();

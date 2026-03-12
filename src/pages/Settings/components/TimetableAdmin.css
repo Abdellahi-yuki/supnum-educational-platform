@@ -90,5 +90,34 @@
     .admin-controls {
         flex-direction: column;
         gap: 1.5rem;
+        padding: 1.25rem !important;
+    }
+
+    .mini-tabs {
+        width: 100%;
+        overflow-x: auto;
+        padding: 0.25rem;
+        display: flex;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .mini-tab {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .mini-select {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .timetable-admin .slot-cell {
+        height: 100px;
+    }
+
+    .timetable-admin .time-col {
+        width: 80px;
     }
 }

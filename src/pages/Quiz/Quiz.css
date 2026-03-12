@@ -297,7 +297,8 @@
     outline: none;
     border-color: var(--primary-blue);
     box-shadow: 0 0 0 3px var(--glow-blue);
-    background: var(--glass-bg-hover);
+    background-color: var(--glass-bg-hover);
+    /* Use background-color to preserve background-image (arrow) */
 }
 
 .quiz-textarea {
@@ -312,6 +313,22 @@
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 36px;
+}
+
+/* Dark Theme Overrides */
+[data-theme='dark'] .quiz-input,
+[data-theme='dark'] .quiz-select,
+[data-theme='dark'] .quiz-textarea {
+    background-color: rgba(30, 41, 59, 0.5);
+    color: #f8fafc;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+
+
+[data-theme='dark'] .quiz-select option {
+    background-color: #1e293b;
+    color: #f8fafc;
 }
 
 .quiz-form-row {

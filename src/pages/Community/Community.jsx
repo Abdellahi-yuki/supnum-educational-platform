@@ -590,26 +590,6 @@ const Community = ({ user }) => {
                             </div>
                         </div>
                     </div>
-                    <button
-                        onClick={() => window.location.href = '/'}
-                        style={{
-                            background: 'rgba(0,0,0,0.05)',
-                            border: 'none',
-                            borderRadius: '12px',
-                            padding: '0.6rem',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'var(--gray-700)',
-                            transition: 'all 0.2s',
-                            marginLeft: 'auto'
-                        }}
-                        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.1)'}
-                        onMouseOut={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
-                    >
-                        <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Return</span>
-                    </button>
                 </div>
 
                 <div className="chat-messages-area">

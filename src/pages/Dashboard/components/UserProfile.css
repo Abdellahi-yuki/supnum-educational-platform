@@ -314,3 +314,89 @@
         transform: translateY(0);
     }
 }
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .user-profile-container {
+        padding: 1rem;
+    }
+
+    .profile-card-inner {
+        padding: 1.5rem;
+    }
+
+    .profile-header-top {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .profile-avatar-wrapper {
+        width: 120px;
+        height: 120px;
+    }
+
+    .profile-avatar-placeholder {
+        font-size: 2.5rem;
+    }
+
+    .profile-message-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.8rem 1.5rem;
+    }
+
+    .profile-username {
+        font-size: 1.8rem;
+        text-align: center;
+    }
+
+    .profile-meta {
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .profile-meta-item {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+    .profile-stats-grid {
+        grid-template-columns: 1fr;
+        margin-top: 2rem;
+    }
+
+    .profile-stat-item {
+        padding: 1.5rem;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+    }
+
+    .profile-messages-section {
+        padding: 1.5rem;
+        border-radius: 24px;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-msg-card {
+        padding: 1.25rem;
+    }
+
+    .msg-content {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+    }
+
+    .msg-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
